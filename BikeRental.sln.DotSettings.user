@@ -1,0 +1,10 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=5e8224db_002D6145_002D40e0_002Db3b5_002Dc14ad79404f3/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Test1" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::28C965CF-4FDB-4BB5-B133-87606ABC86EA::net6.0::UserService.Test.Tests.Test1&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::28C965CF-4FDB-4BB5-B133-87606ABC86EA::net6.0::UserService.Test.UnitTests.UserBusinessLogicTests.GetUsers_ShouldReturnUsersCorrectly&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::28C965CF-4FDB-4BB5-B133-87606ABC86EA::net6.0::UserService.Test.UnitTests.UserBusinessLogicTests.AddUser_ShouldAddUserSuccessfully&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::28C965CF-4FDB-4BB5-B133-87606ABC86EA::net6.0::UserService.Test.UnitTests.UserBusinessLogicTests.AddUser_ShouldAddMessageToQueueAddAddUserToOkta_WhenAddSuccessful&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::28C965CF-4FDB-4BB5-B133-87606ABC86EA::net6.0::UserService.Test.UnitTests.UserBusinessLogicTests&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
