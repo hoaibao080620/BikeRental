@@ -1,17 +1,17 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using Shared.Models;
 
-namespace BikeService.Mercury.Models;
+namespace BikeService.Sonic.Models;
 
 public class BikeStation : BaseEntity
 {
-    [Required]
+    [BsonId]
+    [BsonRepresentation(BsonType.ObjectId)]
+    public new string Id { get; set; } = null!;
     public string Name { get; set; } = null!;
-    [Required]
     public string Address { get; set; } = null!;
-    [Required]
     public double Longitude { get; set; }
-    [Required]
     public double Latitude { get; set; }
     public string? Description { get; set; }
     public int ParkingSpace { get; set; }

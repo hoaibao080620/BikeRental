@@ -1,6 +1,4 @@
-﻿using Shared.Models;
-
-namespace BikeService.Mercury.Models;
+﻿namespace BikeService.Mercury.Models;
 
 // public class BikeReport : BaseEntity
 // {

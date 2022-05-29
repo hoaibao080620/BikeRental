@@ -1,19 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Shared.Models;
+﻿namespace BikeService.Sonic.Dtos;
 
-namespace BikeService.Mercury.Models;
-
-public class BikeStation : BaseEntity
+public class BikeStationSearchDto
 {
-    [Required]
+    public int Id { get; set; }
     public string Name { get; set; } = null!;
-    [Required]
+    public string NameNormalize { get; set; } = null!;
     public string Address { get; set; } = null!;
-    [Required]
+    public string AddressNormalize { get; set; } = null!;
     public double Longitude { get; set; }
-    [Required]
     public double Latitude { get; set; }
     public string? Description { get; set; }
+    public string? DescriptionNormalize { get; set; }
     public int ParkingSpace { get; set; }
     public int UsedParkingSpace { get; set; }
 }
