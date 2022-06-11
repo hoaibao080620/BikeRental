@@ -7,6 +7,7 @@ builder.Services.AddControllers();
 builder.Services.AddScopedServices();
 builder.Services.AddSingletonServices(builder.Configuration);
 builder.Services.AddElasticClient(builder.Configuration);
+builder.Services.AddOktaAuthenticationService(builder.Configuration);
 builder.Services.AddSignalR();
 builder.Services.AddCors(options =>
 {
@@ -14,8 +15,10 @@ builder.Services.AddCors(options =>
         .WithOrigins("http://localhost:3000")
         .AllowAnyMethod()
         .AllowAnyHeader()
-        .AllowCredentials());
+        .AllowCredentials().SetIsOriginAllowed(_ => true));
 });
+builder.Services.AddDbContextService(builder.Configuration);
+builder.Services.AddAutoMapper(typeof(Program));
 
 
 // App pipelines

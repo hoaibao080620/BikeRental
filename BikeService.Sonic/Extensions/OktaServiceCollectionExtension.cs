@@ -19,9 +19,7 @@ public static class OktaServiceCollectionExtension
             {
                 OktaDomain = configuration.GetValue<string>("Okta:Domain"),
                 AuthorizationServerId = configuration.GetValue<string>("Okta:AuthorizationServerId"),
-                Audience = configuration.GetValue<string>("Okta:Audience")
+                Audience = configuration.GetValue<string>("Okta:Audience"),
             });
-
-        serviceCollection.AddAuthorization();
     }
 }

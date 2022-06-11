@@ -1,7 +1,8 @@
-﻿using BikeService.Sonic.DAL;
+﻿using BikeService.Sonic.BusinessLogics;
+using BikeService.Sonic.DAL;
 using BikeService.Sonic.Services.Implementation;
 using BikeService.Sonic.Services.Interfaces;
-using MongoDB.Driver;
+using MessageQueue.SubscriptionManager;
 using Nest;
 
 namespace BikeService.Sonic.Extensions;
@@ -12,6 +13,9 @@ public static class ServiceLifetimeServiceCollectionExtension
     {
         serviceCollection.AddScoped<IElasticSearchService, ElasticSearchService>();
         serviceCollection.AddScoped<IBikeLocationHub, BikeLocationHub>();
+        serviceCollection.AddScoped<IBikeStationManagerRepository, BikeStationManagerRepository>();
+        serviceCollection.AddScoped<IBikeBusinessLogic, BikeBusinessLogic>();
+        serviceCollection.AddScoped<IBikeRepository, BikeRepository>();
     }
     
     public static void AddSingletonServices(this IServiceCollection serviceCollection, IConfiguration configuration)
@@ -21,11 +25,12 @@ public static class ServiceLifetimeServiceCollectionExtension
             options.Configuration = configuration["Redis:Url"];
         });
         
-        serviceCollection.AddSingleton(new MongoClient(configuration["MongoDB:ConnectionString"])
-            .GetDatabase(configuration["MongoDB:Database"]));
+        // serviceCollection.AddSingleton(new MongoClient(configuration["MongoDB:ConnectionString"])
+        //     .GetDatabase(configuration["MongoDB:Database"]));
 
-        serviceCollection.AddSingleton<IBikeStationRepository, BikeStationRepository>();
-        serviceCollection.AddSingleton<IBikeRepository, BikeRepository>();
+        // serviceCollection.AddSingleton<IBikeStationRepository, BikeStationRepository>();
+        // serviceCollection.AddSingleton<IBikeRepository, BikeRepository>();
+        serviceCollection.AddSingleton<IMessageQueueSubscriptionManager>(new MessageQueueSubscriptionManager());
     }
 
     public static void RegisterMessageHandlers(this IServiceCollection serviceCollection)

@@ -1,12 +1,8 @@
 ﻿using BikeService.Sonic.Models;
+using Shared.Repositories;
 
 namespace BikeService.Sonic.DAL;
 
-public interface IBikeRepository
+public interface IBikeRepository : IRepositoryGeneric<Bike>
 {
-    Task<List<Bike>> GetAll();
-    Task<Bike> GetById(string id);
-    Task Add(Bike bike);
-    Task Update(string id, Bike bike);
-    Task Delete(string id);
 }

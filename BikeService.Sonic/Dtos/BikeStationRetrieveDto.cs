@@ -1,4 +1,6 @@
-﻿namespace BikeService.Sonic.Dtos;
+﻿using BikeService.Sonic.Dtos.Bike;
+
+namespace BikeService.Sonic.Dtos;
 
 public class BikeStationRetrieveDto
 {

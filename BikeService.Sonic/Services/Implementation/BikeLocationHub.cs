@@ -1,10 +1,15 @@
-﻿using BikeService.Sonic.Const;
+﻿using System.Security.Claims;
+using BikeService.Sonic.Const;
+using BikeService.Sonic.Dtos;
 using BikeService.Sonic.Models;
 using BikeService.Sonic.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using Okta.AspNetCore;
 
 namespace BikeService.Sonic.Services.Implementation;
 
+[Authorize(AuthenticationSchemes = OktaDefaults.ApiAuthenticationScheme)]
 public class BikeLocationHub : Hub, IBikeLocationHub
 {
     private readonly IHubContext<BikeLocationHub> _hubContext;
@@ -14,8 +19,17 @@ public class BikeLocationHub : Hub, IBikeLocationHub
         _hubContext = hubContext;
     }
     
-    public async Task SendBikeLocationsData(List<Bike> bikes)
+    public async Task SendBikeLocationsData(string? email, BikeLocationDto bike)
     {
-        await _hubContext.Clients.All.SendAsync(SignalRChannel.BikeLocationChannel, bikes);
+        if (string.IsNullOrEmpty(email)) return;
+        await _hubContext.Clients.Group(email).SendAsync(SignalRChannel.BikeLocationChannel, bike);
+    }
+    
+    public override async Task OnConnectedAsync()
+    {
+        var userName = Context.GetHttpContext()!.User.Claims.FirstOrDefault(x => 
+            x.Type == ClaimTypes.NameIdentifier)!.Value;
+
+        await Groups.AddToGroupAsync(Context.ConnectionId, userName);
     }
 }

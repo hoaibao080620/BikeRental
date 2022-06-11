@@ -1,8 +1,8 @@
-﻿using BikeService.Sonic.Models;
+﻿using BikeService.Sonic.Dtos;
 
 namespace BikeService.Sonic.Services.Interfaces;
 
 public interface IBikeLocationHub
 {
-    Task SendBikeLocationsData(List<Bike> bikes);
+    Task SendBikeLocationsData(string? email, BikeLocationDto bike);
 }
