@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using Amazon;
+using Amazon.Runtime;
 using Amazon.SQS;
 using Amazon.SQS.Model;
 
@@ -11,7 +12,9 @@ public class SqsConsumer : IConsumer
 
     public SqsConsumer()
     {
-        _amazonSqs = new AmazonSQSClient(RegionEndpoint.USEast1);
+        var basicCredentials = new BasicAWSCredentials("AKIA2JUZUHJXQBX37EUR", 
+            "bP0ROTQSIv8nJr1P+OZ91duCzOhElC9ud2qG2db0");
+        _amazonSqs = new AmazonSQSClient(basicCredentials, RegionEndpoint.USEast1);
     }
     
     public async Task<List<Message>> ReceiveMessages(string queue)
