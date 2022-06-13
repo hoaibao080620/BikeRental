@@ -1,4 +1,4 @@
-﻿namespace MessageQueue.Events;
+﻿namespace BikeRental.MessageQueue.Events;
 
 public class UserDeleted : BaseMessage
 {

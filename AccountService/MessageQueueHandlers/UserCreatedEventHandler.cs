@@ -1,7 +1,7 @@
 ﻿using AccountService.DataAccess.Interfaces;
 using AccountService.Models;
-using MessageQueue.Events;
-using MessageQueue.Handlers;
+using BikeRental.MessageQueue.Events;
+using BikeRental.MessageQueue.Handlers;
 using Newtonsoft.Json;
 
 namespace AccountService.MessageQueueHandlers;

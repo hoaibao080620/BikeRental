@@ -2,7 +2,7 @@
 using BikeService.Sonic.DAL;
 using BikeService.Sonic.Services.Implementation;
 using BikeService.Sonic.Services.Interfaces;
-using MessageQueue.SubscriptionManager;
+using BikeRental.MessageQueue.SubscriptionManager;
 using Nest;
 using Shared.Service;
 

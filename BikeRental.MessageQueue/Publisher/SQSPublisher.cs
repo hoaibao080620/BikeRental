@@ -3,7 +3,7 @@ using Amazon.Runtime;
 using Amazon.SimpleNotificationService;
 using Amazon.SimpleNotificationService.Model;
 
-namespace MessageQueue.Publisher;
+namespace BikeRental.MessageQueue.Publisher;
 
 public class SqsPublisher : IPublisher
 {

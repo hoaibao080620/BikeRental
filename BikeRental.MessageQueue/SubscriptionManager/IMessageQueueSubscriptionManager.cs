@@ -1,6 +1,6 @@
-﻿using MessageQueue.Handlers;
+﻿using BikeRental.MessageQueue.Handlers;
 
-namespace MessageQueue.SubscriptionManager;
+namespace BikeRental.MessageQueue.SubscriptionManager;
 
 public interface IMessageQueueSubscriptionManager
 {

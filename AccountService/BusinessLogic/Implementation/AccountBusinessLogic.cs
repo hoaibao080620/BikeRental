@@ -1,6 +1,6 @@
 ﻿using AccountService.BusinessLogic.Interfaces;
 using AccountService.MessageQueueHandlers;
-using MessageQueue.Handlers;
+using BikeRental.MessageQueue.Handlers;
 
 namespace AccountService.BusinessLogic.Implementation;
 

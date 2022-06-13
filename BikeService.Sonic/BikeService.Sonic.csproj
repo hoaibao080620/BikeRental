@@ -24,8 +24,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\MessageQueue\MessageQueue.csproj" />
-      <ProjectReference Include="..\Shared\Shared.csproj" />
+      <ProjectReference Include="..\BikeRental.MessageQueue\BikeRental.MessageQueue.csproj" />
+      <ProjectReference Include="..\BikeRental.Shared\BikeRental.Shared.csproj" />
     </ItemGroup>
 
 </Project>

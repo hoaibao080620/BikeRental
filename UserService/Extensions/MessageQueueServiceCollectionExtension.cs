@@ -1,6 +1,6 @@
-﻿using MessageQueue;
-using MessageQueue.Consumer;
-using MessageQueue.Publisher;
+﻿using BikeRental.MessageQueue;
+using BikeRental.MessageQueue.Consumer;
+using BikeRental.MessageQueue.Publisher;
 
 namespace UserService.Extensions;
 

@@ -1,4 +1,4 @@
-﻿namespace MessageQueue;
+﻿namespace BikeRental.MessageQueue;
 
 public abstract class BaseMessage
 {

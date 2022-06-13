@@ -1,6 +1,6 @@
 ﻿using Amazon.SimpleNotificationService.Model;
 
-namespace MessageQueue.Publisher;
+namespace BikeRental.MessageQueue.Publisher;
 
 public interface IPublisher
 {

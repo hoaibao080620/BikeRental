@@ -1,7 +1,7 @@
-﻿using MessageQueue.Handlers;
+﻿using BikeRental.MessageQueue.Handlers;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace MessageQueue.SubscriptionManager;
+namespace BikeRental.MessageQueue.SubscriptionManager;
 
 public class MessageQueueSubscriptionManager : IMessageQueueSubscriptionManager
 {

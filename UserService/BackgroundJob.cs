@@ -1,5 +1,5 @@
-﻿using MessageQueue;
-using MessageQueue.Consumer;
+﻿using BikeRental.MessageQueue;
+using BikeRental.MessageQueue.Consumer;
 
 namespace UserService;
 

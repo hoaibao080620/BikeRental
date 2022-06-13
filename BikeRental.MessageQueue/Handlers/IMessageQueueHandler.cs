@@ -1,4 +1,4 @@
-﻿namespace MessageQueue.Handlers;
+﻿namespace BikeRental.MessageQueue.Handlers;
 
 public interface IMessageQueueHandler
 {

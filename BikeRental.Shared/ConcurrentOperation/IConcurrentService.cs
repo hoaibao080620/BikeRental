@@ -1,4 +1,4 @@
-﻿// namespace Shared.ConcurrentOperation;
+﻿// namespace BikeRental.Shared.ConcurrentOperation;
 //
 // public interface IConcurrentService
 // {

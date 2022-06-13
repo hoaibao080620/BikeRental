@@ -12,11 +12,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Gateway", "Gateway", "{BAD0
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "APIGateway", "APIGateway\APIGateway.csproj", "{206A48A6-413B-4B27-AFD6-AFEBCE8E9823}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessageQueue", "MessageQueue\MessageQueue.csproj", "{A383562D-29A9-4123-9DF7-3220D09D2688}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BikeRental.MessageQueue", "BikeRental.MessageQueue\BikeRental.MessageQueue.csproj", "{A383562D-29A9-4123-9DF7-3220D09D2688}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AccountService", "AccountService\AccountService.csproj", "{3F8CD70B-141A-411D-B859-56F727B166A0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{B05B77B9-7909-4D8C-BB3B-6B62E08FF09A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BikeRental.Shared", "BikeRental.Shared\BikeRental.Shared.csproj", "{B05B77B9-7909-4D8C-BB3B-6B62E08FF09A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserService.Test", "UserService.Test\UserService.Test.csproj", "{28C965CF-4FDB-4BB5-B133-87606ABC86EA}"
 EndProject

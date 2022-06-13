@@ -1,4 +1,4 @@
-﻿// using MessageQueue.Handlers;
+﻿// using BikeRental.MessageQueue.Handlers;
 //
 // namespace BikeService.Sonic.MessageQueueHandlers;
 //

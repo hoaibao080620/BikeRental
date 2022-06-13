@@ -1,6 +1,6 @@
 ﻿using Amazon.SimpleNotificationService.Model;
-using MessageQueue.Events;
-using MessageQueue.Publisher;
+using BikeRental.MessageQueue.Events;
+using BikeRental.MessageQueue.Publisher;
 using Newtonsoft.Json;
 using Shared.Consts;
 using UserService.Models;

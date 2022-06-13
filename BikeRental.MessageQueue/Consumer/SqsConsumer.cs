@@ -4,7 +4,7 @@ using Amazon.Runtime;
 using Amazon.SQS;
 using Amazon.SQS.Model;
 
-namespace MessageQueue.Consumer;
+namespace BikeRental.MessageQueue.Consumer;
 
 public class SqsConsumer : IConsumer
 {
