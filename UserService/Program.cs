@@ -11,7 +11,7 @@ builder.Services.AddMessageQueueServices();
 builder.Services.AddDbContextService(builder.Configuration);
 builder.Services.AddScopedServices();
 builder.Services.AddHttpClientToServices();
-// await builder.Services.SyncOktaUsers();
+await builder.Services.SyncOktaUsers();
 
 
 var app = builder.Build();
