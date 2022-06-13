@@ -8,6 +8,8 @@
 
     <ItemGroup>
       <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+      <PackageReference Include="BikeRental.MessageQueue" Version="1.0.0" />
+      <PackageReference Include="BikeRental.Shared" Version="1.0.0" />
       <PackageReference Include="CsvHelper" Version="27.2.1" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.5" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.5">
@@ -21,11 +23,6 @@
       <PackageReference Include="Okta.AspNetCore" Version="4.2.0" />
       <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.1" />
       <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.18.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\BikeRental.MessageQueue\BikeRental.MessageQueue.csproj" />
-      <ProjectReference Include="..\BikeRental.Shared\BikeRental.Shared.csproj" />
     </ItemGroup>
 
 </Project>
