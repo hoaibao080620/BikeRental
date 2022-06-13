@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - name: Deploy UserService
+      - name: Deploy Shared Project
         uses: akhileshns/heroku-deploy@v3.0.4
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
@@ -36,3 +36,12 @@ jobs:
           heroku_email: ${{secrets.HEROKU_API_KEY}}
         env:
           HD_APP_BASE: "Shared"
+          
+      - name: Deploy MessageQueue
+        uses: akhileshns/heroku-deploy@v3.0.4
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "user-service-13062022"
+          heroku_email: ${{secrets.HEROKU_API_KEY}}
+        env:
+          HD_APP_BASE: "MessageQueue"
