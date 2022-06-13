@@ -7,6 +7,7 @@ public static class OktaServiceCollectionExtension
 {
     public static void AddOktaAuthenticationService(this IServiceCollection serviceCollection, IConfiguration configuration)
     {
+        
         JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("scp");
         JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Add("scp", "scope");
         serviceCollection.AddAuthentication(options =>
