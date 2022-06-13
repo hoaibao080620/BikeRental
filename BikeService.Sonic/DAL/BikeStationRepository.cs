@@ -1,5 +1,6 @@
 ﻿using BikeService.Sonic.BikeDbContext;
 using BikeService.Sonic.Models;
+using Microsoft.EntityFrameworkCore;
 using Shared.Repositories;
 
 namespace BikeService.Sonic.DAL;
@@ -8,5 +9,10 @@ public class BikeStationRepository : RepositoryGeneric<BikeStation, BikeServiceD
 {
     public BikeStationRepository(BikeServiceDbContext context) : base(context)
     {
+    }
+
+    public async Task<BikeStation?> GetBikeStationByName(string name)
+    {
+        return await Context.BikeStations.FirstOrDefaultAsync(b => b.Name.ToLower() == name.ToLower());
     }
 }

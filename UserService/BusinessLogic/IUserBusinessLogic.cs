@@ -9,4 +9,5 @@ public interface IUserBusinessLogic
     Task AddUser(UserInsertDto user);
     Task UpdateUser(int userId, UserUpdateDto user);
     Task DeleteUser(int id);
+    public Task SyncOktaUsers();
 }

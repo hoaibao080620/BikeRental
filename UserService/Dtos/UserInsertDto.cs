@@ -14,8 +14,7 @@ public class UserInsertDto
     public string Password { get; set; } = null!;
 
     public string? Address { get; set; }
-    [Required]
-    public int RoleId { get; set; }
+    public int? RoleId { get; set; }
     [Required]
     public string Email { get; set; } = null!;
 

@@ -5,16 +5,16 @@ namespace Shared.Repositories;
 
 public class RepositoryGeneric<T, TV> : IRepositoryGeneric<T> where TV : DbContext where T : class
 {
-    protected TV Context;
+    protected readonly TV Context;
 
-    public RepositoryGeneric(TV context)
+    protected RepositoryGeneric(TV context)
     {
         Context = context;
     }
     
     public async Task<List<T>> All()
     {
-        return await Context.Set<T>().AsNoTracking().ToListAsync();
+        return await Context.Set<T>().ToListAsync();
     }
 
     public async Task<T?> GetById(int id)
@@ -42,5 +42,15 @@ public class RepositoryGeneric<T, TV> : IRepositoryGeneric<T> where TV : DbConte
     public async Task<List<T>> Find(Expression<Func<T, bool>> predicate)
     {
         return await Context.Set<T>().Where(predicate).ToListAsync();
+    }
+
+    public async Task<bool> Exists(Expression<Func<T, bool>> predicate)
+    {
+        return await Context.Set<T>().AnyAsync(predicate);
+    }
+
+    public async Task SaveChanges()
+    {
+        await Context.SaveChangesAsync();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using Okta.AspNetCore;
+using UserService.BusinessLogic;
 
 namespace UserService.Extensions;
 
@@ -23,5 +24,11 @@ public static class OktaServiceCollectionExtension
             });
 
         serviceCollection.AddAuthorization();
+    }
+
+    public static async Task SyncOktaUsers(this IServiceCollection serviceCollection)
+    {
+        var userBusinessLogic = serviceCollection.BuildServiceProvider().GetRequiredService<IUserBusinessLogic>();
+        await userBusinessLogic.SyncOktaUsers();
     }
 }

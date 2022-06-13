@@ -9,7 +9,10 @@ public static class DbContextServiceCollectionExtension
     {
         serviceCollection.AddDbContext<UserServiceDbContext>(options =>
         {
-            options.UseSqlServer(configuration.GetConnectionString("SqlServer"));
+            var connectionString = configuration.GetConnectionString("MysqlServer");
+
+            options.UseLazyLoadingProxies()
+            .UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
         });
     }
 }

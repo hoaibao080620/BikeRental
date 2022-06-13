@@ -1,6 +1,6 @@
 ﻿namespace Shared.Consts;
 
-public class OktaGroup
+public static class OktaGroup
 {
     public const string ManagerGroup = "00g4vwk9tdLlO48Is5d7";
     public const string EveryoneGroup = "00g4vpyx7lo10jvxQ5d7";

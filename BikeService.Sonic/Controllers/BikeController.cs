@@ -2,6 +2,7 @@
 using BikeService.Sonic.Dtos;
 using BikeService.Sonic.Dtos.Bike;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Service;
 
 namespace BikeService.Sonic.Controllers;
 
@@ -12,10 +13,12 @@ namespace BikeService.Sonic.Controllers;
 public class BikeController : ControllerBase
 {
     private readonly IBikeBusinessLogic _bikeBusinessLogic;
+    private readonly IImportService _importService;
 
-    public BikeController(IBikeBusinessLogic bikeBusinessLogic)
+    public BikeController(IBikeBusinessLogic bikeBusinessLogic, IImportService importService)
     {
         _bikeBusinessLogic = bikeBusinessLogic;
+        _importService = importService;
     }
     
     [HttpGet]
@@ -78,6 +81,16 @@ public class BikeController : ControllerBase
     public async Task<IActionResult> Checkout(BikeCheckoutDto bikeCheckoutDto)
     {
         await _bikeBusinessLogic.BikeCheckout(bikeCheckoutDto);
+        return Ok();
+    }
+    
+    [HttpPost]
+    [Route("[action]")]
+    public async Task<IActionResult> ImportBikes()
+    {
+        if (!Request.Form.Files.Any()) return BadRequest("No files upload");
+        
+        await _importService.Import(Request.Form.Files[0]);
         return Ok();
     }
 }

@@ -12,22 +12,15 @@ public class SqsPublisher : IPublisher
         _amazonSns = new AmazonSimpleNotificationServiceClient(RegionEndpoint.USEast1);
     }
     
-    public async Task SendMessage(string message, string topicArn)
+    public async Task SendMessage(string message, string topicArn, Dictionary<string, MessageAttributeValue>? messageAttributes)
     {
         var request = new PublishRequest
         {
             Message = message,
-            TopicArn = topicArn
+            TopicArn = topicArn,
+            MessageAttributes = messageAttributes
         };
-
-        try
-        {
-            var response = await _amazonSns.PublishAsync(request);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Caught exception publishing request:");
-            Console.WriteLine(ex.Message);
-        }
+        
+        await _amazonSns.PublishAsync(request);
     }
 }

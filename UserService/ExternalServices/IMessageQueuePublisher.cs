@@ -6,5 +6,5 @@ public interface IMessageQueuePublisher
 {
     Task PublishUserAddedEventToMessageQueue(User user);
     Task PublishUserUpdatedEventToMessageQueue(User user);
-    Task PublishUserDeletedEventToMessageQueue(int userId);
+    Task PublishUserDeletedEventToMessageQueue(User user);
 }

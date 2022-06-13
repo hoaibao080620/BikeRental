@@ -1,4 +1,5 @@
-﻿using MessageQueue.Events;
+﻿using Amazon.SimpleNotificationService.Model;
+using MessageQueue.Events;
 using MessageQueue.Publisher;
 using Newtonsoft.Json;
 using Shared.Consts;
@@ -29,12 +30,15 @@ public class MessageQueuePublisher : IMessageQueuePublisher
             MessageType = MessageType.UserAdded
         };
         
-        await _publisher.SendMessage(JsonConvert.SerializeObject(message), _configuration["Topic:UserTopic"]);
+        await _publisher.SendMessage(
+            JsonConvert.SerializeObject(message), 
+            _configuration["Topic:UserTopic"], 
+            GetUserGroupMessageAttributeValues(user.Role.Name));
     }
     
     public async Task PublishUserUpdatedEventToMessageQueue(User user)
     {
-        var message = new UserUpdated()
+        var message = new UserUpdated
         {
             Id = user.Id,
             PhoneNumber = user.PhoneNumber,
@@ -43,17 +47,38 @@ public class MessageQueuePublisher : IMessageQueuePublisher
             MessageType = MessageType.UserUpdated
         };
         
-        await _publisher.SendMessage(JsonConvert.SerializeObject(message), _configuration["Topic:UserTopic"]);
+        await _publisher.SendMessage(
+            JsonConvert.SerializeObject(message), 
+            _configuration["Topic:UserTopic"], 
+            GetUserGroupMessageAttributeValues(user.Role.Name)
+            );
     }
     
-    public async Task PublishUserDeletedEventToMessageQueue(int userId)
+    public async Task PublishUserDeletedEventToMessageQueue(User user)
     {
         var message = new UserDeleted
         {
-            UserId = userId,
+            UserId = user.Id,
             MessageType = MessageType.UserDeleted
         };
         
-        await _publisher.SendMessage(JsonConvert.SerializeObject(message), _configuration["Topic:UserTopic"]);
+        await _publisher.SendMessage(
+            JsonConvert.SerializeObject(message), 
+            _configuration["Topic:UserTopic"],
+            GetUserGroupMessageAttributeValues(user.Role.Name));
+    }
+
+    private static Dictionary<string, MessageAttributeValue> GetUserGroupMessageAttributeValues(string group)
+    {
+        return new Dictionary<string, MessageAttributeValue>
+        {
+            {
+                "user_group", new MessageAttributeValue
+                {
+                    DataType = "String",
+                    StringValue = group
+                }
+            }
+        };
     }
 }

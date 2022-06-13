@@ -28,6 +28,42 @@ public class UserBusinessLogic : IUserBusinessLogic
         _mapper = mapper;
     }
 
+    public async Task SyncOktaUsers()
+    {
+        var isUsersAlreadySync = await _unitOfWork.UserRepository.Exists(_ => true);
+        if (isUsersAlreadySync) return;
+
+        var isRolesAlreadySync = await _unitOfWork.RoleRepository.Exists(_ => true);
+        if (!isRolesAlreadySync) await SyncOktaGroups();
+
+        var groups = await _unitOfWork.RoleRepository.All();
+
+        foreach (var group in groups)
+        {
+            var oktaUsers = await _oktaClient.GetOktaUserByGroup(group.OktaRoleId);
+            foreach (var oktaUser in oktaUsers.Where(o => o.Status == "ACTIVE"))
+            {
+                var user = new User
+                {
+                    OktaUserId = oktaUser.Id,
+                    FirstName = oktaUser.Profile.FirstName,
+                    LastName = oktaUser.Profile.LastName,
+                    CreatedOn = oktaUser.Created,
+                    Email = oktaUser.Profile.Email,
+                    RoleId = group.Id,
+                    IsActive = true,
+                    PhoneNumber = oktaUser.Profile.MobilePhone
+                };
+                
+                await _unitOfWork.UserRepository.Add(user);
+                await _unitOfWork.SaveChangesAsync();
+                await _messageQueuePublisher.PublishUserAddedEventToMessageQueue(
+                    user
+                );
+            }
+        }
+    }
+
     public async Task<IEnumerable<UserRetrieveDto>> GetUsers()
     {
         var users = await _unitOfWork.UserRepository.All();
@@ -47,6 +83,8 @@ public class UserBusinessLogic : IUserBusinessLogic
         var user = _mapper.Map<User>(userInsertDto);
         user.IsActive = true;
         user.CreatedOn = DateTime.UtcNow;
+        user.RoleId = userInsertDto.RoleId ?? 
+                      (await _unitOfWork.RoleRepository.Find(r => r.OktaRoleId == OktaGroup.UserGroup)).FirstOrDefault()!.Id;
         
         await _unitOfWork.UserRepository.Add(user);
         var isAdded = await _unitOfWork.SaveChangesAsync() > 0;
@@ -89,7 +127,7 @@ public class UserBusinessLogic : IUserBusinessLogic
         {
             var tasks = new List<Task>
             {
-                _messageQueuePublisher.PublishUserDeletedEventToMessageQueue(id),
+                _messageQueuePublisher.PublishUserDeletedEventToMessageQueue(user),
                 DeleteOktaUser(user.OktaUserId)
             };
 
@@ -123,5 +161,22 @@ public class UserBusinessLogic : IUserBusinessLogic
     private async Task DeleteOktaUser(string? oktaUserId)
     {
         await _oktaClient.DeleteOktaUser(oktaUserId);
+    }
+
+    private async Task SyncOktaGroups()
+    {
+        var groups = await _oktaClient.GetOktaGroups();
+        foreach (var group in groups)
+        {
+            await _unitOfWork.RoleRepository.Add(new Role
+            {
+                OktaRoleId = group.Id,
+                CreatedOn = group.Created,
+                Description = group.Profile.Description,
+                Name = group.Profile.Name
+            });
+        }
+
+        await _unitOfWork.SaveChangesAsync();
     }
 }

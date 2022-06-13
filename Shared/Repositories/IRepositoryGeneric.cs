@@ -10,4 +10,6 @@ public interface IRepositoryGeneric<T>
     Task Delete(T entity);
     Task Update(T entity);
     Task<List<T>> Find(Expression<Func<T, bool>> predicate);
+    Task<bool> Exists(Expression<Func<T, bool>> predicate);
+    Task SaveChanges();
 }

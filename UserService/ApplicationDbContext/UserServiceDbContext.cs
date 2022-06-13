@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using UserService.BusinessLogic;
 using UserService.Models;
 
 namespace UserService.ApplicationDbContext;
@@ -11,32 +12,15 @@ public class UserServiceDbContext : DbContext
 
     public DbSet<User> Users { get; set; } = null!;
     public DbSet<Role> Roles { get; set; } = null!;
-
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Role>().HasData(new List<Role>
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Role>(entity =>
         {
-            new()
-            {
-                Id = 1,
-                Name = "User",
-                CreatedOn = DateTime.UtcNow,
-                IsActive = true
-            },
-            new()
-            {
-                Id = 2,
-                Name = "Manager",
-                CreatedOn = DateTime.UtcNow,
-                IsActive = true
-            },
-            new()
-            {
-                Id = 3,
-                Name = "SysAdmin",
-                CreatedOn = DateTime.UtcNow,
-                IsActive = true
-            }
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).HasMaxLength(100).IsRequired();
         });
     }
 }

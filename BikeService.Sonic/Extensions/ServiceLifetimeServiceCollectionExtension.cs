@@ -4,6 +4,7 @@ using BikeService.Sonic.Services.Implementation;
 using BikeService.Sonic.Services.Interfaces;
 using MessageQueue.SubscriptionManager;
 using Nest;
+using Shared.Service;
 
 namespace BikeService.Sonic.Extensions;
 
@@ -16,6 +17,8 @@ public static class ServiceLifetimeServiceCollectionExtension
         serviceCollection.AddScoped<IBikeStationManagerRepository, BikeStationManagerRepository>();
         serviceCollection.AddScoped<IBikeBusinessLogic, BikeBusinessLogic>();
         serviceCollection.AddScoped<IBikeRepository, BikeRepository>();
+        serviceCollection.AddScoped<IImportService, CsvImportService>();
+        serviceCollection.AddScoped<IBikeStationRepository, BikeStationRepository>();
     }
     
     public static void AddSingletonServices(this IServiceCollection serviceCollection, IConfiguration configuration)
