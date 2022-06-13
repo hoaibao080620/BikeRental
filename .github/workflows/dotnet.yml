@@ -45,3 +45,12 @@ jobs:
           heroku_email: ${{secrets.HEROKU_API_KEY}}
         env:
           HD_APP_BASE: "MessageQueue"
+          
+      - name: Deploy UserService
+        uses: akhileshns/heroku-deploy@v3.0.4
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "user-service-13062022"
+          heroku_email: ${{secrets.HEROKU_API_KEY}}
+        env:
+          HD_APP_BASE: "UserService"
