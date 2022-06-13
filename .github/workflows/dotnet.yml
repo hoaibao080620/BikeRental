@@ -35,4 +35,4 @@ jobs:
           heroku_app_name: "user-service-13062022"
           heroku_email: ${{secrets.HEROKU_API_KEY}}
         env:
-          HD_APP_BASE: ""
+          HD_APP_BASE: "../"
