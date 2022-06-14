@@ -15,4 +15,11 @@ public static class DbContextServiceCollectionExtension
             .UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
         });
     }
+
+    public static void RunMigrations(this IServiceCollection serviceCollection)
+    {
+        using var scope = serviceCollection.BuildServiceProvider().CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<UserServiceDbContext>();
+        db.Database.Migrate();
+    }
 }

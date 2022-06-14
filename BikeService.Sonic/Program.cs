@@ -19,6 +19,7 @@ builder.Services.AddCors(options =>
 });
 builder.Services.AddDbContextService(builder.Configuration);
 builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.RunMigrations();
 
 
 // App pipelines

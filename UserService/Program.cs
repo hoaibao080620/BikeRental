@@ -9,10 +9,10 @@ builder.Services.AddControllers();
 builder.Services.AddOktaAuthenticationService(builder.Configuration);
 builder.Services.AddMessageQueueServices();
 builder.Services.AddDbContextService(builder.Configuration);
+builder.Services.RunMigrations();
 builder.Services.AddScopedServices();
 builder.Services.AddHttpClientToServices();
 await builder.Services.SyncOktaUsers();
-
 
 var app = builder.Build();
 

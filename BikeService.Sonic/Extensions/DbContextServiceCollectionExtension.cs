@@ -13,4 +13,11 @@ public static class DbContextServiceCollectionExtension
             options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
         });
     }
+    
+    public static void RunMigrations(this IServiceCollection serviceCollection)
+    {
+        using var scope = serviceCollection.BuildServiceProvider().CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<BikeServiceDbContext>();
+        db.Database.Migrate();
+    }
 }
