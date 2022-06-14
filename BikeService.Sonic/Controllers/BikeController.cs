@@ -1,6 +1,8 @@
-﻿using BikeService.Sonic.BusinessLogics;
-using BikeService.Sonic.Dtos;
+﻿using System.Security.Claims;
+using BikeService.Sonic.BusinessLogics;
 using BikeService.Sonic.Dtos.Bike;
+using BikeService.Sonic.Dtos.BikeOperation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Service;
 
@@ -8,8 +10,7 @@ namespace BikeService.Sonic.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-// [Route("[controller]")]
-// [Authorize]
+[Authorize]
 public class BikeController : ControllerBase
 {
     private readonly IBikeBusinessLogic _bikeBusinessLogic;
@@ -72,6 +73,9 @@ public class BikeController : ControllerBase
     [Route("[action]")]
     public async Task<IActionResult> Checking(BikeCheckingDto bikeCheckingDto)
     {
+        var email = HttpContext.User.Claims.FirstOrDefault(x => 
+            x.Type == ClaimTypes.NameIdentifier)!.Value;
+        
         await _bikeBusinessLogic.BikeChecking(bikeCheckingDto);
         return Ok();
     }

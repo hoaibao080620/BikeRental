@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using BikeService.Sonic.Const;
 using BikeService.Sonic.Dtos;
+using BikeService.Sonic.Dtos.BikeOperation;
 using BikeService.Sonic.Models;
 using BikeService.Sonic.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -27,9 +28,9 @@ public class BikeLocationHub : Hub, IBikeLocationHub
     
     public override async Task OnConnectedAsync()
     {
-        var userName = Context.GetHttpContext()!.User.Claims.FirstOrDefault(x => 
+        var email = Context.GetHttpContext()!.User.Claims.FirstOrDefault(x => 
             x.Type == ClaimTypes.NameIdentifier)!.Value;
 
-        await Groups.AddToGroupAsync(Context.ConnectionId, userName);
+        await Groups.AddToGroupAsync(Context.ConnectionId, email);
     }
 }

@@ -10,4 +10,5 @@ public class Bike : BaseEntity
     public int? BikeStationId { get; set; }
     [ForeignKey("BikeStationId")]
     public BikeStation? BikeStation { get; set; }
+    public string Status { get; set; } = null!;
 }

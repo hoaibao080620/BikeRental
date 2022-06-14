@@ -1,5 +1,5 @@
-﻿using BikeService.Sonic.Dtos;
-using BikeService.Sonic.Dtos.Bike;
+﻿using BikeService.Sonic.Dtos.Bike;
+using BikeService.Sonic.Dtos.BikeOperation;
 
 namespace BikeService.Sonic.BusinessLogics;
 
