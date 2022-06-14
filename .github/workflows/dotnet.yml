@@ -41,3 +41,10 @@ jobs:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: "bike-service-13062022"
           heroku_email: ${{secrets.HEROKU_API_KEY}}
+          
+      - name: Deploy API Gateway
+        uses: akhileshns/heroku-deploy@v3.0.4
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "bike-rental-api-gateway"
+          heroku_email: ${{secrets.HEROKU_API_KEY}}

@@ -5,14 +5,13 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 6001
+          "Host": "user-service-13062022.herokuapp.com",
+          "Port": 443
         }
       ],
       "UpstreamPathTemplate": "/api/v1/user-api/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "AuthenticationOptions": {
-        "AuthenticationProviderKey": "OktaProvider",
         "AllowedScopes": []
       }
     }
