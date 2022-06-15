@@ -3,6 +3,7 @@ using BikeService.Sonic.DAL;
 using BikeService.Sonic.Services.Implementation;
 using BikeService.Sonic.Services.Interfaces;
 using BikeRental.MessageQueue.SubscriptionManager;
+using BikeService.Sonic.Models;
 using Nest;
 using Shared.Service;
 
@@ -19,6 +20,8 @@ public static class ServiceLifetimeServiceCollectionExtension
         serviceCollection.AddScoped<IBikeRepository, BikeRepository>();
         serviceCollection.AddScoped<IImportService, CsvImportService>();
         serviceCollection.AddScoped<IBikeStationRepository, BikeStationRepository>();
+        serviceCollection.AddScoped<IBikeRentalTrackingRepository, BikeRentalTrackingRepository>();
+        serviceCollection.AddScoped<IAccountRepository, AccountRepository>();
     }
     
     public static void AddSingletonServices(this IServiceCollection serviceCollection, IConfiguration configuration)

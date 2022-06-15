@@ -5,12 +5,8 @@ namespace BikeService.Sonic.Models;
 
 public class BikeRentalTracking : BaseEntity
 {
-    public DateTime StartedOn { get; set; }
-    public DateTime? EndedOn { get; set; }
-    public double StartLongitude { get; set; }
-    public double StartLatitude { get; set; }
-    public double? EndLongitude { get; set; }
-    public double? EndLatitude { get; set; }
+    public double Longitude { get; set; }
+    public double Latitude { get; set; }
     public int BikeId { get; set; }
     [ForeignKey("BikeId")]
     public Bike Bike { get; set; } = null!;

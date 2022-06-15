@@ -76,17 +76,17 @@ public class BikeController : ControllerBase
         var email = HttpContext.User.Claims.FirstOrDefault(x => 
             x.Type == ClaimTypes.NameIdentifier)!.Value;
         
-        await _bikeBusinessLogic.BikeChecking(bikeCheckingDto);
+        await _bikeBusinessLogic.BikeChecking(bikeCheckingDto, email);
         return Ok();
     }
     
-    [HttpPost]
-    [Route("[action]")]
-    public async Task<IActionResult> Checkout(BikeCheckoutDto bikeCheckoutDto)
-    {
-        await _bikeBusinessLogic.BikeCheckout(bikeCheckoutDto);
-        return Ok();
-    }
+    // [HttpPost]
+    // [Route("[action]")]
+    // public async Task<IActionResult> Checkout(BikeCheckoutDto bikeCheckoutDto)
+    // {
+    //     await _bikeBusinessLogic.BikeCheckout(bikeCheckoutDto);
+    //     return Ok();
+    // }
     
     [HttpPost]
     [Route("[action]")]

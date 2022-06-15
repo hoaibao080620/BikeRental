@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using BikeService.Sonic.Const;
 using BikeService.Sonic.DAL;
-using BikeService.Sonic.Dtos;
 using BikeService.Sonic.Dtos.Bike;
 using BikeService.Sonic.Dtos.BikeOperation;
 using BikeService.Sonic.Exceptions;
@@ -16,22 +15,28 @@ public class BikeBusinessLogic : IBikeBusinessLogic
     private readonly IBikeStationManagerRepository _bikeStationManagerRepository;
     private readonly IBikeRepository _bikeRepository;
     private readonly IMapper _mapper;
+    private readonly IBikeRentalTrackingRepository _bikeRentalTrackingRepository;
+    private readonly IAccountRepository _accountRepository;
 
     public BikeBusinessLogic(
         IBikeLocationHub bikeLocationHub, 
         IBikeStationManagerRepository bikeStationManagerRepository,
         IBikeRepository bikeRepository,
-        IMapper mapper)
+        IMapper mapper,
+        IBikeRentalTrackingRepository bikeRentalTrackingRepository,
+        IAccountRepository accountRepository)
     {
         _bikeLocationHub = bikeLocationHub;
         _bikeStationManagerRepository = bikeStationManagerRepository;
         _bikeRepository = bikeRepository;
         _mapper = mapper;
+        _bikeRentalTrackingRepository = bikeRentalTrackingRepository;
+        _accountRepository = accountRepository;
     }
 
     public async Task<BikeRetrieveDto> GetBike(int id)
     {
-        var bike = await _bikeRepository.GetById(id);
+        var bike = await GetBikeById(id);
         return _mapper.Map<BikeRetrieveDto>(bike);
     }
 
@@ -62,53 +67,96 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         await _bikeRepository.SaveChanges();
     }
 
-    public async Task BikeChecking(BikeCheckingDto bikeCheckingDto)
+    public async Task BikeChecking(BikeCheckingDto bikeCheckingDto, string userEmail)
     {
         var managerEmails = await _bikeStationManagerRepository.GetManagerEmailsByBikeId(bikeCheckingDto.BikeId);
-        var bike = await _bikeRepository.GetById(bikeCheckingDto.BikeId);
-        _ = bike ?? throw new BikeNotFoundException(bikeCheckingDto.BikeId);
-        
-        foreach (var managerEmail in managerEmails)
+        var bike = await GetBikeById(bikeCheckingDto.BikeId);
+
+        var bikeLocation = new BikeLocationDto
         {
-            await _bikeLocationHub.SendBikeLocationsData(managerEmail, new BikeLocationDto
-            {
-                BikeId = bike.Id,
-                Longitude = bikeCheckingDto.Longitude,
-                Latitude = bikeCheckingDto.Latitude,
-                Plate = bike.LicensePlate,
-                Operation = BikeLocationOperation.AddBikeToMap
-            });
-        }
+            BikeId = bike.Id,
+            Longitude = bikeCheckingDto.Longitude,
+            Latitude = bikeCheckingDto.Latitude,
+            Plate = bike.LicensePlate,
+            Operation = BikeLocationOperation.AddBikeToMap
+        };
+
+        var pushEventToMapTask = PushEventToMap(managerEmails, bikeLocation);
+        // var startTrackingBikeTask = StartTrackingBike(bikeLocation, userEmail);
+
+        await Task.WhenAll(pushEventToMapTask);
     }
 
-    public async Task BikeCheckout(BikeCheckoutDto bikeCheckingDto)
+    public async Task BikeCheckout(BikeCheckoutDto bikeCheckingDto, string userEmail)
     {
-        var emails = await _bikeStationManagerRepository.GetManagerEmailsByBikeId(bikeCheckingDto.BikeId);
-        var bike = await _bikeRepository.GetById(bikeCheckingDto.BikeId);
-        _ = bike ?? throw new BikeNotFoundException(bikeCheckingDto.BikeId);
+        var managerEmails = await _bikeStationManagerRepository.GetManagerEmailsByBikeId(bikeCheckingDto.BikeId);
+        var bike = await GetBikeById(bikeCheckingDto.BikeId);
         
-        foreach (var email in emails)
+        var pushEventToMapTask = PushEventToMap(managerEmails, new BikeLocationDto
         {
-            await _bikeLocationHub.SendBikeLocationsData(email, new BikeLocationDto
-            {
-                BikeId = bike.Id,
-                Operation = BikeLocationOperation.RemoveBikeFromMap
-            });
-        }
+            BikeId = bike.Id,
+            Operation = BikeLocationOperation.RemoveBikeFromMap
+        });
+        
+        var stopTrackingBikeTask = StopTrackingBike(userEmail);
+        await Task.WhenAll(pushEventToMapTask, stopTrackingBikeTask);
     }
 
     public async Task UpdateBikeLocation(BikeLocationDto bikeLocationDto)
     {
-        var emails = await _bikeStationManagerRepository.GetManagerEmailsByBikeId(bikeLocationDto.BikeId);
-        var bike = await _bikeRepository.GetById(bikeLocationDto.BikeId);
-        _ = bike ?? throw new BikeNotFoundException(bikeLocationDto.BikeId);
+        var managerEmails = await _bikeStationManagerRepository.GetManagerEmailsByBikeId(bikeLocationDto.BikeId);
+        var bike = await GetBikeById(bikeLocationDto.BikeId);
 
         bikeLocationDto.Plate = bike.LicensePlate;
         bikeLocationDto.Operation = BikeLocationOperation.UpdateBikeFromMap;
+        await PushEventToMap(managerEmails, bikeLocationDto);
+    }
 
-        foreach (var email in emails)
+    private async Task<Bike> GetBikeById(int bikeId)
+    {
+        var bike = await _bikeRepository.GetById(bikeId);
+        return bike ?? throw new BikeNotFoundException(bikeId);
+    }
+
+    private async Task PushEventToMap(List<string> managerEmails, BikeLocationDto bikeLocationDto)
+    {
+        foreach (var managerEmail in managerEmails)
         {
-            await _bikeLocationHub.SendBikeLocationsData(email, bikeLocationDto);
+            await _bikeLocationHub.SendBikeLocationsData(managerEmail, bikeLocationDto);
         }
+    }
+
+    private async Task StartTrackingBike(BikeLocationDto bikeLocationDto, string userEmail)
+    {
+        var account = await GetAccountByEmail(userEmail);
+
+        await _bikeRentalTrackingRepository.Add(new BikeRentalTracking
+        {
+            BikeId = bikeLocationDto.BikeId,
+            AccountId = account.Id,
+            CreatedOn = DateTime.UtcNow,
+            UpdatedOn = DateTime.UtcNow,
+            IsActive = true,
+            Longitude = bikeLocationDto.Longitude,
+            Latitude = bikeLocationDto.Latitude
+        });
+
+        await _bikeRentalTrackingRepository.SaveChanges();
+    }
+    
+    private async Task StopTrackingBike(string userEmail)
+    {
+        var bikeRentalTracking = (await _bikeRentalTrackingRepository
+            .Find(b => b.Account.Email == userEmail)).FirstOrDefault()
+            ?? throw new UserHasNotRentAnyBikeException(userEmail);
+
+        await _bikeRentalTrackingRepository.Delete(bikeRentalTracking);
+        await _bikeRentalTrackingRepository.SaveChanges();
+    }
+
+    private async Task<Account> GetAccountByEmail(string email)
+    {
+        return (await _accountRepository.Find(a => a.Email == email)).FirstOrDefault() 
+            ?? throw new AccountNotfoundException($"Account with email {email} not found!");
     }
 }
