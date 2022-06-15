@@ -30,6 +30,30 @@
         "AuthenticationProviderKey": "OktaProvider",
         "AllowedScopes": []
       }
+    },
+    {
+      "DownstreamPathTemplate": "/bikeLocationHub",
+      "DownstreamScheme": "ws",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "bike-service-13062022.herokuapp.com",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/api/v1/bike-api/bikeLocationHub",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "OPTIONS" ]
+    },
+    {
+      "DownstreamPathTemplate": "/bikeLocationHub/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "bike-service-13062022.herokuapp.com",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/api/v1/bike-api/bikeLocationHub/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "OPTIONS" ]
     }
   ]
 }
