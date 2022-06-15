@@ -80,13 +80,16 @@ public class BikeController : ControllerBase
         return Ok();
     }
     
-    // [HttpPost]
-    // [Route("[action]")]
-    // public async Task<IActionResult> Checkout(BikeCheckoutDto bikeCheckoutDto)
-    // {
-    //     await _bikeBusinessLogic.BikeCheckout(bikeCheckoutDto);
-    //     return Ok();
-    // }
+    [HttpPost]
+    [Route("[action]")]
+    public async Task<IActionResult> Checkout(BikeCheckoutDto bikeCheckoutDto)
+    {
+        var email = HttpContext.User.Claims.FirstOrDefault(x => 
+            x.Type == ClaimTypes.NameIdentifier)!.Value;
+        
+        await _bikeBusinessLogic.BikeCheckout(bikeCheckoutDto, email);
+        return Ok();
+    }
     
     [HttpPost]
     [Route("[action]")]
