@@ -13,7 +13,7 @@ public class BikeServiceDbContext : DbContext
     public DbSet<Account> Users { get; set; } = null!;
     public DbSet<Bike> Bikes { get; set; } = null!;
     public DbSet<BikeStation> BikeStations { get; set; } = null!;
-    public DbSet<BikeRentalTracking> BikeRentalTrackings { get; set; } = null!;
+    public DbSet<BikeRentalOrder> BikeRentalTrackings { get; set; } = null!;
     public DbSet<Manager> Managers { get; set; } = null!;
     public DbSet<BikeStationManager> BikeStationManagers { get; set; } = null!;
 }

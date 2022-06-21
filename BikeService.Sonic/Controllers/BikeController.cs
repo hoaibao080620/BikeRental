@@ -71,12 +71,12 @@ public class BikeController : ControllerBase
     
     [HttpPost]
     [Route("[action]")]
-    public async Task<IActionResult> Checking(BikeCheckingDto bikeCheckingDto)
+    public async Task<IActionResult> Checking(BikeCheckinDto bikeCheckinDto)
     {
         var email = HttpContext.User.Claims.FirstOrDefault(x => 
             x.Type == ClaimTypes.NameIdentifier)!.Value;
         
-        await _bikeBusinessLogic.BikeChecking(bikeCheckingDto, email);
+        await _bikeBusinessLogic.BikeChecking(bikeCheckinDto, email);
         return Ok();
     }
     
