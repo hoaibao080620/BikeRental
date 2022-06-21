@@ -6,7 +6,6 @@ namespace BikeService.Sonic.Controllers;
 
 [ApiController]
 [Route("[controller]/[action]")]
-[Authorize]
 public class BikeStationController : ControllerBase
 {
     private readonly IBikeStationBusinessLogic _bikeStationBusinessLogic;
@@ -31,7 +30,6 @@ public class BikeStationController : ControllerBase
     }
     
     [HttpPost]
-    [Route("[action]")]
     public async Task<IActionResult> AddStationBike(BikeStationInsertDto stationInsertDto)
     {
         await _bikeStationBusinessLogic.AddStationBike(stationInsertDto);
@@ -47,6 +45,7 @@ public class BikeStationController : ControllerBase
     }
     
     [HttpDelete]
+    [Route("{id:int}")]
     public async Task<IActionResult> DeleteStationBike(int id)
     {
         await _bikeStationBusinessLogic.DeleteStationBike(id);

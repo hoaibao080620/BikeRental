@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BikeService.Sonic.Dtos;
 using BikeService.Sonic.Dtos.Bike;
 using BikeService.Sonic.Models;
 
@@ -11,5 +12,8 @@ public class MapperProfile : Profile
         CreateMap<Bike, BikeRetrieveDto>().ReverseMap();
         CreateMap<Bike, BikeInsertDto>().ReverseMap();
         CreateMap<Bike, BikeUpdateDto>().ReverseMap();
+        CreateMap<BikeStation, BikeStationInsertDto>().ReverseMap();
+        CreateMap<BikeStation, BikeStationUpdateDto>().ReverseMap();
+        CreateMap<BikeStation, BikeStationRetrieveDto>().ReverseMap();
     }
 }
