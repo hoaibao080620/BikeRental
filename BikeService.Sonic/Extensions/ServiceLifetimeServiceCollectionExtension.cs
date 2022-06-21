@@ -22,6 +22,8 @@ public static class ServiceLifetimeServiceCollectionExtension
         serviceCollection.AddScoped<IBikeStationRepository, BikeStationRepository>();
         serviceCollection.AddScoped<IBikeRentalTrackingRepository, BikeRentalTrackingRepository>();
         serviceCollection.AddScoped<IAccountRepository, AccountRepository>();
+        serviceCollection.AddScoped<IBikeStationBusinessLogic, BikeStationBusinessLogic>();
+        
     }
     
     public static void AddSingletonServices(this IServiceCollection serviceCollection, IConfiguration configuration)
