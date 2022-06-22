@@ -17,6 +17,8 @@ public class BikeBusinessLogic : IBikeBusinessLogic
     private readonly IMapper _mapper;
     private readonly IBikeRentalTrackingRepository _bikeRentalTrackingRepository;
     private readonly IAccountRepository _accountRepository;
+    private readonly IBikeStationBusinessLogic _bikeStationBusinessLogic;
+    private readonly IBikeStationRepository _bikeStationRepository;
 
     public BikeBusinessLogic(
         IBikeLocationHub bikeLocationHub, 
@@ -24,7 +26,9 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         IBikeRepository bikeRepository,
         IMapper mapper,
         IBikeRentalTrackingRepository bikeRentalTrackingRepository,
-        IAccountRepository accountRepository)
+        IAccountRepository accountRepository,
+        IBikeStationBusinessLogic bikeStationBusinessLogic,
+        IBikeStationRepository bikeStationRepository)
     {
         _bikeLocationHub = bikeLocationHub;
         _bikeStationManagerRepository = bikeStationManagerRepository;
@@ -32,6 +36,8 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         _mapper = mapper;
         _bikeRentalTrackingRepository = bikeRentalTrackingRepository;
         _accountRepository = accountRepository;
+        _bikeStationBusinessLogic = bikeStationBusinessLogic;
+        _bikeStationRepository = bikeStationRepository;
     }
 
     public async Task<BikeRetrieveDto> GetBike(int id)
@@ -73,6 +79,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
     {
         var managerEmails = await _bikeStationManagerRepository.GetManagerEmailsByBikeId(bikeCheckinDto.BikeId);
         var bike = await GetBikeById(bikeCheckinDto.BikeId);
+        var bikeStation = await _bikeStationRepository.GetById(bike.BikeStationId!.Value);
 
         var bikeLocation = new BikeLocationDto
         {
@@ -85,14 +92,16 @@ public class BikeBusinessLogic : IBikeBusinessLogic
 
         var pushEventToMapTask = PushEventToMap(managerEmails, bikeLocation);
         var startTrackingBikeTask = StartTrackingBike(bikeCheckinDto, userEmail);
-
+        bikeStation!.UsedParkingSpace += 1;
+        
+        await _bikeStationRepository.SaveChanges();
         await Task.WhenAll(pushEventToMapTask, startTrackingBikeTask);
     }
 
-    public async Task BikeCheckout(BikeCheckoutDto bikeCheckingDto, string userEmail)
+    public async Task BikeCheckout(BikeCheckoutDto bikeCheckout, string userEmail)
     {
-        var managerEmails = await _bikeStationManagerRepository.GetManagerEmailsByBikeId(bikeCheckingDto.BikeId);
-        var bike = await GetBikeById(bikeCheckingDto.BikeId);
+        var managerEmails = await _bikeStationManagerRepository.GetManagerEmailsByBikeId(bikeCheckout.BikeId);
+        var bike = await GetBikeById(bikeCheckout.BikeId);
         
         var pushEventToMapTask = PushEventToMap(managerEmails, new BikeLocationDto
         {
@@ -101,7 +110,8 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         });
         
         var stopTrackingBikeTask = StopTrackingBike(userEmail);
-        await Task.WhenAll(pushEventToMapTask, stopTrackingBikeTask);
+        var assignBikeToBikeStationTask = AssignBikeToNearestBikeStation(bikeCheckout, bike);
+        await Task.WhenAll(pushEventToMapTask, stopTrackingBikeTask, assignBikeToBikeStationTask);
     }
 
     public async Task UpdateBikeLocation(BikeLocationDto bikeLocationDto)
@@ -160,5 +170,15 @@ public class BikeBusinessLogic : IBikeBusinessLogic
     {
         return (await _accountRepository.Find(a => a.Email == email)).FirstOrDefault() 
             ?? throw new AccountNotfoundException($"Account with email {email} not found!");
+    }
+    
+    private async Task AssignBikeToNearestBikeStation(BikeCheckoutDto bikeCheckout, Bike bike)
+    {
+        var nearestBikeStation = await _bikeStationBusinessLogic
+            .GetNearestBikeStationFromLocation(bikeCheckout.Longitude, bikeCheckout.Latitude);
+
+        bike.BikeStationId = nearestBikeStation.Id;
+        nearestBikeStation.UsedParkingSpace += 1;
+        await _bikeRepository.SaveChanges();
     }
 }

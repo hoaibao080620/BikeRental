@@ -57,7 +57,6 @@ public class BikeController : ControllerBase
     public async Task<IActionResult> DeleteBike(int id)
     {
         await _bikeBusinessLogic.DeleteBike(id);
-
         return Ok();
     }
 

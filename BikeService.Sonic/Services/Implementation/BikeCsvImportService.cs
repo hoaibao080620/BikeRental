@@ -7,12 +7,12 @@ using Shared.Service;
 
 namespace BikeService.Sonic.Services.Implementation;
 
-public class CsvImportService : IImportService
+public class BikeCsvImportService : IImportService
 {
     private readonly IBikeRepository _bikeRepository;
     private readonly IBikeStationRepository _bikeStationRepository;
 
-    public CsvImportService(IBikeRepository bikeRepository, IBikeStationRepository bikeStationRepository)
+    public BikeCsvImportService(IBikeRepository bikeRepository, IBikeStationRepository bikeStationRepository)
     {
         _bikeRepository = bikeRepository;
         _bikeStationRepository = bikeStationRepository;
@@ -59,10 +59,11 @@ public class CsvImportService : IImportService
                 Description = string.IsNullOrEmpty(description) ? null : description,
                 BikeStationId = bikeStationDict[bikeStationName]?.Id,
                 IsActive = true,
-                CreatedOn = DateTime.UtcNow
+                CreatedOn = DateTime.UtcNow,
+                Status = "Available"
             });
-
-            await _bikeRepository.SaveChanges();
         }
+        
+        await _bikeRepository.SaveChanges();
     }
 }

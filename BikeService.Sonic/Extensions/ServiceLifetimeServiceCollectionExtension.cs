@@ -18,7 +18,7 @@ public static class ServiceLifetimeServiceCollectionExtension
         serviceCollection.AddScoped<IBikeStationManagerRepository, BikeStationManagerRepository>();
         serviceCollection.AddScoped<IBikeBusinessLogic, BikeBusinessLogic>();
         serviceCollection.AddScoped<IBikeRepository, BikeRepository>();
-        serviceCollection.AddScoped<IImportService, CsvImportService>();
+        serviceCollection.AddScoped<IImportService, BikeCsvImportService>();
         serviceCollection.AddScoped<IBikeStationRepository, BikeStationRepository>();
         serviceCollection.AddScoped<IBikeRentalTrackingRepository, BikeRentalTrackingRepository>();
         serviceCollection.AddScoped<IAccountRepository, AccountRepository>();

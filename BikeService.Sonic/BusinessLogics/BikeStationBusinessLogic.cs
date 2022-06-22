@@ -1,11 +1,10 @@
-﻿
-using System.Collections;
-using AutoMapper;
+﻿using AutoMapper;
 using BikeService.Sonic.DAL;
 using BikeService.Sonic.Dtos;
-using BikeService.Sonic.Dtos.BikeOperation;
+using BikeService.Sonic.Exceptions;
 using BikeService.Sonic.Models;
 using BikeService.Sonic.Services.Interfaces;
+using Geolocation;
 
 namespace BikeService.Sonic.BusinessLogics;
 
@@ -63,5 +62,22 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
         await _bikeStationRepository.SaveChanges();
     }
 
-  
+    public async Task<BikeStationRetrieveDto> GetNearestBikeStationFromLocation(double longitude, double latitude)
+    {
+        var bikeLocations = await GetAllStationBikes();
+
+        if (!bikeLocations.Any()) throw new NoBikeStationFoundException();
+        
+        var nearestBikeLocation = bikeLocations.Where(x => x.ParkingSpace - x.UsedParkingSpace != 0)
+            .Select(x => new
+        {
+            Distance = GeoCalculator.GetDistance(
+                latitude, longitude,
+                x.Latitude,
+                x.Longitude),
+            BikeStation = x
+        }).OrderBy(x => x.Distance).Select(x => x.BikeStation).FirstOrDefault();
+
+        return nearestBikeLocation!;
+    }
 }
