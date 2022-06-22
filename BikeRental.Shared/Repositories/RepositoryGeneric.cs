@@ -12,9 +12,9 @@ public class RepositoryGeneric<T, TV> : IRepositoryGeneric<T> where TV : DbConte
         Context = context;
     }
     
-    public async Task<List<T>> All()
+    public async Task<IQueryable<T>> All()
     {
-        return await Context.Set<T>().ToListAsync();
+        return await Task.FromResult(Context.Set<T>());
     }
 
     public async Task<T?> GetById(int id)
@@ -39,9 +39,9 @@ public class RepositoryGeneric<T, TV> : IRepositoryGeneric<T> where TV : DbConte
         return Task.CompletedTask;
     }
 
-    public async Task<List<T>> Find(Expression<Func<T, bool>> predicate)
+    public async Task<IQueryable<T>> Find(Expression<Func<T, bool>> predicate)
     {
-        return await Context.Set<T>().Where(predicate).ToListAsync();
+        return await Task.FromResult(Context.Set<T>().Where(predicate));
     }
 
     public async Task<bool> Exists(Expression<Func<T, bool>> predicate)

@@ -49,7 +49,18 @@ public class BikeBusinessLogic : IBikeBusinessLogic
     public async Task<List<BikeRetrieveDto>> GetBikes()
     {
         var bikes = await _bikeRepository.All();
-        return _mapper.Map<List<BikeRetrieveDto>>(bikes);
+        return bikes.Select(b => new BikeRetrieveDto
+        {
+            BikeStationId = b.BikeStationId,
+            BikeStationName = b.BikeStation != null ? b.BikeStation.Name : null,
+            Id = b.Id,
+            CreatedOn = b.CreatedOn,
+            IsActive = b.IsActive,
+            Description = b.Description,
+            LicensePlate = b.LicensePlate,
+            Status = b.Status,
+            UpdatedOn = b.UpdatedOn
+        }).ToList();
     }
 
     public async Task AddBike(BikeInsertDto bikeInsertDto)
@@ -178,7 +189,6 @@ public class BikeBusinessLogic : IBikeBusinessLogic
             .GetNearestBikeStationFromLocation(bikeCheckout.Longitude, bikeCheckout.Latitude);
 
         bike.BikeStationId = nearestBikeStation.Id;
-        nearestBikeStation.UsedParkingSpace += 1;
         await _bikeRepository.SaveChanges();
     }
 }

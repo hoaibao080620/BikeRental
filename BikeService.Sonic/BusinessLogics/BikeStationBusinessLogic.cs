@@ -68,7 +68,7 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
 
         if (!bikeLocations.Any()) throw new NoBikeStationFoundException();
         
-        var nearestBikeLocation = bikeLocations.Where(x => x.ParkingSpace - x.UsedParkingSpace != 0)
+        var nearestBikeLocation = bikeLocations
             .Select(x => new
         {
             Distance = GeoCalculator.GetDistance(

@@ -10,4 +10,5 @@ public class BikeRetrieveDto
     public string? Description { get; set; }
     public int? BikeStationId { get; set; }
     public string Status { get; set; } = null!;
+    public string? BikeStationName { get; set; }
 }
