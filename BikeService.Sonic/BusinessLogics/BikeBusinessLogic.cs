@@ -6,6 +6,7 @@ using BikeService.Sonic.Dtos.BikeOperation;
 using BikeService.Sonic.Exceptions;
 using BikeService.Sonic.Models;
 using BikeService.Sonic.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace BikeService.Sonic.BusinessLogics;
 
@@ -40,16 +41,27 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         _bikeStationRepository = bikeStationRepository;
     }
 
-    public async Task<BikeRetrieveDto> GetBike(int id)
+    public async Task<BikeRetrieveDto?> GetBike(int id)
     {
-        var bike = await GetBikeById(id);
-        return _mapper.Map<BikeRetrieveDto>(bike);
+        var bike = await _bikeRepository.Find(b => b.Id == id);
+        return bike.AsNoTracking().Select(b => new BikeRetrieveDto
+        {
+            BikeStationId = b.BikeStationId,
+            BikeStationName = b.BikeStation != null ? b.BikeStation.Name : null,
+            Id = b.Id,
+            CreatedOn = b.CreatedOn,
+            IsActive = b.IsActive,
+            Description = b.Description,
+            LicensePlate = b.LicensePlate,
+            Status = b.Status,
+            UpdatedOn = b.UpdatedOn
+        }).FirstOrDefault();
     }
 
     public async Task<List<BikeRetrieveDto>> GetBikes()
     {
         var bikes = await _bikeRepository.All();
-        return bikes.Select(b => new BikeRetrieveDto
+        return bikes.AsNoTracking().Select(b => new BikeRetrieveDto
         {
             BikeStationId = b.BikeStationId,
             BikeStationName = b.BikeStation != null ? b.BikeStation.Name : null,
@@ -66,14 +78,16 @@ public class BikeBusinessLogic : IBikeBusinessLogic
     public async Task AddBike(BikeInsertDto bikeInsertDto)
     {
         var bike = _mapper.Map<Bike>(bikeInsertDto);
-        bike.Status = "Available";
+        bike.Status = BikeStatus.Available;
         await _bikeRepository.Add(bike);
         await _bikeRepository.SaveChanges();
     }
 
     public async Task UpdateBike(BikeUpdateDto bikeInsertDto)
     {
-        await _bikeRepository.Update(_mapper.Map<Bike>(bikeInsertDto));
+        var bike = _mapper.Map<Bike>(bikeInsertDto);
+        bike.UpdatedOn = DateTime.UtcNow;
+        await _bikeRepository.Update(bike);
         await _bikeRepository.SaveChanges();
     }
 
@@ -90,7 +104,6 @@ public class BikeBusinessLogic : IBikeBusinessLogic
     {
         var managerEmails = await _bikeStationManagerRepository.GetManagerEmailsByBikeId(bikeCheckinDto.BikeId);
         var bike = await GetBikeById(bikeCheckinDto.BikeId);
-        var bikeStation = await _bikeStationRepository.GetById(bike.BikeStationId!.Value);
 
         var bikeLocation = new BikeLocationDto
         {
@@ -103,9 +116,8 @@ public class BikeBusinessLogic : IBikeBusinessLogic
 
         var pushEventToMapTask = PushEventToMap(managerEmails, bikeLocation);
         var startTrackingBikeTask = StartTrackingBike(bikeCheckinDto, userEmail);
-        bikeStation!.UsedParkingSpace += 1;
-        
-        await _bikeStationRepository.SaveChanges();
+        bike.Status = BikeStatus.InUsed;
+        await _bikeRepository.SaveChanges();
         await Task.WhenAll(pushEventToMapTask, startTrackingBikeTask);
     }
 
@@ -113,6 +125,8 @@ public class BikeBusinessLogic : IBikeBusinessLogic
     {
         var managerEmails = await _bikeStationManagerRepository.GetManagerEmailsByBikeId(bikeCheckout.BikeId);
         var bike = await GetBikeById(bikeCheckout.BikeId);
+        bike.Status = BikeStatus.Available;
+        await _bikeRepository.SaveChanges();
         
         var pushEventToMapTask = PushEventToMap(managerEmails, new BikeLocationDto
         {
@@ -137,7 +151,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
 
     private async Task<Bike> GetBikeById(int bikeId)
     {
-        var bike = await _bikeRepository.GetById(bikeId);
+        var bike = await _bikeRepository.GetById(bikeId) ?? throw new BikeNotFoundException(bikeId);
         return bike ?? throw new BikeNotFoundException(bikeId);
     }
 

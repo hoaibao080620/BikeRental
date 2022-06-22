@@ -5,7 +5,7 @@ namespace BikeService.Sonic.BusinessLogics;
 
 public interface IBikeBusinessLogic
 {
-    Task<BikeRetrieveDto> GetBike(int id);
+    Task<BikeRetrieveDto?> GetBike(int id);
     Task<List<BikeRetrieveDto>> GetBikes();
     Task AddBike(BikeInsertDto bikeInsertDto);
     Task UpdateBike(BikeUpdateDto bikeInsertDto);

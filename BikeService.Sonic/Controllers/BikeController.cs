@@ -34,6 +34,7 @@ public class BikeController : ControllerBase
     public async Task<IActionResult> GetBike(int id)
     {
         var bike = await _bikeBusinessLogic.GetBike(id);
+        if (bike is null) return NotFound();
         return Ok(bike);
     }
 
@@ -41,7 +42,6 @@ public class BikeController : ControllerBase
     public async Task<IActionResult> CreateBike(BikeInsertDto bikeInsertDto)
     {
         await _bikeBusinessLogic.AddBike(bikeInsertDto);
-
         return Ok(bikeInsertDto);
     }
     
