@@ -23,6 +23,6 @@ public class GoogleMapService : IGoogleMapService
         var response = await (await _httpClient.PostAsync(endpoint, null)).Content.ReadAsStringAsync();
         var address = JsonConvert.DeserializeObject<GoogleMapApiResponse>(response);
 
-        return address?.Addresses.FirstOrDefault()?.FormattedAddress;
+        return address?.Results.FirstOrDefault()?.FormattedAddress;
     }
 }

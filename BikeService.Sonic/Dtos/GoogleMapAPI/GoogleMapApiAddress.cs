@@ -1,3 +1,9 @@
-﻿namespace BikeService.Sonic.Dtos.GoogleMapAPI;
+﻿using Newtonsoft.Json;
 
-public record GoogleMapApiAddress(string? FormattedAddress);
+namespace BikeService.Sonic.Dtos.GoogleMapAPI;
+
+public class GoogleMapApiAddress
+{
+    [JsonProperty("formatted_address")]
+    public string FormattedAddress { get; set; } = null!;
+}
