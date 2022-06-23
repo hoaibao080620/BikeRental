@@ -25,7 +25,10 @@ public class BikeController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetBikes()
     {
-        var bikes = await _bikeBusinessLogic.GetBikes();
+        var email = HttpContext.User.Claims.FirstOrDefault(x => 
+            x.Type == ClaimTypes.NameIdentifier)!.Value;
+        
+        var bikes = await _bikeBusinessLogic.GetBikes(email);
         return Ok(bikes);
     }
     

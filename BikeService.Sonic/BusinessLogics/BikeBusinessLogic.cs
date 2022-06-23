@@ -20,6 +20,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
     private readonly IAccountRepository _accountRepository;
     private readonly IBikeStationBusinessLogic _bikeStationBusinessLogic;
     private readonly IBikeStationRepository _bikeStationRepository;
+    private readonly IBikeRentalTrackingHistoryRepository _bikeRentalTrackingHistoryRepository;
 
     public BikeBusinessLogic(
         IBikeLocationHub bikeLocationHub, 
@@ -29,7 +30,8 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         IBikeRentalTrackingRepository bikeRentalTrackingRepository,
         IAccountRepository accountRepository,
         IBikeStationBusinessLogic bikeStationBusinessLogic,
-        IBikeStationRepository bikeStationRepository)
+        IBikeStationRepository bikeStationRepository,
+        IBikeRentalTrackingHistoryRepository bikeRentalTrackingHistoryRepository)
     {
         _bikeLocationHub = bikeLocationHub;
         _bikeStationManagerRepository = bikeStationManagerRepository;
@@ -39,6 +41,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         _accountRepository = accountRepository;
         _bikeStationBusinessLogic = bikeStationBusinessLogic;
         _bikeStationRepository = bikeStationRepository;
+        _bikeRentalTrackingHistoryRepository = bikeRentalTrackingHistoryRepository;
     }
 
     public async Task<BikeRetrieveDto?> GetBike(int id)
@@ -58,10 +61,13 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         }).FirstOrDefault();
     }
 
-    public async Task<List<BikeRetrieveDto>> GetBikes()
+    public async Task<List<BikeRetrieveDto>> GetBikes(string managerEmail)
     {
         var bikes = await _bikeRepository.All();
-        return bikes.AsNoTracking().Select(b => new BikeRetrieveDto
+        return bikes.Where(b => 
+            b.BikeStation != null && 
+            b.BikeStation.BikeStationManagers.Any(bs => bs.Manager.Email == managerEmail))
+        .Select(b => new BikeRetrieveDto
         {
             BikeStationId = b.BikeStationId,
             BikeStationName = b.BikeStation != null ? b.BikeStation.Name : null,
@@ -72,7 +78,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
             LicensePlate = b.LicensePlate,
             Status = b.Status,
             UpdatedOn = b.UpdatedOn
-        }).ToList();
+        }).AsNoTracking().ToList();
     }
 
     public async Task AddBike(BikeInsertDto bikeInsertDto)
@@ -178,7 +184,15 @@ public class BikeBusinessLogic : IBikeBusinessLogic
             CheckinTime = bikeCheckinDto.CheckinTime
         });
 
-        await _bikeRentalTrackingRepository.SaveChanges();
+        await _bikeRentalTrackingHistoryRepository.Add(new BikeRentalTrackingHistory
+        {
+            BikeId = bikeCheckinDto.BikeId,
+            CreatedOn = DateTime.UtcNow,
+            UpdatedOn = DateTime.UtcNow,
+            IsActive = true,
+            Latitude = bikeCheckinDto.Latitude,
+            Longitude = bikeCheckinDto.Longitude
+        });
     }
     
     private async Task StopTrackingBike(string userEmail)

@@ -1,5 +1,6 @@
 ﻿using BikeService.Sonic.BusinessLogics;
 using BikeService.Sonic.Dtos;
+using BikeService.Sonic.Validation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 namespace BikeService.Sonic.Controllers;
@@ -9,9 +10,12 @@ namespace BikeService.Sonic.Controllers;
 public class BikeStationController : ControllerBase
 {
     private readonly IBikeStationBusinessLogic _bikeStationBusinessLogic;
-    public BikeStationController(IBikeStationBusinessLogic bikeStationBusinessLogic)
+    private readonly IBikeStationValidation _bikeStationValidation;
+
+    public BikeStationController(IBikeStationBusinessLogic bikeStationBusinessLogic, IBikeStationValidation bikeStationValidation)
     {
         _bikeStationBusinessLogic = bikeStationBusinessLogic;
+        _bikeStationValidation = bikeStationValidation;
     }
 
     [HttpGet]
@@ -48,8 +52,10 @@ public class BikeStationController : ControllerBase
     [Route("{id:int}")]
     public async Task<IActionResult> DeleteStationBike(int id)
     {
+        if (await _bikeStationValidation.IsBikeStationHasBikes(id)) 
+            return BadRequest("Bike station has bike, cannot delete it!");
+        
         await _bikeStationBusinessLogic.DeleteStationBike(id);
-
         return Ok();
     }
 }

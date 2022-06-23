@@ -18,18 +18,15 @@ public class UserCreatedEventHandler : IMessageQueueHandler
     public async Task Handle(string message)
     {
         var userCreatedMessage = JsonConvert.DeserializeObject<UserCreated>(message);
-
         if(userCreatedMessage is null) return;
 
-        var user = AddUser(userCreatedMessage);
-        
+        var user = await AddUser(userCreatedMessage);
         await _unitOfWork.AccountRepository.Add(new Account
         {
             AccountCode = Guid.NewGuid(),
-            Balance = 0,
             CreatedOn = DateTime.UtcNow,
             IsActive = true,
-            UserId = user.Id
+            User = user
         });
         
         await _unitOfWork.SaveChangesAsync();
@@ -47,9 +44,6 @@ public class UserCreatedEventHandler : IMessageQueueHandler
         };
         
         await _unitOfWork.UserRepository.Add(user);
-        await _unitOfWork.SaveChangesAsync();
-
         return user;
     }
-    
 }

@@ -17,7 +17,6 @@ public class UserUpdatedEventHandler : IMessageQueueHandler
     public async Task Handle(string message)
     {
         var userUpdatedMessage = JsonConvert.DeserializeObject<UserCreated>(message);
-
         if(userUpdatedMessage is null) return;
 
         var user = (await _unitOfWork.UserRepository
@@ -25,8 +24,11 @@ public class UserUpdatedEventHandler : IMessageQueueHandler
         
         if(user is null) return;
 
-        user.FirstName = user.FirstName;
-        user.LastName = user.LastName;
-        user.PhoneNumber = user.PhoneNumber;
+        user.FirstName = userUpdatedMessage.FirstName;
+        user.LastName = userUpdatedMessage.LastName;
+        user.PhoneNumber = userUpdatedMessage.PhoneNumber ?? user.PhoneNumber;
+        user.Email = userUpdatedMessage.Email;
+
+        await _unitOfWork.UserRepository.SaveChanges();
     }
 }

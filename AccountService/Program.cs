@@ -13,6 +13,7 @@ builder.Services.AddDbContextService(builder.Configuration);
 builder.Services.AddOktaAuthenticationService(builder.Configuration);
 builder.Services.AddSingletonServices();
 builder.Services.RegisterMessageHandlers();
+builder.Services.RunMigrations();
 
 
 var app = builder.Build();

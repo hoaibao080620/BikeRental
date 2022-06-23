@@ -9,7 +9,15 @@ public static class DbContextServiceCollectionExtension
     {
         serviceCollection.AddDbContext<AccountServiceDbContext>(options =>
         {
-            options.UseSqlServer(configuration.GetConnectionString("SqlServer"));
+            var connectionString = configuration.GetConnectionString("MysqlServer");
+            options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
         });
+    }
+    
+    public static void RunMigrations(this IServiceCollection serviceCollection)
+    {
+        using var scope = serviceCollection.BuildServiceProvider().CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AccountServiceDbContext>();
+        db.Database.Migrate();
     }
 }

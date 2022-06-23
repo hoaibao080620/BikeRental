@@ -11,4 +11,5 @@ public class BikeRetrieveDto
     public int? BikeStationId { get; set; }
     public string Status { get; set; } = null!;
     public string? BikeStationName { get; set; }
+    public string LastAddress { get; set; } = null!;
 }
