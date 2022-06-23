@@ -11,7 +11,7 @@ builder.Services.AddOktaAuthenticationService(builder.Configuration);
 builder.Services.AddSignalR();
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("CorsPolicy", builder => builder
+    options.AddPolicy("CorsPolicy", innerBuilder => innerBuilder
         .WithOrigins("http://localhost:3000")
         .AllowAnyMethod()
         .AllowAnyHeader()
@@ -19,6 +19,7 @@ builder.Services.AddCors(options =>
 });
 builder.Services.AddDbContextService(builder.Configuration);
 builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddHttpClientToServices();
 builder.Services.RunMigrations();
 
 

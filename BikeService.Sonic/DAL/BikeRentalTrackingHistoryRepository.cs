@@ -5,7 +5,7 @@ using Shared.Repositories;
 namespace BikeService.Sonic.DAL;
 
 public class BikeRentalTrackingHistoryRepository : 
-    RepositoryGeneric<BikeRentalTrackingHistory, BikeServiceDbContext>, 
+    RepositoryGeneric<BikeLocationTrackingHistory, BikeServiceDbContext>, 
     IBikeRentalTrackingHistoryRepository
 {
     public BikeRentalTrackingHistoryRepository(BikeServiceDbContext context) : base(context)

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BikeService.Sonic.Migrations
 {
-    public partial class initialMigrations : Migration
+    public partial class InitialMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -47,6 +47,8 @@ namespace BikeService.Sonic.Migrations
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Email = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    ExternalId = table.Column<int>(type: "int", nullable: false),
+                    IsSuperManager = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedOn = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false)
@@ -66,6 +68,7 @@ namespace BikeService.Sonic.Migrations
                     AccountCode = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     Email = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    Point = table.Column<double>(type: "double", nullable: false),
                     ExternalId = table.Column<int>(type: "int", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedOn = table.Column<DateTime>(type: "datetime(6)", nullable: true),
@@ -88,6 +91,8 @@ namespace BikeService.Sonic.Migrations
                     Description = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     BikeStationId = table.Column<int>(type: "int", nullable: true),
+                    Status = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     CreatedOn = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedOn = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false)
@@ -134,56 +139,63 @@ namespace BikeService.Sonic.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "BikeRentalTrackings",
+                name: "BikeLocationTrackingHistories",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    StartedOn = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    EndedOn = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    StartLongitude = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    StartLatitude = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    EndLongitude = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    EndLatitude = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    TotalDistance = table.Column<double>(type: "double", nullable: true),
+                    Longitude = table.Column<double>(type: "double", nullable: false),
+                    Latitude = table.Column<double>(type: "double", nullable: false),
                     BikeId = table.Column<int>(type: "int", nullable: false),
-                    AccountId = table.Column<int>(type: "int", nullable: false),
-                    State = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
                     CreatedOn = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdatedOn = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BikeRentalTrackings", x => x.Id);
+                    table.PrimaryKey("PK_BikeLocationTrackingHistories", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_BikeRentalTrackings_Bikes_BikeId",
+                        name: "FK_BikeLocationTrackingHistories_Bikes_BikeId",
                         column: x => x.BikeId,
                         principalTable: "Bikes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "BikeLocationTrackings",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Longitude = table.Column<double>(type: "double", nullable: false),
+                    Latitude = table.Column<double>(type: "double", nullable: false),
+                    BikeId = table.Column<int>(type: "int", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdatedOn = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BikeLocationTrackings", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_BikeRentalTrackings_Users_AccountId",
-                        column: x => x.AccountId,
-                        principalTable: "Users",
+                        name: "FK_BikeLocationTrackings_Bikes_BikeId",
+                        column: x => x.BikeId,
+                        principalTable: "Bikes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BikeRentalTrackings_AccountId",
-                table: "BikeRentalTrackings",
-                column: "AccountId");
+                name: "IX_BikeLocationTrackingHistories_BikeId",
+                table: "BikeLocationTrackingHistories",
+                column: "BikeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BikeRentalTrackings_BikeId",
-                table: "BikeRentalTrackings",
+                name: "IX_BikeLocationTrackings_BikeId",
+                table: "BikeLocationTrackings",
                 column: "BikeId");
 
             migrationBuilder.CreateIndex(
@@ -205,16 +217,19 @@ namespace BikeService.Sonic.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "BikeRentalTrackings");
+                name: "BikeLocationTrackingHistories");
+
+            migrationBuilder.DropTable(
+                name: "BikeLocationTrackings");
 
             migrationBuilder.DropTable(
                 name: "BikeStationManagers");
 
             migrationBuilder.DropTable(
-                name: "Bikes");
+                name: "Users");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "Bikes");
 
             migrationBuilder.DropTable(
                 name: "Managers");

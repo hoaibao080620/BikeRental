@@ -3,7 +3,7 @@ using Shared.Repositories;
 
 namespace BikeService.Sonic.DAL;
 
-public interface IBikeRentalTrackingHistoryRepository : IRepositoryGeneric<BikeRentalTrackingHistory>
+public interface IBikeRentalTrackingHistoryRepository : IRepositoryGeneric<BikeLocationTrackingHistory>
 {
     
 }

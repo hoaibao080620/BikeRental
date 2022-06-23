@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BikeService.Sonic.Migrations
 {
     [DbContext(typeof(BikeServiceDbContext))]
-    [Migration("20220614134015_AddStatusFieldToBikeModel")]
-    partial class AddStatusFieldToBikeModel
+    [Migration("20220623221702_InitialMigration")]
+    partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -42,6 +42,9 @@ namespace BikeService.Sonic.Migrations
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("tinyint(1)");
+
+                    b.Property<double>("Point")
+                        .HasColumnType("double");
 
                     b.Property<DateTime?>("UpdatedOn")
                         .HasColumnType("datetime(6)");
@@ -87,13 +90,10 @@ namespace BikeService.Sonic.Migrations
                     b.ToTable("Bikes");
                 });
 
-            modelBuilder.Entity("BikeService.Sonic.Models.BikeRentalTracking", b =>
+            modelBuilder.Entity("BikeService.Sonic.Models.BikeLocationTracking", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int>("AccountId")
                         .HasColumnType("int");
 
                     b.Property<int>("BikeId")
@@ -102,37 +102,54 @@ namespace BikeService.Sonic.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<double?>("EndLatitude")
-                        .HasColumnType("double");
-
-                    b.Property<double?>("EndLongitude")
-                        .HasColumnType("double");
-
-                    b.Property<DateTime?>("EndedOn")
-                        .HasColumnType("datetime(6)");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<double>("StartLatitude")
+                    b.Property<double>("Latitude")
                         .HasColumnType("double");
 
-                    b.Property<double>("StartLongitude")
+                    b.Property<double>("Longitude")
                         .HasColumnType("double");
-
-                    b.Property<DateTime>("StartedOn")
-                        .HasColumnType("datetime(6)");
 
                     b.Property<DateTime?>("UpdatedOn")
                         .HasColumnType("datetime(6)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AccountId");
+                    b.HasIndex("BikeId");
+
+                    b.ToTable("BikeLocationTrackings");
+                });
+
+            modelBuilder.Entity("BikeService.Sonic.Models.BikeLocationTrackingHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("BikeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<double>("Latitude")
+                        .HasColumnType("double");
+
+                    b.Property<double>("Longitude")
+                        .HasColumnType("double");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("BikeId");
 
-                    b.ToTable("BikeRentalTrackings");
+                    b.ToTable("BikeLocationTrackingHistories");
                 });
 
             modelBuilder.Entity("BikeService.Sonic.Models.BikeStation", b =>
@@ -226,6 +243,9 @@ namespace BikeService.Sonic.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<bool>("IsSuperManager")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<DateTime?>("UpdatedOn")
                         .HasColumnType("datetime(6)");
 
@@ -243,21 +263,24 @@ namespace BikeService.Sonic.Migrations
                     b.Navigation("BikeStation");
                 });
 
-            modelBuilder.Entity("BikeService.Sonic.Models.BikeRentalTracking", b =>
+            modelBuilder.Entity("BikeService.Sonic.Models.BikeLocationTracking", b =>
                 {
-                    b.HasOne("BikeService.Sonic.Models.Account", "Account")
-                        .WithMany()
-                        .HasForeignKey("AccountId")
+                    b.HasOne("BikeService.Sonic.Models.Bike", "Bike")
+                        .WithMany("BikeLocationTrackings")
+                        .HasForeignKey("BikeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Bike");
+                });
+
+            modelBuilder.Entity("BikeService.Sonic.Models.BikeLocationTrackingHistory", b =>
+                {
                     b.HasOne("BikeService.Sonic.Models.Bike", "Bike")
                         .WithMany()
                         .HasForeignKey("BikeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Account");
 
                     b.Navigation("Bike");
                 });
@@ -279,6 +302,11 @@ namespace BikeService.Sonic.Migrations
                     b.Navigation("BikeStation");
 
                     b.Navigation("Manager");
+                });
+
+            modelBuilder.Entity("BikeService.Sonic.Models.Bike", b =>
+                {
+                    b.Navigation("BikeLocationTrackings");
                 });
 
             modelBuilder.Entity("BikeService.Sonic.Models.BikeStation", b =>

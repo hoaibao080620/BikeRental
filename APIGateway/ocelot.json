@@ -20,14 +20,14 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "bike-service-13062022.herokuapp.com",
-          "Port": 443
+          "Host": "localhost",
+          "Port": 7199
         }
       ],
       "UpstreamPathTemplate": "/api/v1/bike-api/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "AuthenticationOptions": {
-        "AuthenticationProviderKey": "OktaProvider",
+        "AuthenticationProviderKey": "",
         "AllowedScopes": []
       }
     },

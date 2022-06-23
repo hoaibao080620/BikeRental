@@ -3,7 +3,7 @@ using Shared.Models;
 
 namespace BikeService.Sonic.Models;
 
-public class BikeRentalTrackingHistory : BaseEntity
+public class BikeLocationTrackingHistory : BaseEntity
 {
     public double Longitude { get; set; }
     public double Latitude { get; set; }

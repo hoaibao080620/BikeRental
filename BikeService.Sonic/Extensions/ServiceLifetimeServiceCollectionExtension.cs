@@ -3,7 +3,6 @@ using BikeService.Sonic.DAL;
 using BikeService.Sonic.Services.Implementation;
 using BikeService.Sonic.Services.Interfaces;
 using BikeRental.MessageQueue.SubscriptionManager;
-using BikeService.Sonic.Models;
 using BikeService.Sonic.Validation;
 using Nest;
 using Shared.Service;
@@ -21,7 +20,7 @@ public static class ServiceLifetimeServiceCollectionExtension
         serviceCollection.AddScoped<IBikeRepository, BikeRepository>();
         serviceCollection.AddScoped<IImportService, BikeCsvImportService>();
         serviceCollection.AddScoped<IBikeStationRepository, BikeStationRepository>();
-        serviceCollection.AddScoped<IBikeRentalTrackingRepository, BikeRentalTrackingRepository>();
+        serviceCollection.AddScoped<IBikeLocationTrackingRepository, BikeLocationTrackingRepository>();
         serviceCollection.AddScoped<IAccountRepository, AccountRepository>();
         serviceCollection.AddScoped<IBikeStationBusinessLogic, BikeStationBusinessLogic>();
         serviceCollection.AddScoped<IBikeRentalTrackingHistoryRepository, BikeRentalTrackingHistoryRepository>();
@@ -41,6 +40,7 @@ public static class ServiceLifetimeServiceCollectionExtension
         // serviceCollection.AddSingleton<IBikeStationRepository, BikeStationRepository>();
         // serviceCollection.AddSingleton<IBikeRepository, BikeRepository>();
         serviceCollection.AddSingleton<IMessageQueueSubscriptionManager>(new MessageQueueSubscriptionManager());
+        serviceCollection.AddSingleton<IGoogleMapService, GoogleMapService>();
     }
 
     public static void RegisterMessageHandlers(this IServiceCollection serviceCollection)

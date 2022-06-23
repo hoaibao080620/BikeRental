@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using BikeService.Sonic.Const;
 using BikeService.Sonic.DAL;
 using BikeService.Sonic.Models;
 using CsvHelper;
@@ -60,7 +61,7 @@ public class BikeCsvImportService : IImportService
                 BikeStationId = bikeStationDict[bikeStationName]?.Id,
                 IsActive = true,
                 CreatedOn = DateTime.UtcNow,
-                Status = "Available"
+                Status = BikeStatus.Available
             });
         }
         
