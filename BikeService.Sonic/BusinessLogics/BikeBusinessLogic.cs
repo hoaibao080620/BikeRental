@@ -93,17 +93,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
             bikeCheckinDto.Longitude,
             bikeCheckinDto.Latitude);
 
-        var bikeLocation = new BikeLocationDto
-        {
-            BikeId = bike.Id,
-            Longitude = bikeCheckinDto.Longitude,
-            Latitude = bikeCheckinDto.Latitude,
-            LicensePlate = bike.LicensePlate,
-            Address = address,
-            Operation = BikeLocationOperation.AddBikeToMap
-        };
-
-        var pushEventToMapTask = PushEventToMap(managerEmails, bikeLocation);
+        var pushEventToMapTask = NotifyBikeLocationChange(managerEmails);
         var startTrackingBikeTask = StartTrackingBike(bikeCheckinDto, userEmail);
         var updateCachedTask = UpdateBikeCache(new BikeCacheParameter
         {
@@ -131,13 +121,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
             bikeCheckout.Longitude,
             bikeCheckout.Latitude);
         
-        var pushEventToMapTask = PushEventToMap(managerEmails, new BikeLocationDto
-        {
-            BikeId = bike.Id,
-            Operation = BikeLocationOperation.RemoveBikeFromMap,
-            Address = address
-        });
-        
+        var pushEventToMapTask = NotifyBikeLocationChange(managerEmails);
         var stopTrackingBikeTask = StopTrackingBike(userEmail, bike.Id);
         var updateBikeCache = UpdateBikeCache(new BikeCacheParameter
         {
@@ -170,7 +154,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
             bikeLocationDto.Longitude, 
             bikeLocationDto.Latitude);
         
-        var pushEventTask = PushEventToMap(managerEmails, bikeLocationDto);
+        var pushEventTask = NotifyBikeLocationChange(managerEmails);
         var updateBikeCache = UpdateBikeCache(new BikeCacheParameter
         {
             BikeId = bike.Id,
@@ -188,11 +172,11 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         return bike ?? throw new BikeNotFoundException(bikeId);
     }
 
-    private async Task PushEventToMap(List<string> managerEmails, BikeLocationDto bikeLocationDto)
+    private async Task NotifyBikeLocationChange(List<string> managerEmails)
     {
         foreach (var managerEmail in managerEmails)
         {
-            await _bikeLocationHub.SendBikeLocationsData(managerEmail, bikeLocationDto);
+            await _bikeLocationHub.NotifyBikeLocationHasChanged(managerEmail);
         }
     }
 

@@ -20,10 +20,10 @@ public class BikeLocationHub : Hub, IBikeLocationHub
         _hubContext = hubContext;
     }
     
-    public async Task SendBikeLocationsData(string? email, BikeLocationDto bike)
+    public async Task NotifyBikeLocationHasChanged(string? email)
     {
         if (string.IsNullOrEmpty(email)) return;
-        await _hubContext.Clients.Group(email).SendAsync(SignalRChannel.BikeLocationChannel, bike);
+        await _hubContext.Clients.Group(email).SendAsync(SignalRChannel.BikeLocationChannel);
     }
     
     public override async Task OnConnectedAsync()
