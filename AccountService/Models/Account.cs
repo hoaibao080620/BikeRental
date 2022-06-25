@@ -7,8 +7,7 @@ namespace AccountService.Models;
 public class Account : BaseEntity
 {
     public Guid AccountCode { get; set; }
-    public string? CreditCard { get; set; }
-    public double Balance { get; set; }
+    public double Point { get; set; }
     [Required]
     public int UserId { get; set; }
     [ForeignKey("UserId")]

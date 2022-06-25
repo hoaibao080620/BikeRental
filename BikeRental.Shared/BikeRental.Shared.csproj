@@ -16,4 +16,12 @@
       </PackageReference>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="nupkgs" />
+    </ItemGroup>
+
+    <PropertyGroup>
+        <Version>1.1.0-alpha</Version>
+    </PropertyGroup>
+
 </Project>

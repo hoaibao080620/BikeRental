@@ -4,6 +4,7 @@ using BikeService.Sonic.Services.Implementation;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddRedisCache(builder.Configuration);
 builder.Services.AddScopedServices();
 builder.Services.AddSingletonServices(builder.Configuration);
 builder.Services.AddElasticClient(builder.Configuration);
@@ -11,7 +12,7 @@ builder.Services.AddOktaAuthenticationService(builder.Configuration);
 builder.Services.AddSignalR();
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("CorsPolicy", builder => builder
+    options.AddPolicy("CorsPolicy", innerBuilder => innerBuilder
         .WithOrigins("http://localhost:3000")
         .AllowAnyMethod()
         .AllowAnyHeader()
@@ -19,6 +20,7 @@ builder.Services.AddCors(options =>
 });
 builder.Services.AddDbContextService(builder.Configuration);
 builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddHttpClientToServices();
 builder.Services.RunMigrations();
 
 

@@ -4,6 +4,7 @@ using BikeService.Sonic.BikeDbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -17,245 +18,353 @@ namespace BikeService.Sonic.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "6.0.5")
-                .HasAnnotation("Relational:MaxIdentifierLength", 64);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("BikeService.Sonic.Models.Account", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<Guid>("AccountCode")
-                        .HasColumnType("char(36)");
+                        .HasColumnType("uuid")
+                        .HasColumnName("account_code");
 
                     b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_on");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("text")
+                        .HasColumnName("email");
 
                     b.Property<int>("ExternalId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("external_id");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
+                    b.Property<double>("Point")
+                        .HasColumnType("double precision")
+                        .HasColumnName("point");
 
                     b.Property<DateTime?>("UpdatedOn")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_on");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_users");
 
-                    b.ToTable("Users");
+                    b.ToTable("users", (string)null);
                 });
 
             modelBuilder.Entity("BikeService.Sonic.Models.Bike", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("BikeStationId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("bike_station_id");
 
                     b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_on");
 
                     b.Property<string>("Description")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text")
+                        .HasColumnName("description");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
 
                     b.Property<string>("LicensePlate")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("text")
+                        .HasColumnName("license_plate");
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("text")
+                        .HasColumnName("status");
 
                     b.Property<DateTime?>("UpdatedOn")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_on");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_bikes");
 
-                    b.HasIndex("BikeStationId");
+                    b.HasIndex("BikeStationId")
+                        .HasDatabaseName("ix_bikes_bike_station_id");
 
-                    b.ToTable("Bikes");
+                    b.ToTable("bikes", (string)null);
                 });
 
-            modelBuilder.Entity("BikeService.Sonic.Models.BikeRentalTracking", b =>
+            modelBuilder.Entity("BikeService.Sonic.Models.BikeLocationTracking", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
-                    b.Property<int>("AccountId")
-                        .HasColumnType("int");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("BikeId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("bike_id");
 
                     b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<double?>("EndLatitude")
-                        .HasColumnType("double");
-
-                    b.Property<double?>("EndLongitude")
-                        .HasColumnType("double");
-
-                    b.Property<DateTime?>("EndedOn")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_on");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
 
-                    b.Property<double>("StartLatitude")
-                        .HasColumnType("double");
+                    b.Property<double>("Latitude")
+                        .HasColumnType("double precision")
+                        .HasColumnName("latitude");
 
-                    b.Property<double>("StartLongitude")
-                        .HasColumnType("double");
-
-                    b.Property<DateTime>("StartedOn")
-                        .HasColumnType("datetime(6)");
+                    b.Property<double>("Longitude")
+                        .HasColumnType("double precision")
+                        .HasColumnName("longitude");
 
                     b.Property<DateTime?>("UpdatedOn")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_on");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_bike_location_trackings");
 
-                    b.HasIndex("AccountId");
+                    b.HasIndex("BikeId")
+                        .HasDatabaseName("ix_bike_location_trackings_bike_id");
 
-                    b.HasIndex("BikeId");
+                    b.ToTable("bike_location_trackings", (string)null);
+                });
 
-                    b.ToTable("BikeRentalTrackings");
+            modelBuilder.Entity("BikeService.Sonic.Models.BikeLocationTrackingHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BikeId")
+                        .HasColumnType("integer")
+                        .HasColumnName("bike_id");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_on");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
+                    b.Property<double>("Latitude")
+                        .HasColumnType("double precision")
+                        .HasColumnName("latitude");
+
+                    b.Property<double>("Longitude")
+                        .HasColumnType("double precision")
+                        .HasColumnName("longitude");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_on");
+
+                    b.HasKey("Id")
+                        .HasName("pk_bike_location_tracking_histories");
+
+                    b.HasIndex("BikeId")
+                        .HasDatabaseName("ix_bike_location_tracking_histories_bike_id");
+
+                    b.ToTable("bike_location_tracking_histories", (string)null);
                 });
 
             modelBuilder.Entity("BikeService.Sonic.Models.BikeStation", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("text")
+                        .HasColumnName("address");
 
                     b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_on");
 
                     b.Property<string>("Description")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text")
+                        .HasColumnName("description");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
 
                     b.Property<double>("Latitude")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision")
+                        .HasColumnName("latitude");
 
                     b.Property<double>("Longitude")
-                        .HasColumnType("double");
+                        .HasColumnType("double precision")
+                        .HasColumnName("longitude");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("text")
+                        .HasColumnName("name");
 
                     b.Property<int>("ParkingSpace")
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("parking_space");
 
                     b.Property<DateTime?>("UpdatedOn")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_on");
 
                     b.Property<int>("UsedParkingSpace")
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("used_parking_space");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_bike_stations");
 
-                    b.ToTable("BikeStations");
+                    b.ToTable("bike_stations", (string)null);
                 });
 
             modelBuilder.Entity("BikeService.Sonic.Models.BikeStationManager", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("BikeStationId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("bike_station_id");
 
                     b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_on");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
 
                     b.Property<int>("ManagerId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("manager_id");
 
                     b.Property<DateTime?>("UpdatedOn")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_on");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_bike_station_managers");
 
-                    b.HasIndex("BikeStationId");
+                    b.HasIndex("BikeStationId")
+                        .HasDatabaseName("ix_bike_station_managers_bike_station_id");
 
-                    b.HasIndex("ManagerId");
+                    b.HasIndex("ManagerId")
+                        .HasDatabaseName("ix_bike_station_managers_manager_id");
 
-                    b.ToTable("BikeStationManagers");
+                    b.ToTable("bike_station_managers", (string)null);
                 });
 
             modelBuilder.Entity("BikeService.Sonic.Models.Manager", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_on");
 
                     b.Property<string>("Email")
-                        .HasColumnType("longtext");
+                        .HasColumnType("text")
+                        .HasColumnName("email");
 
                     b.Property<int>("ExternalId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("external_id");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
+                    b.Property<bool>("IsSuperManager")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_super_manager");
 
                     b.Property<DateTime?>("UpdatedOn")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_on");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_managers");
 
-                    b.ToTable("Managers");
+                    b.ToTable("managers", (string)null);
                 });
 
             modelBuilder.Entity("BikeService.Sonic.Models.Bike", b =>
                 {
                     b.HasOne("BikeService.Sonic.Models.BikeStation", "BikeStation")
                         .WithMany("Bikes")
-                        .HasForeignKey("BikeStationId");
+                        .HasForeignKey("BikeStationId")
+                        .HasConstraintName("fk_bikes_bike_stations_bike_station_id");
 
                     b.Navigation("BikeStation");
                 });
 
-            modelBuilder.Entity("BikeService.Sonic.Models.BikeRentalTracking", b =>
+            modelBuilder.Entity("BikeService.Sonic.Models.BikeLocationTracking", b =>
                 {
-                    b.HasOne("BikeService.Sonic.Models.Account", "Account")
-                        .WithMany()
-                        .HasForeignKey("AccountId")
+                    b.HasOne("BikeService.Sonic.Models.Bike", "Bike")
+                        .WithMany("BikeLocationTrackings")
+                        .HasForeignKey("BikeId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_bike_location_trackings_bikes_bike_id");
 
+                    b.Navigation("Bike");
+                });
+
+            modelBuilder.Entity("BikeService.Sonic.Models.BikeLocationTrackingHistory", b =>
+                {
                     b.HasOne("BikeService.Sonic.Models.Bike", "Bike")
                         .WithMany()
                         .HasForeignKey("BikeId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Account");
+                        .IsRequired()
+                        .HasConstraintName("fk_bike_location_tracking_histories_bikes_bike_id");
 
                     b.Navigation("Bike");
                 });
@@ -266,17 +375,24 @@ namespace BikeService.Sonic.Migrations
                         .WithMany("BikeStationManagers")
                         .HasForeignKey("BikeStationId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_bike_station_managers_bike_stations_bike_station_id");
 
                     b.HasOne("BikeService.Sonic.Models.Manager", "Manager")
                         .WithMany("BikeStationManagers")
                         .HasForeignKey("ManagerId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_bike_station_managers_managers_manager_id");
 
                     b.Navigation("BikeStation");
 
                     b.Navigation("Manager");
+                });
+
+            modelBuilder.Entity("BikeService.Sonic.Models.Bike", b =>
+                {
+                    b.Navigation("BikeLocationTrackings");
                 });
 
             modelBuilder.Entity("BikeService.Sonic.Models.BikeStation", b =>

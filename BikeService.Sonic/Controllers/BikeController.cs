@@ -25,7 +25,10 @@ public class BikeController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetBikes()
     {
-        var bikes = await _bikeBusinessLogic.GetBikes();
+        var email = HttpContext.User.Claims.FirstOrDefault(x => 
+            x.Type == ClaimTypes.NameIdentifier)!.Value;
+        
+        var bikes = await _bikeBusinessLogic.GetBikes(email);
         return Ok(bikes);
     }
     
@@ -34,6 +37,7 @@ public class BikeController : ControllerBase
     public async Task<IActionResult> GetBike(int id)
     {
         var bike = await _bikeBusinessLogic.GetBike(id);
+        if (bike is null) return NotFound();
         return Ok(bike);
     }
 
@@ -41,7 +45,6 @@ public class BikeController : ControllerBase
     public async Task<IActionResult> CreateBike(BikeInsertDto bikeInsertDto)
     {
         await _bikeBusinessLogic.AddBike(bikeInsertDto);
-
         return Ok(bikeInsertDto);
     }
     
@@ -53,11 +56,10 @@ public class BikeController : ControllerBase
         return Ok();
     }
     
-    [HttpDelete]
+    [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteBike(int id)
     {
         await _bikeBusinessLogic.DeleteBike(id);
-
         return Ok();
     }
 
@@ -71,12 +73,12 @@ public class BikeController : ControllerBase
     
     [HttpPost]
     [Route("[action]")]
-    public async Task<IActionResult> Checking(BikeCheckingDto bikeCheckingDto)
+    public async Task<IActionResult> Checking(BikeCheckinDto bikeCheckinDto)
     {
         var email = HttpContext.User.Claims.FirstOrDefault(x => 
             x.Type == ClaimTypes.NameIdentifier)!.Value;
         
-        await _bikeBusinessLogic.BikeChecking(bikeCheckingDto, email);
+        await _bikeBusinessLogic.BikeChecking(bikeCheckinDto, email);
         return Ok();
     }
     

@@ -3,7 +3,9 @@ using BikeService.Sonic.DAL;
 using BikeService.Sonic.Services.Implementation;
 using BikeService.Sonic.Services.Interfaces;
 using BikeRental.MessageQueue.SubscriptionManager;
-using BikeService.Sonic.Models;
+using BikeService.Sonic.Decorators;
+using BikeService.Sonic.Validation;
+using Microsoft.Extensions.Caching.Distributed;
 using Nest;
 using Shared.Service;
 
@@ -17,21 +19,29 @@ public static class ServiceLifetimeServiceCollectionExtension
         serviceCollection.AddScoped<IBikeLocationHub, BikeLocationHub>();
         serviceCollection.AddScoped<IBikeStationManagerRepository, BikeStationManagerRepository>();
         serviceCollection.AddScoped<IBikeBusinessLogic, BikeBusinessLogic>();
-        serviceCollection.AddScoped<IBikeRepository, BikeRepository>();
-        serviceCollection.AddScoped<IImportService, CsvImportService>();
+        serviceCollection.AddScoped<IImportService, BikeCsvImportService>();
         serviceCollection.AddScoped<IBikeStationRepository, BikeStationRepository>();
-        serviceCollection.AddScoped<IBikeRentalTrackingRepository, BikeRentalTrackingRepository>();
+        serviceCollection.AddScoped<IBikeLocationTrackingRepository, BikeLocationTrackingRepository>();
         serviceCollection.AddScoped<IAccountRepository, AccountRepository>();
         serviceCollection.AddScoped<IBikeStationBusinessLogic, BikeStationBusinessLogic>();
-        
+        serviceCollection.AddScoped<IBikeRentalTrackingHistoryRepository, BikeRentalTrackingHistoryRepository>();
+        serviceCollection.AddScoped<IBikeStationValidation, BikeStationValidation>();
+        serviceCollection.AddScoped<IBikeRepository, BikeRepository>();
+
+        serviceCollection.AddScoped<IBikeRepositoryAdapter, BikeRepositoryConcrete>();
+        serviceCollection.Decorate<IBikeRepositoryAdapter>((inner, provider) => 
+            new BikeRepositoryAdapterWithCachingDecorator(
+                inner, 
+                provider.GetRequiredService<IDistributedCache>(),
+                provider.GetRequiredService<IGoogleMapService>()));
     }
     
     public static void AddSingletonServices(this IServiceCollection serviceCollection, IConfiguration configuration)
     {
-        serviceCollection.AddStackExchangeRedisCache(options =>
-        {
-            options.Configuration = configuration["Redis:Url"];
-        });
+        // serviceCollection.AddStackExchangeRedisCache(options =>
+        // {
+        //     options.Configuration = configuration["Redis:Url"];
+        // });
         
         // serviceCollection.AddSingleton(new MongoClient(configuration["MongoDB:ConnectionString"])
         //     .GetDatabase(configuration["MongoDB:Database"]));
@@ -39,6 +49,7 @@ public static class ServiceLifetimeServiceCollectionExtension
         // serviceCollection.AddSingleton<IBikeStationRepository, BikeStationRepository>();
         // serviceCollection.AddSingleton<IBikeRepository, BikeRepository>();
         serviceCollection.AddSingleton<IMessageQueueSubscriptionManager>(new MessageQueueSubscriptionManager());
+        serviceCollection.AddSingleton<IGoogleMapService, GoogleMapService>();
     }
 
     public static void RegisterMessageHandlers(this IServiceCollection serviceCollection)
