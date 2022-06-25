@@ -101,6 +101,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
 
         var pushEventToMapTask = PushEventToMap(managerEmails, bikeLocation);
         var startTrackingBikeTask = StartTrackingBike(bikeCheckinDto, userEmail);
+        await _distributedCache.RemoveAsync(string.Format(RedisCacheKey.SingleBikeStation, bikeLocation.BikeId));
         bike.Status = BikeStatus.InUsed;
         await _bikeRepository.SaveChanges();
         await Task.WhenAll(pushEventToMapTask, startTrackingBikeTask);
