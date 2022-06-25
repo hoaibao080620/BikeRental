@@ -129,7 +129,9 @@ public class BikeBusinessLogic : IBikeBusinessLogic
             Latitude = bikeCheckout.Latitude,
             Address = await _googleMapService.GetAddressOfLocation(
                 bikeCheckout.Longitude, 
-                bikeCheckout.Latitude)
+                bikeCheckout.Latitude),
+            IsRenting = false,
+            Status = BikeStatus.Available
         });
         
         await Task.WhenAll(pushEventToMapTask, stopTrackingBikeTask, updateBikeCache);
@@ -218,12 +220,12 @@ public class BikeBusinessLogic : IBikeBusinessLogic
     
     private async Task StopTrackingBike(string userEmail, int bikeId)
     {
-        var bikeRentalTracking = (await _bikeLocationTrackingRepository
+        var bikeLocationTracking = (await _bikeLocationTrackingRepository
             .Find(b => b.BikeId == bikeId)).FirstOrDefault()
             ?? throw new UserHasNotRentAnyBikeException(userEmail);
 
-        bikeRentalTracking.IsActive = false;
-        bikeRentalTracking.UpdatedOn = DateTime.UtcNow;
+        bikeLocationTracking.IsActive = false;
+        bikeLocationTracking.UpdatedOn = DateTime.UtcNow;
         await _bikeLocationTrackingRepository.SaveChanges();
     }
 
@@ -233,18 +235,20 @@ public class BikeBusinessLogic : IBikeBusinessLogic
             ?? throw new AccountNotfoundException($"Account with email {email} not found!");
     }
 
-    private async Task UpdateBikeCache(BikeCacheParameter bikeLocationDto)
+    private async Task UpdateBikeCache(BikeCacheParameter bikeCacheParameter)
     {
-        await _distributedCache.RemoveAsync(string.Format(RedisCacheKey.SingleBikeStation, bikeLocationDto.BikeId));
+        await _distributedCache.RemoveAsync(string.Format(RedisCacheKey.SingleBikeStation, bikeCacheParameter.BikeId));
         var bikesCache = await _distributedCache.GetStringAsync(RedisCacheKey.BikeStationIds);
 
         if (bikesCache is null) return;
 
         var bikes = JsonSerializer.Deserialize<List<BikeRetrieveDto>>(bikesCache);
-        var bike = bikes!.FirstOrDefault(b => b.Id == bikeLocationDto.BikeId)!;
-        bike.LastLatitude = bikeLocationDto.Latitude;
-        bike.LastLongitude = bikeLocationDto.Longitude;
-        bike.LastAddress = bikeLocationDto.Address;
+        var bike = bikes!.FirstOrDefault(b => b.Id == bikeCacheParameter.BikeId)!;
+        bike.LastLatitude = bikeCacheParameter.Latitude;
+        bike.LastLongitude = bikeCacheParameter.Longitude;
+        bike.LastAddress = bikeCacheParameter.Address;
+        bike.Status = bikeCacheParameter.Status ?? bike.Status;
+        bike.IsRenting = bikeCacheParameter.IsRenting ?? bike.IsRenting;
         
         await _distributedCache.SetAsync(
             RedisCacheKey.BikeStationIds, 

@@ -1,6 +1,5 @@
 ﻿using BikeService.Sonic.DAL;
 using BikeService.Sonic.Dtos.Bike;
-using BikeService.Sonic.Mapper;
 using BikeService.Sonic.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
