@@ -18,10 +18,25 @@ public class BikeRepositoryConcrete : IBikeRepositoryAdapter
     public async Task<BikeRetrieveDto?> GetBike(int bikeId)
     {
         var bike = await _bikeRepository.Find(b => b.Id == bikeId);
-        return bike.Include(b => b.BikeStation)
-            .Include(b => b.BikeLocationTrackings)
+        return bike
             .AsNoTracking()
-            .Select(b => BikeMapper.Map(b)).FirstOrDefault();
+            .Select(b => new BikeRetrieveDto
+            {
+                BikeStationId = b.BikeStationId,
+                BikeStationName = b.BikeStation != null ? b.BikeStation.Name : null,
+                Id = b.Id,
+                CreatedOn = b.CreatedOn,
+                IsActive = b.IsActive,
+                Description = b.Description,
+                LicensePlate = b.LicensePlate,
+                Status = b.Status,
+                UpdatedOn = b.UpdatedOn,
+                LastLongitude = b.BikeLocationTrackings.FirstOrDefault() != null ? 
+                    b.BikeLocationTrackings.FirstOrDefault()!.Longitude : null,
+                LastLatitude = b.BikeLocationTrackings.FirstOrDefault() != null ? 
+                    b.BikeLocationTrackings.FirstOrDefault()!.Latitude : null,
+                IsRenting = b.BikeLocationTrackings.Any(bt => bt.IsActive)
+            }).FirstOrDefault();
     }
 
     public async Task<List<BikeRetrieveDto>> GetBikes(string managerEmail)
@@ -30,7 +45,23 @@ public class BikeRepositoryConcrete : IBikeRepositoryAdapter
         var bikesRetrieveDtos =  bikes.Where(b => 
             b.BikeStation != null && 
             b.BikeStation.BikeStationManagers.Any(bs => bs.Manager.Email == managerEmail)
-        ).Include(b => b.BikeStation).Include(b => b.BikeLocationTrackings).Select(b => BikeMapper.Map(b)).AsNoTracking().ToList();
+        ).Select(b => new BikeRetrieveDto
+        {
+            BikeStationId = b.BikeStationId,
+            BikeStationName = b.BikeStation != null ? b.BikeStation.Name : null,
+            Id = b.Id,
+            CreatedOn = b.CreatedOn,
+            IsActive = b.IsActive,
+            Description = b.Description,
+            LicensePlate = b.LicensePlate,
+            Status = b.Status,
+            UpdatedOn = b.UpdatedOn,
+            LastLongitude = b.BikeLocationTrackings.FirstOrDefault() != null ? 
+                b.BikeLocationTrackings.FirstOrDefault()!.Longitude : null,
+            LastLatitude = b.BikeLocationTrackings.FirstOrDefault() != null ? 
+                b.BikeLocationTrackings.FirstOrDefault()!.Latitude : null,
+            IsRenting = b.BikeLocationTrackings.Any(bt => bt.IsActive)
+        }).AsNoTracking().ToList();
 
         return bikesRetrieveDtos;
     }
