@@ -236,7 +236,11 @@ public class BikeBusinessLogic : IBikeBusinessLogic
     private async Task UpdateBikeCache(BikeCacheParameter bikeLocationDto)
     {
         await _distributedCache.RemoveAsync(string.Format(RedisCacheKey.SingleBikeStation, bikeLocationDto.BikeId));
-        var bikes = JsonSerializer.Deserialize<List<BikeRetrieveDto>>(RedisCacheKey.BikeStationIds)!;
+        var bikesCache = await _distributedCache.GetStringAsync(RedisCacheKey.BikeStationIds);
+
+        if (bikesCache is null) return;
+
+        var bikes = JsonSerializer.Deserialize<List<BikeRetrieveDto>>(bikesCache);
         var bike = bikes!.FirstOrDefault(b => b.Id == bikeLocationDto.BikeId)!;
         bike.LastLatitude = bikeLocationDto.Latitude;
         bike.LastLongitude = bikeLocationDto.Longitude;
