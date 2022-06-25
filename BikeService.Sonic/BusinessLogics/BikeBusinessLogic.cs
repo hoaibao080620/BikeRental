@@ -101,10 +101,21 @@ public class BikeBusinessLogic : IBikeBusinessLogic
 
         var pushEventToMapTask = PushEventToMap(managerEmails, bikeLocation);
         var startTrackingBikeTask = StartTrackingBike(bikeCheckinDto, userEmail);
-        await _distributedCache.RemoveAsync(string.Format(RedisCacheKey.SingleBikeStation, bikeLocation.BikeId));
+        var updateCachedTask = UpdateBikeCache(new BikeCacheParameter
+        {
+            BikeId = bike.Id,
+            Longitude = bikeCheckinDto.Longitude,
+            Latitude = bikeCheckinDto.Latitude,
+            IsRenting = true,
+            Address = await _googleMapService.GetAddressOfLocation(
+                bikeCheckinDto.Longitude, 
+                bikeCheckinDto.Latitude),
+            Status = BikeStatus.InUsed
+        });
+        
         bike.Status = BikeStatus.InUsed;
         await _bikeRepository.SaveChanges();
-        await Task.WhenAll(pushEventToMapTask, startTrackingBikeTask);
+        await Task.WhenAll(pushEventToMapTask, startTrackingBikeTask, updateCachedTask);
     }
 
     public async Task BikeCheckout(BikeCheckoutDto bikeCheckout, string userEmail)
