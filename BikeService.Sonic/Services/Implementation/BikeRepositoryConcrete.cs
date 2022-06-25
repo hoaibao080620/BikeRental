@@ -18,7 +18,9 @@ public class BikeRepositoryConcrete : IBikeRepositoryAdapter
     public async Task<BikeRetrieveDto?> GetBike(int bikeId)
     {
         var bike = await _bikeRepository.Find(b => b.Id == bikeId);
-        return bike.Include(b => b.BikeLocationTrackings).AsNoTracking()
+        return bike.Include(b => b.BikeStation)
+            .Include(b => b.BikeLocationTrackings)
+            .AsNoTracking()
             .Select(b => BikeMapper.Map(b)).FirstOrDefault();
     }
 
@@ -28,7 +30,7 @@ public class BikeRepositoryConcrete : IBikeRepositoryAdapter
         var bikesRetrieveDtos =  bikes.Where(b => 
             b.BikeStation != null && 
             b.BikeStation.BikeStationManagers.Any(bs => bs.Manager.Email == managerEmail)
-        ).Include(b => b.BikeLocationTrackings).Select(b => BikeMapper.Map(b)).AsNoTracking().ToList();
+        ).Include(b => b.BikeStation).Include(b => b.BikeLocationTrackings).Select(b => BikeMapper.Map(b)).AsNoTracking().ToList();
 
         return bikesRetrieveDtos;
     }

@@ -20,7 +20,6 @@ public class BikeBusinessLogic : IBikeBusinessLogic
     private readonly IMapper _mapper;
     private readonly IBikeLocationTrackingRepository _bikeLocationTrackingRepository;
     private readonly IAccountRepository _accountRepository;
-    private readonly IBikeStationBusinessLogic _bikeStationBusinessLogic;
     private readonly IBikeRentalTrackingHistoryRepository _bikeRentalTrackingHistoryRepository;
     private readonly IBikeRepositoryAdapter _bikeRepositoryAdapter;
     private readonly IDistributedCache _distributedCache;
@@ -33,7 +32,6 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         IMapper mapper,
         IBikeLocationTrackingRepository bikeLocationTrackingRepository,
         IAccountRepository accountRepository,
-        IBikeStationBusinessLogic bikeStationBusinessLogic,
         IBikeRentalTrackingHistoryRepository bikeRentalTrackingHistoryRepository,
         IBikeRepositoryAdapter bikeRepositoryAdapter,
         IDistributedCache distributedCache,
@@ -45,7 +43,6 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         _mapper = mapper;
         _bikeLocationTrackingRepository = bikeLocationTrackingRepository;
         _accountRepository = accountRepository;
-        _bikeStationBusinessLogic = bikeStationBusinessLogic;
         _bikeRentalTrackingHistoryRepository = bikeRentalTrackingHistoryRepository;
         _bikeRepositoryAdapter = bikeRepositoryAdapter;
         _distributedCache = distributedCache;
