@@ -20,7 +20,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
     private readonly IAccountRepository _accountRepository;
     private readonly IBikeStationBusinessLogic _bikeStationBusinessLogic;
     private readonly IBikeRentalTrackingHistoryRepository _bikeRentalTrackingHistoryRepository;
-    private readonly IGoogleMapService _googleMapService;
+    private readonly IBikeRepositoryAdapter _bikeRepositoryAdapter;
 
     public BikeBusinessLogic(
         IBikeLocationHub bikeLocationHub, 
@@ -31,7 +31,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         IAccountRepository accountRepository,
         IBikeStationBusinessLogic bikeStationBusinessLogic,
         IBikeRentalTrackingHistoryRepository bikeRentalTrackingHistoryRepository,
-        IGoogleMapService googleMapService)
+        IBikeRepositoryAdapter bikeRepositoryAdapter)
     {
         _bikeLocationHub = bikeLocationHub;
         _bikeStationManagerRepository = bikeStationManagerRepository;
@@ -41,60 +41,18 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         _accountRepository = accountRepository;
         _bikeStationBusinessLogic = bikeStationBusinessLogic;
         _bikeRentalTrackingHistoryRepository = bikeRentalTrackingHistoryRepository;
-        _googleMapService = googleMapService;
+        _bikeRepositoryAdapter = bikeRepositoryAdapter;
     }
 
     public async Task<BikeRetrieveDto?> GetBike(int id)
     {
-        var bike = await _bikeRepository.Find(b => b.Id == id);
-        return bike.AsNoTracking().Select(b => new BikeRetrieveDto
-        {
-            BikeStationId = b.BikeStationId,
-            BikeStationName = b.BikeStation != null ? b.BikeStation.Name : null,
-            Id = b.Id,
-            CreatedOn = b.CreatedOn,
-            IsActive = b.IsActive,
-            Description = b.Description,
-            LicensePlate = b.LicensePlate,
-            Status = b.Status,
-            UpdatedOn = b.UpdatedOn
-        }).FirstOrDefault();
+        return await _bikeRepositoryAdapter.GetBike(id);
     }
 
     public async Task<List<BikeRetrieveDto>> GetBikes(string managerEmail)
     {
-        var bikes = await _bikeRepository.All();
-        var bikesRetrieveDtos =  bikes.Where(b => 
-            b.BikeStation != null && 
-            b.BikeStation.BikeStationManagers.Any(bs => bs.Manager.Email == managerEmail)
-        ).Select(b => new BikeRetrieveDto
-        {
-            BikeStationId = b.BikeStationId,
-            BikeStationName = b.BikeStation != null ? b.BikeStation.Name : null,
-            Id = b.Id,
-            CreatedOn = b.CreatedOn,
-            IsActive = b.IsActive,
-            Description = b.Description,
-            LicensePlate = b.LicensePlate,
-            Status = b.Status,
-            UpdatedOn = b.UpdatedOn,
-            LastLongitude = b.BikeLocationTrackings.Any() ? 
-                b.BikeLocationTrackings.FirstOrDefault()!.Longitude : null,
-            LastLatitude = b.BikeLocationTrackings.Any() != null ? 
-                b.BikeLocationTrackings.FirstOrDefault()!.Latitude : null,
-            IsRenting = b.BikeLocationTrackings.Any(bt => bt.IsActive)
-        }).AsNoTracking().ToList();
-
-        foreach (var bikeRetrieveDto in bikesRetrieveDtos)
-        {
-            if(!bikeRetrieveDto.LastLongitude.HasValue || !bikeRetrieveDto.LastLatitude.HasValue) continue;
-            
-            bikeRetrieveDto.LastAddress =
-                await _googleMapService.GetAddressOfLocation(bikeRetrieveDto.LastLongitude!.Value,
-                    bikeRetrieveDto.LastLatitude!.Value);
-        }
-
-        return bikesRetrieveDtos;
+        var bikes = await _bikeRepositoryAdapter.GetBikes(managerEmail);
+        return bikes;
     }
 
     public async Task AddBike(BikeInsertDto bikeInsertDto)
@@ -132,7 +90,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
             BikeId = bike.Id,
             Longitude = bikeCheckinDto.Longitude,
             Latitude = bikeCheckinDto.Latitude,
-            Plate = bike.LicensePlate,
+            LicensePlate = bike.LicensePlate,
             Operation = BikeLocationOperation.AddBikeToMap
         };
 
@@ -173,7 +131,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         bikeRentalTracking.UpdatedOn = DateTime.UtcNow;
         await _bikeLocationTrackingRepository.SaveChanges();
 
-        bikeLocationDto.Plate = bike.LicensePlate;
+        bikeLocationDto.LicensePlate = bike.LicensePlate;
         bikeLocationDto.Operation = BikeLocationOperation.UpdateBikeFromMap;
         await PushEventToMap(managerEmails, bikeLocationDto);
     }

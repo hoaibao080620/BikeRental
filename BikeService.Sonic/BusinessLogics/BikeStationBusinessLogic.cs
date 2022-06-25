@@ -10,24 +10,19 @@ namespace BikeService.Sonic.BusinessLogics;
 
 public class BikeStationBusinessLogic : IBikeStationBusinessLogic
 {
-    private readonly IBikeLocationHub _bikeLocationHub;
-    private readonly IBikeStationManagerRepository _bikeStationManagerRepository;
     private readonly IBikeStationRepository _bikeStationRepository;
+    private readonly IGoogleMapService _googleMapService;
     private readonly IMapper _mapper;
-    public BikeStationBusinessLogic(IBikeLocationHub bikeLocationHub, 
-        IBikeStationManagerRepository bikeStationManagerRepository,
-        IBikeRepository bikeRepository,
+    public BikeStationBusinessLogic(
         IMapper mapper, 
-        IBikeStationRepository bikeStationRepository)
+        IBikeStationRepository bikeStationRepository,
+        IGoogleMapService googleMapService)
     {
-        _bikeLocationHub = bikeLocationHub;
-        _bikeStationManagerRepository = bikeStationManagerRepository;
-        
         _mapper = mapper;
         _bikeStationRepository = bikeStationRepository;
+        _googleMapService = googleMapService;
     }
-
-
+    
     public async Task<BikeStationRetrieveDto> GetStationBike(int id)
     {
     
@@ -43,7 +38,14 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
 
     public async Task AddStationBike(BikeStationInsertDto bikeInsertDto)
     {
-        await _bikeStationRepository.Add(_mapper.Map<BikeStation>(bikeInsertDto));
+        var bikeStation = _mapper.Map<BikeStation>(bikeInsertDto);
+        bikeStation.CreatedOn = DateTime.UtcNow;
+        bikeStation.IsActive = true;
+        var (latitude, longitude) = await _googleMapService.GetLocationOfAddress(bikeInsertDto.PlaceId);
+        bikeStation.Latitude = latitude;
+        bikeStation.Longitude = longitude;
+        
+        await _bikeStationRepository.Add(bikeStation);
         await _bikeStationRepository.SaveChanges();
     }
 

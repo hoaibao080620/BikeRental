@@ -4,6 +4,7 @@ using BikeService.Sonic.Services.Implementation;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+builder.Services.AddRedisCache(builder.Configuration);
 builder.Services.AddScopedServices();
 builder.Services.AddSingletonServices(builder.Configuration);
 builder.Services.AddElasticClient(builder.Configuration);

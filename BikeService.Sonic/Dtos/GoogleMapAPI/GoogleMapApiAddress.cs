@@ -6,4 +6,6 @@ public class GoogleMapApiAddress
 {
     [JsonProperty("formatted_address")]
     public string FormattedAddress { get; set; } = null!;
+
+    public GoogleMapGeometry Geometry { get; set; } = null!;
 }

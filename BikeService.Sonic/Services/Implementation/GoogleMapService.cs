@@ -25,4 +25,13 @@ public class GoogleMapService : IGoogleMapService
 
         return address?.Results.FirstOrDefault()?.FormattedAddress;
     }
+
+    public async Task<(double, double)> GetLocationOfAddress(string placeId)
+    {
+        var endpoint = $"{_baseUrl}?placeId={placeId}&key={_apiKey}";
+        var response = await (await _httpClient.PostAsync(endpoint, null)).Content.ReadAsStringAsync();
+        var location = JsonConvert.DeserializeObject<List<GoogleMapApiAddress>>(response)?.FirstOrDefault()!;
+
+        return (location.Geometry.Location.Latitude, location.Geometry.Location.Longitude);
+    }
 }

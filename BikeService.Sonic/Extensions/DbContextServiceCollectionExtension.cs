@@ -9,8 +9,8 @@ public static class DbContextServiceCollectionExtension
     {
         serviceCollection.AddDbContext<BikeServiceDbContext>(options =>
         {
-            var connectionString = configuration.GetConnectionString("MysqlServer");
-            options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+            var connectionString = configuration.GetConnectionString("Postgres");
+            options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention();
         });
     }
     
