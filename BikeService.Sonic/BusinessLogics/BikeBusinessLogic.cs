@@ -89,6 +89,9 @@ public class BikeBusinessLogic : IBikeBusinessLogic
     {
         var managerEmails = await _bikeStationManagerRepository.GetManagerEmailsByBikeId(bikeCheckinDto.BikeId);
         var bike = await GetBikeById(bikeCheckinDto.BikeId);
+        var address = await _googleMapService.GetAddressOfLocation(
+            bikeCheckinDto.Longitude,
+            bikeCheckinDto.Latitude);
 
         var bikeLocation = new BikeLocationDto
         {
@@ -96,6 +99,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
             Longitude = bikeCheckinDto.Longitude,
             Latitude = bikeCheckinDto.Latitude,
             LicensePlate = bike.LicensePlate,
+            Address = address,
             Operation = BikeLocationOperation.AddBikeToMap
         };
 
@@ -107,9 +111,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
             Longitude = bikeCheckinDto.Longitude,
             Latitude = bikeCheckinDto.Latitude,
             IsRenting = true,
-            Address = await _googleMapService.GetAddressOfLocation(
-                bikeCheckinDto.Longitude, 
-                bikeCheckinDto.Latitude),
+            Address = address,
             Status = BikeStatus.InUsed
         });
         
@@ -125,11 +127,15 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         bike.Status = BikeStatus.Available;
         bike.BikeStationId = bikeCheckout.BikeStationId;
         await _bikeRepository.SaveChanges();
+        var address = await _googleMapService.GetAddressOfLocation(
+            bikeCheckout.Longitude,
+            bikeCheckout.Latitude);
         
         var pushEventToMapTask = PushEventToMap(managerEmails, new BikeLocationDto
         {
             BikeId = bike.Id,
-            Operation = BikeLocationOperation.RemoveBikeFromMap
+            Operation = BikeLocationOperation.RemoveBikeFromMap,
+            Address = address
         });
         
         var stopTrackingBikeTask = StopTrackingBike(userEmail, bike.Id);
@@ -138,9 +144,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
             BikeId = bike.Id,
             Longitude = bikeCheckout.Longitude,
             Latitude = bikeCheckout.Latitude,
-            Address = await _googleMapService.GetAddressOfLocation(
-                bikeCheckout.Longitude, 
-                bikeCheckout.Latitude),
+            Address = address,
             IsRenting = false,
             Status = BikeStatus.Available
         });
