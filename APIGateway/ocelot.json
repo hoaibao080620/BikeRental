@@ -32,15 +32,31 @@
       }
     },
     {
+      "DownstreamPathTemplate": "/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "https://bike-rental-notification.herokuapp.com",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/api/v1/notification/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "OktaProvider",
+        "AllowedScopes": []
+      }
+    },
+    {
       "DownstreamPathTemplate": "/bikeLocationHub",
       "DownstreamScheme": "ws",
       "DownstreamHostAndPorts": [
         {
-          "Host": "bike-service-13062022.herokuapp.com",
+          "Host": "https://bike-rental-notification.herokuapp.com",
           "Port": 443
         }
       ],
-      "UpstreamPathTemplate": "/api/v1/bike-api/bikeLocationHub",
+      "UpstreamPathTemplate": "/api/v1/notification/bikeLocationHub",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "OPTIONS" ]
     },
     {
@@ -48,11 +64,11 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "bike-service-13062022.herokuapp.com",
+          "Host": "https://bike-rental-notification.herokuapp.com",
           "Port": 443
         }
       ],
-      "UpstreamPathTemplate": "/api/v1/bike-api/bikeLocationHub/{everything}",
+      "UpstreamPathTemplate": "/api/v1/notification/bikeLocationHub/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "OPTIONS" ]
     }
   ]

@@ -2,9 +2,9 @@
 using AccountService.DataAccess.Interfaces;
 using AccountService.MessageQueueHandlers;
 using BikeRental.MessageQueue.Consumer;
+using BikeRental.MessageQueue.MessageType;
 using BikeRental.MessageQueue.Publisher;
 using BikeRental.MessageQueue.SubscriptionManager;
-using Shared.Consts;
 
 namespace AccountService.Extensions;
 

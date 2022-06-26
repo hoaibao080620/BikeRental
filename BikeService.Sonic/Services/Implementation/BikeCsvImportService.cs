@@ -10,13 +10,11 @@ namespace BikeService.Sonic.Services.Implementation;
 
 public class BikeCsvImportService : IImportService
 {
-    private readonly IBikeRepository _bikeRepository;
-    private readonly IBikeStationRepository _bikeStationRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public BikeCsvImportService(IBikeRepository bikeRepository, IBikeStationRepository bikeStationRepository)
+    public BikeCsvImportService(IUnitOfWork unitOfWork)
     {
-        _bikeRepository = bikeRepository;
-        _bikeStationRepository = bikeStationRepository;
+        _unitOfWork = unitOfWork;
     }
     
     public async Task Import(IFormFile formFile)
@@ -50,11 +48,11 @@ public class BikeCsvImportService : IImportService
 
             if (isBikeStationHasNeverBeenRetrieved)
             {
-                var bikeStation = await _bikeStationRepository.GetBikeStationByName(bikeStationName);
+                var bikeStation = await _unitOfWork.BikeStationRepository.GetBikeStationByName(bikeStationName);
                 bikeStationDict.Add(bikeStationName, bikeStation);
             }
 
-            await _bikeRepository.Add(new Bike
+            await _unitOfWork.BikeRepository.Add(new Bike
             {
                 LicensePlate = licensePlate,
                 Description = string.IsNullOrEmpty(description) ? null : description,
@@ -65,6 +63,6 @@ public class BikeCsvImportService : IImportService
             });
         }
         
-        await _bikeRepository.SaveChanges();
+        await _unitOfWork.SaveChangesAsync();
     }
 }

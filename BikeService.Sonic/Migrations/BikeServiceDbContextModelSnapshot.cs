@@ -61,9 +61,9 @@ namespace BikeService.Sonic.Migrations
                         .HasColumnName("updated_on");
 
                     b.HasKey("Id")
-                        .HasName("pk_users");
+                        .HasName("pk_user");
 
-                    b.ToTable("users", (string)null);
+                    b.ToTable("user", (string)null);
                 });
 
             modelBuilder.Entity("BikeService.Sonic.Models.Bike", b =>
@@ -106,12 +106,12 @@ namespace BikeService.Sonic.Migrations
                         .HasColumnName("updated_on");
 
                     b.HasKey("Id")
-                        .HasName("pk_bikes");
+                        .HasName("pk_bike");
 
                     b.HasIndex("BikeStationId")
-                        .HasDatabaseName("ix_bikes_bike_station_id");
+                        .HasDatabaseName("ix_bike_bike_station_id");
 
-                    b.ToTable("bikes", (string)null);
+                    b.ToTable("bike", (string)null);
                 });
 
             modelBuilder.Entity("BikeService.Sonic.Models.BikeLocationTracking", b =>
@@ -148,12 +148,12 @@ namespace BikeService.Sonic.Migrations
                         .HasColumnName("updated_on");
 
                     b.HasKey("Id")
-                        .HasName("pk_bike_location_trackings");
+                        .HasName("pk_bike_location_tracking");
 
                     b.HasIndex("BikeId")
-                        .HasDatabaseName("ix_bike_location_trackings_bike_id");
+                        .HasDatabaseName("ix_bike_location_tracking_bike_id");
 
-                    b.ToTable("bike_location_trackings", (string)null);
+                    b.ToTable("bike_location_tracking", (string)null);
                 });
 
             modelBuilder.Entity("BikeService.Sonic.Models.BikeLocationTrackingHistory", b =>
@@ -190,12 +190,65 @@ namespace BikeService.Sonic.Migrations
                         .HasColumnName("updated_on");
 
                     b.HasKey("Id")
-                        .HasName("pk_bike_location_tracking_histories");
+                        .HasName("pk_bike_location_tracking_history");
 
                     b.HasIndex("BikeId")
-                        .HasDatabaseName("ix_bike_location_tracking_histories_bike_id");
+                        .HasDatabaseName("ix_bike_location_tracking_history_bike_id");
 
-                    b.ToTable("bike_location_tracking_histories", (string)null);
+                    b.ToTable("bike_location_tracking_history", (string)null);
+                });
+
+            modelBuilder.Entity("BikeService.Sonic.Models.BikeRentalBooking", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AccountId")
+                        .HasColumnType("integer")
+                        .HasColumnName("account_id");
+
+                    b.Property<double>("Amount")
+                        .HasColumnType("double precision")
+                        .HasColumnName("amount");
+
+                    b.Property<int>("BikeId")
+                        .HasColumnType("integer")
+                        .HasColumnName("bike_id");
+
+                    b.Property<DateTime>("CheckinOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("checkin_on");
+
+                    b.Property<DateTime?>("CheckoutOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("checkout_on");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_on");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_active");
+
+                    b.Property<DateTime?>("UpdatedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_on");
+
+                    b.HasKey("Id")
+                        .HasName("pk_bike_rental_booking");
+
+                    b.HasIndex("AccountId")
+                        .HasDatabaseName("ix_bike_rental_booking_account_id");
+
+                    b.HasIndex("BikeId")
+                        .HasDatabaseName("ix_bike_rental_booking_bike_id");
+
+                    b.ToTable("bike_rental_booking", (string)null);
                 });
 
             modelBuilder.Entity("BikeService.Sonic.Models.BikeStation", b =>
@@ -250,9 +303,9 @@ namespace BikeService.Sonic.Migrations
                         .HasColumnName("used_parking_space");
 
                     b.HasKey("Id")
-                        .HasName("pk_bike_stations");
+                        .HasName("pk_bike_station");
 
-                    b.ToTable("bike_stations", (string)null);
+                    b.ToTable("bike_station", (string)null);
                 });
 
             modelBuilder.Entity("BikeService.Sonic.Models.BikeStationManager", b =>
@@ -285,15 +338,15 @@ namespace BikeService.Sonic.Migrations
                         .HasColumnName("updated_on");
 
                     b.HasKey("Id")
-                        .HasName("pk_bike_station_managers");
+                        .HasName("pk_bike_station_manager");
 
                     b.HasIndex("BikeStationId")
-                        .HasDatabaseName("ix_bike_station_managers_bike_station_id");
+                        .HasDatabaseName("ix_bike_station_manager_bike_station_id");
 
                     b.HasIndex("ManagerId")
-                        .HasDatabaseName("ix_bike_station_managers_manager_id");
+                        .HasDatabaseName("ix_bike_station_manager_manager_id");
 
-                    b.ToTable("bike_station_managers", (string)null);
+                    b.ToTable("bike_station_manager", (string)null);
                 });
 
             modelBuilder.Entity("BikeService.Sonic.Models.Manager", b =>
@@ -330,9 +383,9 @@ namespace BikeService.Sonic.Migrations
                         .HasColumnName("updated_on");
 
                     b.HasKey("Id")
-                        .HasName("pk_managers");
+                        .HasName("pk_manager");
 
-                    b.ToTable("managers", (string)null);
+                    b.ToTable("manager", (string)null);
                 });
 
             modelBuilder.Entity("BikeService.Sonic.Models.Bike", b =>
@@ -340,7 +393,7 @@ namespace BikeService.Sonic.Migrations
                     b.HasOne("BikeService.Sonic.Models.BikeStation", "BikeStation")
                         .WithMany("Bikes")
                         .HasForeignKey("BikeStationId")
-                        .HasConstraintName("fk_bikes_bike_stations_bike_station_id");
+                        .HasConstraintName("fk_bike_bike_station_bike_station_id");
 
                     b.Navigation("BikeStation");
                 });
@@ -352,7 +405,7 @@ namespace BikeService.Sonic.Migrations
                         .HasForeignKey("BikeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_bike_location_trackings_bikes_bike_id");
+                        .HasConstraintName("fk_bike_location_tracking_bike_bike_id");
 
                     b.Navigation("Bike");
                 });
@@ -364,7 +417,28 @@ namespace BikeService.Sonic.Migrations
                         .HasForeignKey("BikeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_bike_location_tracking_histories_bikes_bike_id");
+                        .HasConstraintName("fk_bike_location_tracking_history_bike_bike_id");
+
+                    b.Navigation("Bike");
+                });
+
+            modelBuilder.Entity("BikeService.Sonic.Models.BikeRentalBooking", b =>
+                {
+                    b.HasOne("BikeService.Sonic.Models.Account", "Account")
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_bike_rental_booking_user_account_id");
+
+                    b.HasOne("BikeService.Sonic.Models.Bike", "Bike")
+                        .WithMany()
+                        .HasForeignKey("BikeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_bike_rental_booking_bike_bike_id");
+
+                    b.Navigation("Account");
 
                     b.Navigation("Bike");
                 });
@@ -376,14 +450,14 @@ namespace BikeService.Sonic.Migrations
                         .HasForeignKey("BikeStationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_bike_station_managers_bike_stations_bike_station_id");
+                        .HasConstraintName("fk_bike_station_manager_bike_station_bike_station_id");
 
                     b.HasOne("BikeService.Sonic.Models.Manager", "Manager")
                         .WithMany("BikeStationManagers")
                         .HasForeignKey("ManagerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_bike_station_managers_managers_manager_id");
+                        .HasConstraintName("fk_bike_station_manager_manager_manager_id");
 
                     b.Navigation("BikeStation");
 

@@ -16,7 +16,7 @@ public class SqsPublisher : IPublisher
         _amazonSns = new AmazonSimpleNotificationServiceClient(basicCredentials, RegionEndpoint.USEast1);
     }
     
-    public async Task SendMessage(string message, string topicArn, Dictionary<string, MessageAttributeValue>? messageAttributes)
+    public async Task SendMessage(string message, string topicArn, Dictionary<string, MessageAttributeValue>? messageAttributes = null)
     {
         var request = new PublishRequest
         {

@@ -11,5 +11,4 @@ public interface IRepositoryGeneric<T>
     Task Update(T entity);
     Task<IQueryable<T>> Find(Expression<Func<T, bool>> predicate);
     Task<bool> Exists(Expression<Func<T, bool>> predicate);
-    Task SaveChanges();
 }

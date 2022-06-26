@@ -48,9 +48,4 @@ public class RepositoryGeneric<T, TV> : IRepositoryGeneric<T> where TV : DbConte
     {
         return await Context.Set<T>().AnyAsync(predicate);
     }
-
-    public async Task SaveChanges()
-    {
-        await Context.SaveChangesAsync();
-    }
 }

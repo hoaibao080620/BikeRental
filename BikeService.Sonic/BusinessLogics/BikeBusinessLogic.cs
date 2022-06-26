@@ -1,52 +1,44 @@
-﻿using System.Text;
-using System.Text.Json;
+﻿using System.Text.Json;
 using AutoMapper;
+using BikeRental.MessageQueue.Commands;
+using BikeRental.MessageQueue.MessageType;
 using BikeService.Sonic.Const;
 using BikeService.Sonic.DAL;
 using BikeService.Sonic.Dtos.Bike;
 using BikeService.Sonic.Dtos.BikeOperation;
 using BikeService.Sonic.Exceptions;
+using BikeService.Sonic.MessageQueue.Publisher;
 using BikeService.Sonic.Models;
 using BikeService.Sonic.Services.Interfaces;
-using Microsoft.Extensions.Caching.Distributed;
 
 namespace BikeService.Sonic.BusinessLogics;
 
 public class BikeBusinessLogic : IBikeBusinessLogic
 {
-    private readonly IBikeLocationHub _bikeLocationHub;
-    private readonly IBikeStationManagerRepository _bikeStationManagerRepository;
-    private readonly IBikeRepository _bikeRepository;
     private readonly IMapper _mapper;
-    private readonly IBikeLocationTrackingRepository _bikeLocationTrackingRepository;
-    private readonly IAccountRepository _accountRepository;
-    private readonly IBikeRentalTrackingHistoryRepository _bikeRentalTrackingHistoryRepository;
     private readonly IBikeRepositoryAdapter _bikeRepositoryAdapter;
-    private readonly IDistributedCache _distributedCache;
     private readonly IGoogleMapService _googleMapService;
+    private readonly ICacheService _cacheService;
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IMessageQueuePublisher _messageQueuePublisher;
+    private readonly IBikeLocationHub _bikeLocationHub;
 
     public BikeBusinessLogic(
-        IBikeLocationHub bikeLocationHub, 
-        IBikeStationManagerRepository bikeStationManagerRepository,
-        IBikeRepository bikeRepository,
         IMapper mapper,
-        IBikeLocationTrackingRepository bikeLocationTrackingRepository,
-        IAccountRepository accountRepository,
-        IBikeRentalTrackingHistoryRepository bikeRentalTrackingHistoryRepository,
         IBikeRepositoryAdapter bikeRepositoryAdapter,
-        IDistributedCache distributedCache,
-        IGoogleMapService googleMapService)
+        IGoogleMapService googleMapService,
+        ICacheService cacheService,
+        IUnitOfWork unitOfWork,
+        IMessageQueuePublisher messageQueuePublisher,
+        IBikeLocationHub bikeLocationHub)
     {
-        _bikeLocationHub = bikeLocationHub;
-        _bikeStationManagerRepository = bikeStationManagerRepository;
-        _bikeRepository = bikeRepository;
         _mapper = mapper;
-        _bikeLocationTrackingRepository = bikeLocationTrackingRepository;
-        _accountRepository = accountRepository;
-        _bikeRentalTrackingHistoryRepository = bikeRentalTrackingHistoryRepository;
         _bikeRepositoryAdapter = bikeRepositoryAdapter;
-        _distributedCache = distributedCache;
         _googleMapService = googleMapService;
+        _cacheService = cacheService;
+        _unitOfWork = unitOfWork;
+        _messageQueuePublisher = messageQueuePublisher;
+        _bikeLocationHub = bikeLocationHub;
     }
 
     public async Task<BikeRetrieveDto?> GetBike(int id)
@@ -64,37 +56,57 @@ public class BikeBusinessLogic : IBikeBusinessLogic
     {
         var bike = _mapper.Map<Bike>(bikeInsertDto);
         bike.Status = BikeStatus.Available;
-        await _bikeRepository.Add(bike);
-        await _bikeRepository.SaveChanges();
+        await _unitOfWork.BikeRepository.Add(bike);
+        await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task UpdateBike(BikeUpdateDto bikeInsertDto)
     {
         var bike = _mapper.Map<Bike>(bikeInsertDto);
         bike.UpdatedOn = DateTime.UtcNow;
-        await _bikeRepository.Update(bike);
-        await _bikeRepository.SaveChanges();
+        await _unitOfWork.BikeRepository.Update(bike);
+        await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task DeleteBike(int id)
     {
-        var bike = await _bikeRepository.GetById(id);
+        var bike = await _unitOfWork.BikeRepository.GetById(id);
         if (bike is null) throw new InvalidOperationException();
         
-        await _bikeRepository.Delete(bike);
-        await _bikeRepository.SaveChanges();
+        await _unitOfWork.BikeRepository.Delete(bike);
+        await _unitOfWork.SaveChangesAsync();
     }
 
-    public async Task BikeChecking(BikeCheckinDto bikeCheckinDto, string userEmail)
+    public async Task BikeChecking(BikeCheckinDto bikeCheckinDto, string accountEmail)
     {
-        var managerEmails = await _bikeStationManagerRepository.GetManagerEmailsByBikeId(bikeCheckinDto.BikeId);
+        var managerEmails = await _unitOfWork.BikeStationManagerRepository
+            .GetManagerEmailsByBikeId(bikeCheckinDto.BikeId);
+
         var bike = await GetBikeById(bikeCheckinDto.BikeId);
         var address = await _googleMapService.GetAddressOfLocation(
             bikeCheckinDto.Longitude,
             bikeCheckinDto.Latitude);
+        
+        var bikeStation = await _unitOfWork.BikeStationRepository.GetById(bikeCheckinDto.BikeStationId);
+        bikeStation!.UsedParkingSpace++;
 
-        var pushEventToMapTask = NotifyBikeLocationChange(managerEmails);
-        var startTrackingBikeTask = StartTrackingBike(bikeCheckinDto, userEmail);
+        await _bikeLocationHub.NotifyBikeLocationHasChanged(managerEmails.FirstOrDefault());
+        var pushEventToMapTask = _messageQueuePublisher.PublishBikeLocationChangeCommand(managerEmails);
+        var pushNotificationToManagers = _messageQueuePublisher.PublishBikeCheckinNotificationCommand(
+            new PushBikeCheckinNotification
+            {
+                ManagerEmails = managerEmails,
+                BikeId = bike.Id,
+                BikeStationId = bikeStation.Id,
+                BikeStationName = bikeStation.Name,
+                AccountEmail = accountEmail,
+                LicensePlate = bike.LicensePlate,
+                CheckinOn = bikeCheckinDto.CheckinTime,
+                MessageType = MessageType.NotifyBikeCheckin
+            });
+        
+        var startTrackingBikeTask = StartTrackingBike(bikeCheckinDto);
+        var createBikeBookingTask = CreateBikeRentalBooking(bikeCheckinDto, accountEmail);
         var updateCachedTask = UpdateBikeCache(new BikeCacheParameter
         {
             BikeId = bike.Id,
@@ -106,23 +118,34 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         });
         
         bike.Status = BikeStatus.InUsed;
-        await _bikeRepository.SaveChanges();
-        await Task.WhenAll(pushEventToMapTask, startTrackingBikeTask, updateCachedTask);
+        await Task.WhenAll(
+            pushEventToMapTask, 
+            startTrackingBikeTask,
+            updateCachedTask, 
+            createBikeBookingTask,
+            pushNotificationToManagers
+        );
+        
+        await _unitOfWork.SaveChangesAsync();
     }
 
-    public async Task BikeCheckout(BikeCheckoutDto bikeCheckout, string userEmail)
+    public async Task BikeCheckout(BikeCheckoutDto bikeCheckout, string accountEmail)
     {
-        var managerEmails = await _bikeStationManagerRepository.GetManagerEmailsByBikeId(bikeCheckout.BikeId);
+        var bikeStation = await _unitOfWork.BikeStationRepository.GetById(bikeCheckout.BikeStationId);
+        var managerEmails = await _unitOfWork.BikeStationManagerRepository
+            .GetManagerEmailsByBikeId(bikeCheckout.BikeId);
+        
         var bike = await GetBikeById(bikeCheckout.BikeId);
         bike.Status = BikeStatus.Available;
         bike.BikeStationId = bikeCheckout.BikeStationId;
-        await _bikeRepository.SaveChanges();
+        bikeStation!.UsedParkingSpace++;
+
         var address = await _googleMapService.GetAddressOfLocation(
             bikeCheckout.Longitude,
             bikeCheckout.Latitude);
         
-        var pushEventToMapTask = NotifyBikeLocationChange(managerEmails);
-        var stopTrackingBikeTask = StopTrackingBike(userEmail, bike.Id);
+        var pushEventToMapTask = _messageQueuePublisher.PublishBikeLocationChangeCommand(managerEmails);
+        var stopTrackingBikeTask = StopTrackingBike(accountEmail, bike.Id);
         var updateBikeCache = UpdateBikeCache(new BikeCacheParameter
         {
             BikeId = bike.Id,
@@ -133,28 +156,42 @@ public class BikeBusinessLogic : IBikeBusinessLogic
             Status = BikeStatus.Available
         });
         
-        await Task.WhenAll(pushEventToMapTask, stopTrackingBikeTask, updateBikeCache);
+        var pushNotificationToManagers = _messageQueuePublisher.PublishBikeCheckoutNotificationCommand(
+            new PushBikeCheckoutNotification
+            {
+                ManagerEmails = managerEmails,
+                BikeId = bike.Id,
+                BikeStationId = bikeStation.Id,
+                BikeStationName = bikeStation.Name,
+                AccountEmail = accountEmail,
+                LicensePlate = bike.LicensePlate,
+                CheckoutOn = bikeCheckout.CheckoutOn,
+                MessageType = MessageType.NotifyBikeCheckout
+            });
+        
+        await Task.WhenAll(pushEventToMapTask, stopTrackingBikeTask, updateBikeCache, pushNotificationToManagers);
+        await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task UpdateBikeLocation(BikeLocationDto bikeLocationDto)
     {
-        var managerEmails = await _bikeStationManagerRepository.GetManagerEmailsByBikeId(bikeLocationDto.BikeId);
+        var managerEmails = await _unitOfWork.BikeStationManagerRepository
+            .GetManagerEmailsByBikeId(bikeLocationDto.BikeId);
+        
         var bike = await GetBikeById(bikeLocationDto.BikeId);
-        var bikeRentalTracking = (await _bikeLocationTrackingRepository.Find(
+        var bikeRentalTracking = (await _unitOfWork.BikeLocationTrackingRepository.Find(
             b => b.BikeId == bike.Id)).FirstOrDefault();
         
         bikeRentalTracking!.Latitude = bikeLocationDto.Latitude;
         bikeRentalTracking.Longitude = bikeLocationDto.Longitude;
         bikeRentalTracking.UpdatedOn = DateTime.UtcNow;
-        await _bikeLocationTrackingRepository.SaveChanges();
         
-        bikeLocationDto.LicensePlate = bike.LicensePlate;
         bikeLocationDto.Operation = BikeLocationOperation.UpdateBikeFromMap;
         bikeLocationDto.Address = await _googleMapService.GetAddressOfLocation(
             bikeLocationDto.Longitude, 
             bikeLocationDto.Latitude);
         
-        var pushEventTask = NotifyBikeLocationChange(managerEmails);
+        var pushEventTask = _messageQueuePublisher.PublishBikeLocationChangeCommand(managerEmails);
         var updateBikeCache = UpdateBikeCache(new BikeCacheParameter
         {
             BikeId = bike.Id,
@@ -164,31 +201,24 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         });
 
         await Task.WhenAll(pushEventTask, updateBikeCache);
+        await _unitOfWork.SaveChangesAsync();
     }
 
     private async Task<Bike> GetBikeById(int bikeId)
     {
-        var bike = await _bikeRepository.GetById(bikeId) ?? throw new BikeNotFoundException(bikeId);
+        var bike = await _unitOfWork.BikeRepository.GetById(bikeId) ?? throw new BikeNotFoundException(bikeId);
         return bike ?? throw new BikeNotFoundException(bikeId);
     }
 
-    private async Task NotifyBikeLocationChange(List<string> managerEmails)
-    {
-        foreach (var managerEmail in managerEmails)
-        {
-            await _bikeLocationHub.NotifyBikeLocationHasChanged(managerEmail);
-        }
-    }
-
-    private async Task StartTrackingBike(BikeCheckinDto bikeCheckinDto, string userEmail)
+    private async Task StartTrackingBike(BikeCheckinDto bikeCheckinDto)
     {
         // var account = await GetAccountByEmail(userEmail);
-        var bikeTracking = (await _bikeLocationTrackingRepository.Find(b =>
+        var bikeTracking = (await _unitOfWork.BikeLocationTrackingRepository.Find(b =>
             b.BikeId == bikeCheckinDto.BikeId && b.IsActive == false)).FirstOrDefault();
 
         if (bikeTracking is null)
         {
-            await _bikeLocationTrackingRepository.Add(new BikeLocationTracking
+            await _unitOfWork.BikeLocationTrackingRepository.Add(new BikeLocationTracking
             {
                 BikeId = bikeCheckinDto.BikeId,
                 CreatedOn = DateTime.UtcNow,
@@ -206,7 +236,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
             bikeTracking.Latitude = bikeCheckinDto.Latitude;
         }
         
-        await _bikeRentalTrackingHistoryRepository.Add(new BikeLocationTrackingHistory
+        await _unitOfWork.BikeRentalTrackingHistoryRepository.Add(new BikeLocationTrackingHistory
         {
             BikeId = bikeCheckinDto.BikeId,
             CreatedOn = DateTime.UtcNow,
@@ -219,25 +249,18 @@ public class BikeBusinessLogic : IBikeBusinessLogic
     
     private async Task StopTrackingBike(string userEmail, int bikeId)
     {
-        var bikeLocationTracking = (await _bikeLocationTrackingRepository
+        var bikeLocationTracking = (await _unitOfWork.BikeLocationTrackingRepository
             .Find(b => b.BikeId == bikeId)).FirstOrDefault()
             ?? throw new UserHasNotRentAnyBikeException(userEmail);
 
         bikeLocationTracking.IsActive = false;
         bikeLocationTracking.UpdatedOn = DateTime.UtcNow;
-        await _bikeLocationTrackingRepository.SaveChanges();
-    }
-
-    private async Task<Account> GetAccountByEmail(string email)
-    {
-        return (await _accountRepository.Find(a => a.Email == email)).FirstOrDefault() 
-            ?? throw new AccountNotfoundException($"Account with email {email} not found!");
     }
 
     private async Task UpdateBikeCache(BikeCacheParameter bikeCacheParameter)
     {
-        await _distributedCache.RemoveAsync(string.Format(RedisCacheKey.SingleBikeStation, bikeCacheParameter.BikeId));
-        var bikesCache = await _distributedCache.GetStringAsync(RedisCacheKey.BikeStationIds);
+        await _cacheService.Remove(string.Format(RedisCacheKey.SingleBikeStation, bikeCacheParameter.BikeId));
+        var bikesCache = await _cacheService.Get(RedisCacheKey.BikeStationIds);
 
         if (bikesCache is null) return;
 
@@ -249,13 +272,25 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         bike.Status = bikeCacheParameter.Status ?? bike.Status;
         bike.IsRenting = bikeCacheParameter.IsRenting ?? bike.IsRenting;
         
-        await _distributedCache.SetAsync(
-            RedisCacheKey.BikeStationIds, 
-            Encoding.ASCII.GetBytes( JsonSerializer.Serialize(bikes)), 
-            new DistributedCacheEntryOptions
-            {
-                AbsoluteExpiration = DateTimeOffset.UtcNow.AddHours(1),
-                SlidingExpiration = TimeSpan.FromMinutes(45)
-            });
+        await _cacheService.Add(RedisCacheKey.BikeStationIds, JsonSerializer.Serialize(bikes));
+    }
+
+    private async Task CreateBikeRentalBooking(BikeCheckinDto bikeCheckinDto, string accountEmail)
+    {
+        var account = await GetAccountByEmail(accountEmail);
+        await _unitOfWork.BikeRentalBookingRepository.Add(new BikeRentalBooking
+        {
+            CheckinOn = bikeCheckinDto.CheckinTime,
+            AccountId = account.Id,
+            BikeId = bikeCheckinDto.BikeId,
+            IsActive = true,
+            CreatedOn = DateTime.UtcNow
+        });
+    }
+    
+    private async Task<Account> GetAccountByEmail(string email)
+    {
+        return (await _unitOfWork.AccountRepository.Find(a => a.Email == email)).FirstOrDefault() 
+               ?? throw new AccountNotfoundException($"Account with email {email} not found!");
     }
 }

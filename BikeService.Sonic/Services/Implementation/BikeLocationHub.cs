@@ -1,8 +1,4 @@
 ﻿using System.Security.Claims;
-using BikeService.Sonic.Const;
-using BikeService.Sonic.Dtos;
-using BikeService.Sonic.Dtos.BikeOperation;
-using BikeService.Sonic.Models;
 using BikeService.Sonic.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
@@ -23,7 +19,7 @@ public class BikeLocationHub : Hub, IBikeLocationHub
     public async Task NotifyBikeLocationHasChanged(string? email)
     {
         if (string.IsNullOrEmpty(email)) return;
-        await _hubContext.Clients.Group(email).SendAsync(SignalRChannel.BikeLocationChannel);
+        await _hubContext.Clients.Group(email).SendAsync("");
     }
     
     public override async Task OnConnectedAsync()

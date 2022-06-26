@@ -4,5 +4,5 @@ namespace BikeRental.MessageQueue.Publisher;
 
 public interface IPublisher
 {
-    public Task SendMessage(string message, string topicArn, Dictionary<string, MessageAttributeValue>? messageAttributes);
+    public Task SendMessage(string message, string topicArn, Dictionary<string, MessageAttributeValue>? messageAttributes = null);
 }

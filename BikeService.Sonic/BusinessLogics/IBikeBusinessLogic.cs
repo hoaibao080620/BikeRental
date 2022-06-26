@@ -10,7 +10,7 @@ public interface IBikeBusinessLogic
     Task AddBike(BikeInsertDto bikeInsertDto);
     Task UpdateBike(BikeUpdateDto bikeInsertDto);
     Task DeleteBike(int id);
-    Task BikeChecking(BikeCheckinDto bikeCheckinDto, string userEmail);
-    Task BikeCheckout(BikeCheckoutDto bikeCheckingDto, string userEmail);
+    Task BikeChecking(BikeCheckinDto bikeCheckinDto, string accountEmail);
+    Task BikeCheckout(BikeCheckoutDto bikeCheckingDto, string accountEmail);
     Task UpdateBikeLocation(BikeLocationDto bikeLocationDto);
 }

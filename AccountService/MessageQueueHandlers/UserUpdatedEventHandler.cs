@@ -29,6 +29,6 @@ public class UserUpdatedEventHandler : IMessageQueueHandler
         user.PhoneNumber = userUpdatedMessage.PhoneNumber ?? user.PhoneNumber;
         user.Email = userUpdatedMessage.Email;
 
-        await _unitOfWork.UserRepository.SaveChanges();
+        await _unitOfWork.SaveChangesAsync();
     }
 }

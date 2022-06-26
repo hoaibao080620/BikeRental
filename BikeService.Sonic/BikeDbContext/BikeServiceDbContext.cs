@@ -10,11 +10,12 @@ public class BikeServiceDbContext : DbContext
         
     }
 
-    public DbSet<Account> Users { get; set; } = null!;
-    public DbSet<Bike> Bikes { get; set; } = null!;
-    public DbSet<BikeStation> BikeStations { get; set; } = null!;
-    public DbSet<BikeLocationTracking> BikeLocationTrackings { get; set; } = null!;
-    public DbSet<Manager> Managers { get; set; } = null!;
-    public DbSet<BikeStationManager> BikeStationManagers { get; set; } = null!;
-    public DbSet<BikeLocationTrackingHistory> BikeLocationTrackingHistories { get; set; } = null!;
+    public DbSet<Account> User { get; set; } = null!;
+    public DbSet<Bike> Bike { get; set; } = null!;
+    public DbSet<BikeStation> BikeStation { get; set; } = null!;
+    public DbSet<BikeLocationTracking> BikeLocationTracking { get; set; } = null!;
+    public DbSet<Manager> Manager { get; set; } = null!;
+    public DbSet<BikeStationManager> BikeStationManager { get; set; } = null!;
+    public DbSet<BikeLocationTrackingHistory> BikeLocationTrackingHistory { get; set; } = null!;
+    public DbSet<BikeRentalBooking> BikeRentalBooking { get; set; } = null!;
 }
