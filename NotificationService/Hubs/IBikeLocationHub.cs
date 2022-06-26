@@ -1,4 +1,4 @@
-﻿namespace NotificationService.Hub;
+﻿namespace NotificationService.Hubs;
 
 public interface IBikeLocationHub
 {

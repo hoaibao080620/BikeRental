@@ -1,5 +1,5 @@
 using NotificationService.Extensions;
-using NotificationService.Hub;
+using NotificationService.Hubs;
 using NotificationService.MessageQueue.BackgroundJob;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,8 +11,6 @@ builder.Services.AddOktaAuthenticationService(builder.Configuration);
 builder.Services.AddHostedService<MessageQueueConsumer>();
 builder.Services.AddScopedServices();
 builder.Services.AddSingletonServices();
-builder.Services.AddSignalR();
-builder.Services.RegisterMessageHandlers();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", innerBuilder => innerBuilder
@@ -21,10 +19,14 @@ builder.Services.AddCors(options =>
         .AllowAnyHeader()
         .AllowCredentials().SetIsOriginAllowed(_ => true));
 });
+builder.Services.AddSignalR();
+// builder.Services.RegisterMessageHandlers();
+
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+
 app.UseHttpsRedirection();
 app.UseCors("CorsPolicy");
 
@@ -33,5 +35,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapHub<BikeLocationHub>("/bikeLocationHub");
+app.RegisterMessageHandler();
 
 app.Run();
