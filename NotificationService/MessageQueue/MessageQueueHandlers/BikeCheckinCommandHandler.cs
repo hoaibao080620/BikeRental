@@ -3,6 +3,7 @@ using BikeRental.MessageQueue.Commands;
 using BikeRental.MessageQueue.Handlers;
 using NotificationService.Consts;
 using NotificationService.DAL;
+using NotificationService.Hubs;
 using NotificationService.Models;
 
 namespace NotificationService.MessageQueue.MessageQueueHandlers;
@@ -10,10 +11,12 @@ namespace NotificationService.MessageQueue.MessageQueueHandlers;
 public class BikeCheckinCommandHandler : IMessageQueueHandler
 {
     private readonly INotificationRepository _notificationRepository;
+    private readonly INotificationHub _notificationHub;
 
-    public BikeCheckinCommandHandler(INotificationRepository notificationRepository)
+    public BikeCheckinCommandHandler(INotificationRepository notificationRepository, INotificationHub notificationHub)
     {
         _notificationRepository = notificationRepository;
+        _notificationHub = notificationHub;
     }
     
     public async Task Handle(string message)
@@ -21,22 +24,27 @@ public class BikeCheckinCommandHandler : IMessageQueueHandler
         var notificationCommand = JsonSerializer.Deserialize<PushBikeCheckinNotification>(message);
         if(notificationCommand is null) return;
 
-        var tasks = notificationCommand.ManagerEmails.Select(email => 
-            _notificationRepository.AddNotification(new Notification
+        var tasks = new List<Task>();
+        foreach (var email in notificationCommand.ManagerEmails)
+        {
+            var notification = new Notification
             {
                 NotificationEmail = email,
                 IsOpen = false,
                 IsSeen = false,
                 IsHidden = false,
                 NotificationContent = string.Format(
-                    NotificationMessage.CheckinMessage, 
+                    NotificationMessage.CheckinMessage,
                     notificationCommand.AccountEmail,
                     notificationCommand.LicensePlate,
                     notificationCommand.BikeStationName,
                     notificationCommand.CheckinOn),
                 CreatedOn = DateTime.UtcNow,
-                NotificationType = NotificationType.Checkin
-            })).ToList();
+            };
+            
+            tasks.Add(_notificationRepository.AddNotification(notification));
+            tasks.Add(_notificationHub.PushNotification(email, notification));
+        }
 
         await Task.WhenAll(tasks);
     }

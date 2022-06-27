@@ -3,6 +3,7 @@ using BikeRental.MessageQueue.Commands;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using NotificationService.Consts;
+using NotificationService.Models;
 
 namespace NotificationService.Hubs;
 
@@ -21,7 +22,13 @@ public class NotificationHub : Hub, INotificationHub
         if (string.IsNullOrEmpty(email)) return;
         await _hubContext.Clients.Group(email).SendAsync(SignalRChannel.BikeLocationChangeChannel);
     }
-    
+
+    public async Task PushNotification(string? email, Notification notification)
+    {
+        if (string.IsNullOrEmpty(email)) return;
+        await _hubContext.Clients.Group(email).SendAsync(SignalRChannel.NotificationChannel);
+    }
+
     public override async Task OnConnectedAsync()
     {
         var email = Context.GetHttpContext()!.User.Claims.FirstOrDefault(x => 
