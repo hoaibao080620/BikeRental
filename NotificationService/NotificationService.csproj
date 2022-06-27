@@ -9,6 +9,7 @@
     <ItemGroup>
         <PackageReference Include="BikeRental.MessageQueue" Version="1.2.0-alpha" />
         <PackageReference Include="BikeRental.Shared" Version="1.2.0-alpha" />
+        <PackageReference Include="MongoDB.Driver" Version="2.16.1" />
         <PackageReference Include="Okta.AspNet.Abstractions" Version="4.0.1" />
         <PackageReference Include="Okta.AspNetCore" Version="4.1.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />

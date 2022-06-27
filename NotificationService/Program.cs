@@ -11,6 +11,7 @@ builder.Services.AddOktaAuthenticationService(builder.Configuration);
 builder.Services.AddHostedService<MessageQueueConsumer>();
 builder.Services.AddScopedServices();
 builder.Services.AddSingletonServices();
+builder.Services.AddSignalR();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", innerBuilder => innerBuilder
@@ -19,8 +20,7 @@ builder.Services.AddCors(options =>
         .AllowAnyHeader()
         .AllowCredentials().SetIsOriginAllowed(_ => true));
 });
-builder.Services.AddSignalR();
-// builder.Services.RegisterMessageHandlers();
+builder.Services.AddMongoDb(builder.Configuration);
 
 
 var app = builder.Build();
@@ -34,7 +34,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapHub<BikeLocationHub>("/hub");
+app.MapHub<NotificationHub>("/hub");
 app.RegisterMessageHandler();
 
 app.Run();

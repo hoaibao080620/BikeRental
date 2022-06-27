@@ -1,6 +1,6 @@
 ﻿namespace NotificationService.Hubs;
 
-public interface IBikeLocationHub
+public interface INotificationHub
 {
     Task NotifyBikeLocationHasChanged(string? email);
 }

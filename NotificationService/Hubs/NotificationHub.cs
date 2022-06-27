@@ -6,12 +6,12 @@ using NotificationService.Consts;
 
 namespace NotificationService.Hubs;
 
-
-public class BikeLocationHub : Hub, IBikeLocationHub
+[Authorize]
+public class NotificationHub : Hub, INotificationHub
 {
-    private readonly IHubContext<BikeLocationHub> _hubContext;
+    private readonly IHubContext<NotificationHub> _hubContext;
 
-    public BikeLocationHub(IHubContext<BikeLocationHub> hubContext)
+    public NotificationHub(IHubContext<NotificationHub> hubContext)
     {
         _hubContext = hubContext;
     }

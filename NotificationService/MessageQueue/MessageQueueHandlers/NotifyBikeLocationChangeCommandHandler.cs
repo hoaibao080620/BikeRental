@@ -7,11 +7,11 @@ namespace NotificationService.MessageQueue.MessageQueueHandlers;
 
 public class NotifyBikeLocationChangeCommandHandler : IMessageQueueHandler
 {
-    private readonly IBikeLocationHub _bikeLocationHub;
+    private readonly INotificationHub _notificationHub;
 
-    public NotifyBikeLocationChangeCommandHandler(IBikeLocationHub bikeLocationHub)
+    public NotifyBikeLocationChangeCommandHandler(INotificationHub notificationHub)
     {
-        _bikeLocationHub = bikeLocationHub;
+        _notificationHub = notificationHub;
     }
     
     public async Task Handle(string message)
@@ -22,7 +22,7 @@ public class NotifyBikeLocationChangeCommandHandler : IMessageQueueHandler
         
         foreach (var email in notifyBikeLocationChange.ManagerEmails)
         {
-            await _bikeLocationHub.NotifyBikeLocationHasChanged(email);
+            await _notificationHub.NotifyBikeLocationHasChanged(email);
         }
     }
 }
