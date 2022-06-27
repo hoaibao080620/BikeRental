@@ -34,7 +34,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-app.MapHub<BikeLocationHub>("/bikeLocationHub");
+app.MapHub<BikeLocationHub>("/hub");
 app.RegisterMessageHandler();
 
 app.Run();

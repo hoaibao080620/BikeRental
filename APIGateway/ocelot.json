@@ -48,7 +48,7 @@
       }
     },
     {
-      "DownstreamPathTemplate": "/bikeLocationHub",
+      "DownstreamPathTemplate": "/hub",
       "DownstreamScheme": "ws",
       "DownstreamHostAndPorts": [
         {
@@ -56,11 +56,11 @@
           "Port": 443
         }
       ],
-      "UpstreamPathTemplate": "/api/v1/notification/bikeLocationHub",
+      "UpstreamPathTemplate": "/api/v1/notification/hub",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "OPTIONS" ]
     },
     {
-      "DownstreamPathTemplate": "/bikeLocationHub/{everything}",
+      "DownstreamPathTemplate": "/hub/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
@@ -68,7 +68,7 @@
           "Port": 443
         }
       ],
-      "UpstreamPathTemplate": "/api/v1/notification/bikeLocationHub/{everything}",
+      "UpstreamPathTemplate": "/api/v1/notification/hub/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "OPTIONS" ]
     }
   ]
