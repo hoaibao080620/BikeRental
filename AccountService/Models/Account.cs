@@ -6,10 +6,11 @@ namespace AccountService.Models;
 
 public class Account : BaseEntity
 {
-    public Guid AccountCode { get; set; }
     public double Point { get; set; }
-    [Required]
-    public int UserId { get; set; }
-    [ForeignKey("UserId")]
-    public User User { get; set; } = null!;
+    public string FirstName { get; set; } = null!;
+    public string LastName { get; set; } = null!;
+    public string? Address { get; set; }
+    public string Email { get; set; } = null!;
+    public string? PhoneNumber { get; set; }
+    public int ExternalUserId { get; set; }
 }

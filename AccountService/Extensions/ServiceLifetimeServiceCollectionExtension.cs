@@ -1,8 +1,4 @@
-﻿using AccountService.DataAccess.Implementation;
-using AccountService.DataAccess.Interfaces;
-using AccountService.MessageQueueHandlers;
-using BikeRental.MessageQueue.Consumer;
-using BikeRental.MessageQueue.MessageType;
+﻿using BikeRental.MessageQueue.Consumer;
 using BikeRental.MessageQueue.Publisher;
 using BikeRental.MessageQueue.SubscriptionManager;
 
@@ -12,7 +8,6 @@ public static class ServiceLifetimeServiceCollectionExtension
 {
     public static void AddScopedServices(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddScoped<IUnitOfWork, UnitOfWork>();
         serviceCollection.AddAutoMapper(typeof(Program));
         serviceCollection.AddScoped<IConsumer, SqsConsumer>();
         serviceCollection.AddScoped<IPublisher, SqsPublisher>();
@@ -23,21 +18,21 @@ public static class ServiceLifetimeServiceCollectionExtension
         serviceCollection.AddSingleton<IMessageQueueSubscriptionManager>(new MessageQueueSubscriptionManager());
     }
 
-    public static void RegisterMessageHandlers(this IServiceCollection serviceCollection)
-    {
-        var serviceProvider = serviceCollection.BuildServiceProvider();
-        var messageQueueSubscriptionManager = serviceProvider.GetRequiredService<IMessageQueueSubscriptionManager>();
-        
-        messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserCreatedEventHandler>(
-            serviceProvider.CreateScope().ServiceProvider, 
-            MessageType.UserAdded);
-        
-        messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserUpdatedEventHandler>(
-            serviceProvider.CreateScope().ServiceProvider, 
-            MessageType.UserUpdated);
-        
-        messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserDeletedEventHandler>(
-            serviceProvider.CreateScope().ServiceProvider, 
-            MessageType.UserDeleted);
-    }
+    // public static void RegisterMessageHandlers(this IServiceCollection serviceCollection)
+    // {
+    //     var serviceProvider = serviceCollection.BuildServiceProvider();
+    //     var messageQueueSubscriptionManager = serviceProvider.GetRequiredService<IMessageQueueSubscriptionManager>();
+    //     
+    //     messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserCreatedEventHandler>(
+    //         serviceProvider.CreateScope().ServiceProvider, 
+    //         MessageType.UserAdded);
+    //     
+    //     messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserUpdatedEventHandler>(
+    //         serviceProvider.CreateScope().ServiceProvider, 
+    //         MessageType.UserUpdated);
+    //     
+    //     messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserDeletedEventHandler>(
+    //         serviceProvider.CreateScope().ServiceProvider, 
+    //         MessageType.UserDeleted);
+    // }
 }

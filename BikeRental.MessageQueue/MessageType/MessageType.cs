@@ -8,4 +8,6 @@ public class MessageType
     public const string NotifyBikeLocationChange = "NotifyBikeLocationChange";
     public const string NotifyBikeCheckin = "NotifyBikeCheckin";
     public const string NotifyBikeCheckout = "NotifyBikeCheckout";
+    public const string PaymentSucceeded = "PaymentSucceeded";
+    public const string PaymentFailed = "PaymentFailed";
 }

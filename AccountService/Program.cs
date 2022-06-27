@@ -9,11 +9,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHostedService<MessageQueueConsumer>();
 builder.Services.AddScopedServices();
-builder.Services.AddDbContextService(builder.Configuration);
 builder.Services.AddOktaAuthenticationService(builder.Configuration);
 builder.Services.AddSingletonServices();
-builder.Services.RegisterMessageHandlers();
-builder.Services.RunMigrations();
+// builder.Services.RegisterMessageHandlers();
+// builder.Services.RunMigrations();
 
 
 var app = builder.Build();
