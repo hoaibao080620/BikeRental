@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PaymentService.DTO;
 using PaymentService.Services;
-using Stripe;
 
 namespace PaymentService.Controllers;
 
@@ -11,12 +10,10 @@ namespace PaymentService.Controllers;
 [Route("[controller]/[action]")]
 public class PaymentController : ControllerBase
 {
-    private readonly IConfiguration _configuration;
     private readonly IStripeService _stripeService;
 
-    public PaymentController(IConfiguration configuration, IStripeService stripeService)
+    public PaymentController(IStripeService stripeService)
     {
-        _configuration = configuration;
         _stripeService = stripeService;
     }
     
@@ -28,7 +25,6 @@ public class PaymentController : ControllerBase
             x.Type == ClaimTypes.NameIdentifier)!.Value;
 
         var paymentCreatedDto = await _stripeService.CreatePaymentIntent(paymentDto, email);
-
         return Ok(paymentCreatedDto);
     }
 
