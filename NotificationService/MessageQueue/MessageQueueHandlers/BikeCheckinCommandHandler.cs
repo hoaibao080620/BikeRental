@@ -40,6 +40,7 @@ public class BikeCheckinCommandHandler : IMessageQueueHandler
                     notificationCommand.BikeStationName,
                     notificationCommand.CheckinOn),
                 CreatedOn = DateTime.UtcNow,
+                NotificationType = NotificationType.Checkin
             };
             
             tasks.Add(_notificationRepository.AddNotification(notification));
