@@ -26,7 +26,7 @@ public class NotificationHub : Hub, INotificationHub
     public async Task PushNotification(string? email, Notification notification)
     {
         if (string.IsNullOrEmpty(email)) return;
-        await _hubContext.Clients.Group(email).SendAsync(SignalRChannel.NotificationChannel);
+        await _hubContext.Clients.Group(email).SendAsync(SignalRChannel.NotificationChannel, notification);
     }
 
     public override async Task OnConnectedAsync()

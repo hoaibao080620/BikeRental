@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PaymentService.DTO;
 using Stripe;
 
@@ -6,13 +8,18 @@ namespace PaymentService.Controllers;
 
 [ApiController]
 [Route("[controller]/[action]")]
+[Authorize]
 public class PaymentController : ControllerBase
 {
     [HttpPost]
     public async Task<IActionResult> CreatePayment([FromBody] PaymentDto paymentDto)
     {
         var service = new CustomerService();
-        var customer = await service.CreateAsync(null);
+        var customer = await service.CreateAsync(new CustomerCreateOptions
+        {
+            Email = HttpContext.User.Claims.FirstOrDefault(x => 
+            x.Type == ClaimTypes.NameIdentifier)!.Value
+        });
         
         var options = new PaymentIntentCreateOptions
         {
@@ -55,17 +62,16 @@ public class PaymentController : ControllerBase
 
             switch (stripeEvent.Type)
             {
-                // Handle the event
                 case Events.PaymentIntentSucceeded:
                 {
                     var paymentIntent = stripeEvent.Data.Object as PaymentIntent;
                     Console.WriteLine("PaymentIntent was successful!");
                     break;
                 }
-                case Events.PaymentMethodAttached:
+                case Events.PaymentIntentPaymentFailed:
                 {
-                    var paymentMethod = stripeEvent.Data.Object as PaymentMethod;
-                    Console.WriteLine("PaymentMethod was attached to a Customer!");
+                    var paymentIntent = stripeEvent.Data.Object as PaymentIntent;
+                    Console.WriteLine("paymentIntent was attached to a Customer!");
                     break;
                 }
                 // ... handle other event types
