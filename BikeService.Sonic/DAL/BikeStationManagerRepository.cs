@@ -13,8 +13,7 @@ public class BikeStationManagerRepository : RepositoryGeneric<BikeStationManager
 
     public async Task<List<string>> GetManagerEmailsByBikeId(int bikeId)
     {
-        var managerEmails = await Context.BikeStationManagers
-            .Include(b => b.Manager)
+        var managerEmails = await Context.BikeStationManager
             .Where(b => b.BikeStation.Bikes.Any(x => x.Id == bikeId))
             .Select(x => x.Manager.Email)
             .ToListAsync();

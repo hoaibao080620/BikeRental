@@ -10,29 +10,28 @@ namespace BikeService.Sonic.BusinessLogics;
 
 public class BikeStationBusinessLogic : IBikeStationBusinessLogic
 {
-    private readonly IBikeStationRepository _bikeStationRepository;
     private readonly IGoogleMapService _googleMapService;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     public BikeStationBusinessLogic(
-        IMapper mapper, 
-        IBikeStationRepository bikeStationRepository,
+        IUnitOfWork unitOfWork,
+        IMapper mapper,
         IGoogleMapService googleMapService)
     {
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
-        _bikeStationRepository = bikeStationRepository;
         _googleMapService = googleMapService;
     }
     
     public async Task<BikeStationRetrieveDto> GetStationBike(int id)
     {
-    
-        var stationBike =await _bikeStationRepository.GetById(id);
+        var stationBike = await _unitOfWork.BikeStationRepository.GetById(id);
         return _mapper.Map<BikeStationRetrieveDto>(stationBike);
     }
 
     public async Task<List<BikeStationRetrieveDto>> GetAllStationBikes()
     {
-        var stationBikes = await _bikeStationRepository.All();
+        var stationBikes = await _unitOfWork.BikeStationRepository.All();
         return _mapper.Map<List<BikeStationRetrieveDto>>(stationBikes);
     }
 
@@ -45,23 +44,23 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
         bikeStation.Latitude = latitude;
         bikeStation.Longitude = longitude;
         
-        await _bikeStationRepository.Add(bikeStation);
-        await _bikeStationRepository.SaveChanges();
+        await _unitOfWork.BikeStationRepository.Add(bikeStation);
+        await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task DeleteStationBike(int id)
     {
-        var bikeStation = await _bikeStationRepository.GetById(id);
+        var bikeStation = await _unitOfWork.BikeStationRepository.GetById(id);
         if (bikeStation is null) throw new InvalidOperationException();
         
-        await _bikeStationRepository.Delete(bikeStation);
-        await _bikeStationRepository.SaveChanges();
+        await _unitOfWork.BikeStationRepository.Delete(bikeStation);
+        await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task UpdateStationBike(BikeStationUpdateDto bikeInsertDto)
     {
-        await _bikeStationRepository.Update(_mapper.Map<BikeStation>(bikeInsertDto));
-        await _bikeStationRepository.SaveChanges();
+        await _unitOfWork.BikeStationRepository.Update(_mapper.Map<BikeStation>(bikeInsertDto));
+        await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task<BikeStationRetrieveDto> GetNearestBikeStationFromLocation(double longitude, double latitude)

@@ -13,6 +13,6 @@ public class BikeStationRepository : RepositoryGeneric<BikeStation, BikeServiceD
 
     public async Task<BikeStation?> GetBikeStationByName(string name)
     {
-        return await Context.BikeStations.FirstOrDefaultAsync(b => b.Name.ToLower() == name.ToLower());
+        return await Context.BikeStation.FirstOrDefaultAsync(b => b.Name.ToLower() == name.ToLower());
     }
 }

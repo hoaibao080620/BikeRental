@@ -20,6 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\BikeService.Sonic\BikeService.Sonic.csproj" />
       <ProjectReference Include="..\UserService\UserService.csproj" />
     </ItemGroup>
 

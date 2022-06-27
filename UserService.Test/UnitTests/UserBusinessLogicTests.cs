@@ -1,14 +1,10 @@
-﻿// using System;
-// using System.Collections.Generic;
-// using System.Linq;
-// using System.Threading.Tasks;
+﻿// using System.Collections.Generic;
 // using AutoMapper;
 // using Moq;
 // using NUnit.Framework;
 // using UserService.BusinessLogic;
 // using UserService.Clients;
 // using UserService.DataAccess;
-// using UserService.Dtos;
 // using UserService.ExternalServices;
 // using UserService.Models;
 //
@@ -44,79 +40,84 @@
 //         _unitOfWork.SetupGet(x => x.UserRepository).Returns(userRepository.Object);
 //     }
 //
-//     [Test]
-//     public async Task GetUsers_ShouldReturnUsersCorrectly()
-//     {
-//         // Arrange
-//         var setupUsers = SetupUsers();
-//         _unitOfWork.Setup(x => x.UserRepository.All()).Returns(Task.FromResult(setupUsers));
-//         _mapper.Setup(x => x.Map<List<UserRetrieveDto>>(It.IsAny<IEnumerable<User>>()))
-//             .Returns(new List<UserRetrieveDto>
-//             {
-//                 new()
-//                 {
-//                     Id = setupUsers.FirstOrDefault()!.Id
-//                 }
-//             });
+//     // [Test]
+//     // public async Task GetUsers_ShouldReturnUsersCorrectly()
+//     // {
+//     //     // Arrange
+//     //     var setupUsers = SetupUsers();
+//     //     _unitOfWork.Setup(x => x.UserRepository.All()).Returns(Task.FromResult(setupUsers));
+//     //     _mapper.Setup(x => x.Map<List<UserRetrieveDto>>(It.IsAny<IEnumerable<User>>()))
+//     //         .Returns(new List<UserRetrieveDto>
+//     //         {
+//     //             new()
+//     //             {
+//     //                 Id = setupUsers.FirstOrDefault()!.Id
+//     //             }
+//     //         });
+//     //
+//     //     // Act
+//     //     var users = await _userBusinessLogic.GetUsers();
+//     //     users = users.ToList();
+//     //     
+//     //     // Assert
+//     //     Assert.AreEqual(users.Count(), setupUsers.Count);
+//     //     Assert.AreEqual(users.FirstOrDefault()?.Id, setupUsers.FirstOrDefault()?.Id);
+//     // }
+//     //
+//     // [Test]
+//     // public async Task AddUser_ShouldAddUserSuccessfully()
+//     // {
+//     //     // Arrange
+//     //     var userInsertDto = new UserInsertDto();
+//     //     var userReturn = new User
+//     //     {
+//     //         RoleId = 1,
+//     //         Role = new Role
+//     //         {
+//     //             Name = Guid.NewGuid().ToString()
+//     //         }
+//     //     };
+//     //     
+//     //     _mapper.Setup(x => x.Map<User>(It.IsAny<UserInsertDto>()))
+//     //         .Returns(userReturn);
+//     //
+//     //     // Act
+//     //     await _userBusinessLogic.AddUser(userInsertDto);
+//     //
+//     //     // Assert
+//     //     _unitOfWork.Verify(x => x.SaveChangesAsync(), Times.AtLeastOnce);
+//     //     Assert.IsTrue(userReturn.IsActive);
+//     // }
+//     //
+//     // [Test]
+//     // public async Task AddUser_ShouldAddMessageToQueueAddAddUserToOkta_WhenAddSuccessful()
+//     // {
+//     //     // Arrange
+//     //     var userInsertDto = new UserInsertDto();
+//     //     _mapper.Setup(x => x.Map<User>(It.IsAny<UserInsertDto>()))
+//     //         .Returns(new User
+//     //         {
+//     //             RoleId = 1,
+//     //             Role = new Role
+//     //             {
+//     //                 Name = Guid.NewGuid().ToString()
+//     //             }
+//     //         });
+//     //
+//     //     _unitOfWork.Setup(x => x.SaveChangesAsync()).Returns(Task.FromResult(1));
+//     //
+//     //     // Act
+//     //     await _userBusinessLogic.AddUser(userInsertDto);
+//     //
+//     //     // Assert
+//     //     _messageQueuePublisher.Verify(x => 
+//     //         x.PublishUserAddedEventToMessageQueue(It.IsAny<User>()), Times.Once);
+//     //     _oktaClient.Verify(x => x.AddUserToOkta(It.IsAny<OktaUserInsertDto>()), Times.Once);
+//     // }
 //
-//         // Act
-//         var users = await _userBusinessLogic.GetUsers();
-//         users = users.ToList();
+//     public void TestBikeChecking_ShouldSendLocationData_WhenReturnManagerEmails()
+//     {
 //         
-//         // Assert
-//         Assert.AreEqual(users.Count(), setupUsers.Count);
-//         Assert.AreEqual(users.FirstOrDefault()?.Id, setupUsers.FirstOrDefault()?.Id);
-//     }
-//     
-//     [Test]
-//     public async Task AddUser_ShouldAddUserSuccessfully()
-//     {
-//         // Arrange
-//         var userInsertDto = new UserInsertDto();
-//         var userReturn = new User
-//         {
-//             RoleId = 1,
-//             Role = new Role
-//             {
-//                 Name = Guid.NewGuid().ToString()
-//             }
-//         };
-//         
-//         _mapper.Setup(x => x.Map<User>(It.IsAny<UserInsertDto>()))
-//             .Returns(userReturn);
-//
-//         // Act
-//         await _userBusinessLogic.AddUser(userInsertDto);
-//
-//         // Assert
-//         _unitOfWork.Verify(x => x.SaveChangesAsync(), Times.AtLeastOnce);
-//         Assert.IsTrue(userReturn.IsActive);
-//     }
-//     
-//     [Test]
-//     public async Task AddUser_ShouldAddMessageToQueueAddAddUserToOkta_WhenAddSuccessful()
-//     {
-//         // Arrange
-//         var userInsertDto = new UserInsertDto();
-//         _mapper.Setup(x => x.Map<User>(It.IsAny<UserInsertDto>()))
-//             .Returns(new User
-//             {
-//                 RoleId = 1,
-//                 Role = new Role
-//                 {
-//                     Name = Guid.NewGuid().ToString()
-//                 }
-//             });
-//
-//         _unitOfWork.Setup(x => x.SaveChangesAsync()).Returns(Task.FromResult(1));
-//
-//         // Act
-//         await _userBusinessLogic.AddUser(userInsertDto);
-//
-//         // Assert
-//         _messageQueuePublisher.Verify(x => 
-//             x.PublishUserAddedEventToMessageQueue(It.IsAny<User>()), Times.Once);
-//         _oktaClient.Verify(x => x.AddUserToOkta(It.IsAny<OktaUserInsertDto>()), Times.Once);
 //     }
 //
 //     private static List<User> SetupUsers()
