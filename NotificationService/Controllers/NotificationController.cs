@@ -16,7 +16,8 @@ public class NotificationController : ControllerBase
     {
         _notificationRepository = notificationRepository;
     }
-
+    
+    [HttpGet]
     public async Task<IActionResult> GetNotifications()
     {
         var email = HttpContext.User.Claims.FirstOrDefault(x => 
@@ -26,6 +27,7 @@ public class NotificationController : ControllerBase
     }
     
     [HttpPost]
+    [Route("[action]")]
     public async Task<IActionResult> MarkNotificationSeen()
     {
         var email = HttpContext.User.Claims.FirstOrDefault(x => 
