@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NotificationService.DAL;
+using NotificationService.Dto;
 
 namespace NotificationService.Controllers;
 
@@ -33,6 +34,14 @@ public class NotificationController : ControllerBase
         var email = HttpContext.User.Claims.FirstOrDefault(x => 
             x.Type == ClaimTypes.NameIdentifier)!.Value;
         await _notificationRepository.MarkNotificationSeen(email);
+        return Ok();
+    }
+    
+    [HttpPost]
+    [Route("[action]")]
+    public async Task<IActionResult> MarkNotificationOpen([FromBody] MarkNotificationOpenDto markNotificationOpenDto)
+    {
+        await _notificationRepository.MarkNotificationOpen(markNotificationOpenDto.Id);
         return Ok();
     }
 }
