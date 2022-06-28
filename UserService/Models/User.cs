@@ -13,6 +13,7 @@ public class User
     public string? Address { get; set; }
     public string Email { get; set; } = null!;
     public string? PhoneNumber { get; set; }
+    public DateTime DateOfBirth { get; set; }
     public string? OktaUserId { get; set; }
     public string RoleName { get; set; } = null!;
     public bool IsActive { get; set; }

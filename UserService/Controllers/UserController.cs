@@ -1,12 +1,12 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UserService.BusinessLogic;
-using UserService.Dtos;
 
 namespace UserService.Controllers;
 
-[Route("[controller]")]
+[Route("[controller]/[action]")]
 [ApiController]
 [Authorize]
 public class UserController : ControllerBase
@@ -20,6 +20,15 @@ public class UserController : ControllerBase
         _mapper = mapper;
     }
     
+    [HttpGet]
+    public async Task<IActionResult> GetUserProfile()
+    {
+        var email = HttpContext.User.Claims.FirstOrDefault(x => 
+            x.Type == ClaimTypes.NameIdentifier)!.Value;
+        var user = await _userBusinessLogic.GetUserProfile(email);
+        return Ok(user);
+    }
+
     // [HttpGet]
     // public async Task<IActionResult> GetUsers()
     // {

@@ -3,6 +3,7 @@ using Shared.Consts;
 using UserService.Clients;
 using UserService.DataAccess;
 using UserService.Dtos;
+using UserService.Dtos.User;
 using UserService.ExternalServices;
 using UserService.Models;
 
@@ -25,6 +26,24 @@ public class UserBusinessLogic : IUserBusinessLogic
         _messageQueuePublisher = messageQueuePublisher;
         _mapper = mapper;
         _mongoService = mongoService;
+    }
+
+    public async Task<UserProfileDto?> GetUserProfile(string email)
+    {
+        var user = await _mongoService.FindUser(u => u.Email == email);
+
+        return user is not null
+            ? new UserProfileDto
+            {
+                Id = user.Id,
+                Address = user.Address,
+                DateOfBirth = user.DateOfBirth,
+                Email = email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Role = user.RoleName
+            }
+            : null;
     }
 
     public async Task SyncOktaUsers()
