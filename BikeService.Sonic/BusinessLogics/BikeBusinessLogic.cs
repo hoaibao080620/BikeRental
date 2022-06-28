@@ -16,7 +16,7 @@ namespace BikeService.Sonic.BusinessLogics;
 public class BikeBusinessLogic : IBikeBusinessLogic
 {
     private readonly IMapper _mapper;
-    private readonly IBikeRepositoryAdapter _bikeRepositoryAdapter;
+    private readonly IBikeLoaderAdapter _bikeLoaderAdapter;
     private readonly IGoogleMapService _googleMapService;
     private readonly ICacheService _cacheService;
     private readonly IUnitOfWork _unitOfWork;
@@ -25,7 +25,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
 
     public BikeBusinessLogic(
         IMapper mapper,
-        IBikeRepositoryAdapter bikeRepositoryAdapter,
+        IBikeLoaderAdapter bikeLoaderAdapter,
         IGoogleMapService googleMapService,
         ICacheService cacheService,
         IUnitOfWork unitOfWork,
@@ -33,7 +33,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         IBikeLocationHub bikeLocationHub)
     {
         _mapper = mapper;
-        _bikeRepositoryAdapter = bikeRepositoryAdapter;
+        _bikeLoaderAdapter = bikeLoaderAdapter;
         _googleMapService = googleMapService;
         _cacheService = cacheService;
         _unitOfWork = unitOfWork;
@@ -43,13 +43,20 @@ public class BikeBusinessLogic : IBikeBusinessLogic
 
     public async Task<BikeRetrieveDto?> GetBike(int id)
     {
-        return await _bikeRepositoryAdapter.GetBike(id);
+        return await _bikeLoaderAdapter.GetBike(id);
     }
 
     public async Task<List<BikeRetrieveDto>> GetBikes(string managerEmail)
     {
-        var bikes = await _bikeRepositoryAdapter.GetBikes(managerEmail);
-        return bikes;
+        var bikeIds = await _bikeLoaderAdapter.GetBikeIdsOfManager(managerEmail);
+        var bikes = new List<BikeRetrieveDto>();
+        foreach (var bikeId in bikeIds)
+        {
+            var bike = await _bikeLoaderAdapter.GetBike(bikeId);
+            bikes.Add(bike);
+        }
+        
+        return bikes.ToList();
     }
 
     public async Task AddBike(BikeInsertDto bikeInsertDto)
@@ -86,10 +93,11 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         var address = await _googleMapService.GetAddressOfLocation(
             bikeCheckinDto.Longitude,
             bikeCheckinDto.Latitude);
+        ArgumentNullException.ThrowIfNull(address);
         
         var bikeStation = await _unitOfWork.BikeStationRepository.GetById(bikeCheckinDto.BikeStationId);
         bikeStation!.UsedParkingSpace++;
-
+        
         await _bikeLocationHub.NotifyBikeLocationHasChanged(managerEmails.FirstOrDefault());
         var pushEventToMapTask = _messageQueuePublisher.PublishBikeLocationChangeCommand(managerEmails);
         var pushNotificationToManagers = _messageQueuePublisher.PublishBikeCheckinNotificationCommand(
@@ -105,7 +113,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
                 MessageType = MessageType.NotifyBikeCheckin
             });
         
-        var startTrackingBikeTask = StartTrackingBike(bikeCheckinDto);
+        var startTrackingBikeTask = StartTrackingBike(bikeCheckinDto, address);
         var createBikeBookingTask = CreateBikeRentalBooking(bikeCheckinDto, accountEmail);
         var updateCachedTask = UpdateBikeCache(new BikeCacheParameter
         {
@@ -210,7 +218,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         return bike ?? throw new BikeNotFoundException(bikeId);
     }
 
-    private async Task StartTrackingBike(BikeCheckinDto bikeCheckinDto)
+    private async Task StartTrackingBike(BikeCheckinDto bikeCheckinDto, string address)
     {
         // var account = await GetAccountByEmail(userEmail);
         var bikeTracking = (await _unitOfWork.BikeLocationTrackingRepository.Find(b =>
@@ -226,6 +234,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
                 IsActive = true,
                 Longitude = bikeCheckinDto.Longitude,
                 Latitude = bikeCheckinDto.Latitude,
+                Address = address
             });
         }
         else
@@ -234,6 +243,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
             bikeTracking.IsActive = true;
             bikeTracking.Longitude = bikeCheckinDto.Longitude;
             bikeTracking.Latitude = bikeCheckinDto.Latitude;
+            bikeTracking.Address = address;
         }
         
         await _unitOfWork.BikeRentalTrackingHistoryRepository.Add(new BikeLocationTrackingHistory
@@ -243,7 +253,8 @@ public class BikeBusinessLogic : IBikeBusinessLogic
             UpdatedOn = DateTime.UtcNow,
             IsActive = true,
             Latitude = bikeCheckinDto.Latitude,
-            Longitude = bikeCheckinDto.Longitude
+            Longitude = bikeCheckinDto.Longitude,
+            Address = address
         });
     }
     
@@ -259,8 +270,8 @@ public class BikeBusinessLogic : IBikeBusinessLogic
 
     private async Task UpdateBikeCache(BikeCacheParameter bikeCacheParameter)
     {
-        await _cacheService.Remove(string.Format(RedisCacheKey.SingleBikeStation, bikeCacheParameter.BikeId));
-        var bikesCache = await _cacheService.Get(RedisCacheKey.BikeStationIds);
+        await _cacheService.Remove(string.Format(RedisCacheKey.SingleBike, bikeCacheParameter.BikeId));
+        var bikesCache = await _cacheService.Get(RedisCacheKey.ManagerBikeIds);
 
         if (bikesCache is null) return;
 
@@ -272,7 +283,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         bike.Status = bikeCacheParameter.Status ?? bike.Status;
         bike.IsRenting = bikeCacheParameter.IsRenting ?? bike.IsRenting;
         
-        await _cacheService.Add(RedisCacheKey.BikeStationIds, JsonSerializer.Serialize(bikes));
+        await _cacheService.Add(RedisCacheKey.ManagerBikeIds, JsonSerializer.Serialize(bikes));
     }
 
     private async Task CreateBikeRentalBooking(BikeCheckinDto bikeCheckinDto, string accountEmail)
