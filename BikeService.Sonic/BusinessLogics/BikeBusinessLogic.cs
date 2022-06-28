@@ -151,9 +151,10 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         var address = await _googleMapService.GetAddressOfLocation(
             bikeCheckout.Longitude,
             bikeCheckout.Latitude);
-        
+
+        bikeCheckout.Address = address;
         var pushEventToMapTask = _messageQueuePublisher.PublishBikeLocationChangeCommand(managerEmails);
-        var stopTrackingBikeTask = StopTrackingBike(accountEmail, bike.Id);
+        var stopTrackingBikeTask = StopTrackingBike(bikeCheckout, accountEmail);
         var updateBikeCache = UpdateBikeCache(new BikeCacheParameter
         {
             BikeId = bike.Id,
@@ -258,32 +259,45 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         });
     }
     
-    private async Task StopTrackingBike(string userEmail, int bikeId)
+    private async Task StopTrackingBike(BikeCheckoutDto bikeCheckoutDto, string userEmail)
     {
         var bikeLocationTracking = (await _unitOfWork.BikeLocationTrackingRepository
-            .Find(b => b.BikeId == bikeId)).FirstOrDefault()
+            .Find(b => b.BikeId == bikeCheckoutDto.BikeId)).FirstOrDefault()
             ?? throw new UserHasNotRentAnyBikeException(userEmail);
 
         bikeLocationTracking.IsActive = false;
         bikeLocationTracking.UpdatedOn = DateTime.UtcNow;
+        bikeLocationTracking.Address = bikeCheckoutDto.Address!;
+        bikeLocationTracking.Latitude = bikeCheckoutDto.Latitude;
+        bikeLocationTracking.Longitude = bikeCheckoutDto.Longitude;
+        
+        await _unitOfWork.BikeRentalTrackingHistoryRepository.Add(new BikeLocationTrackingHistory
+        {
+            BikeId = bikeCheckoutDto.BikeId,
+            CreatedOn = DateTime.UtcNow,
+            UpdatedOn = DateTime.UtcNow,
+            IsActive = true,
+            Latitude = bikeCheckoutDto.Latitude,
+            Longitude = bikeCheckoutDto.Longitude,
+            Address = bikeCheckoutDto.Address!
+        });
     }
 
     private async Task UpdateBikeCache(BikeCacheParameter bikeCacheParameter)
     {
-        await _cacheService.Remove(string.Format(RedisCacheKey.SingleBike, bikeCacheParameter.BikeId));
-        var bikesCache = await _cacheService.Get(RedisCacheKey.ManagerBikeIds);
+        var key = string.Format(RedisCacheKey.SingleBike, bikeCacheParameter.BikeId);
+        var bikeCache = await _cacheService.Get(key);
 
-        if (bikesCache is null) return;
-
-        var bikes = JsonSerializer.Deserialize<List<BikeRetrieveDto>>(bikesCache);
-        var bike = bikes!.FirstOrDefault(b => b.Id == bikeCacheParameter.BikeId)!;
+        if (bikeCache is null) return;
+        var bike = JsonSerializer.Deserialize<BikeRetrieveDto>(bikeCache);
+        ArgumentNullException.ThrowIfNull(bike);
         bike.LastLatitude = bikeCacheParameter.Latitude;
         bike.LastLongitude = bikeCacheParameter.Longitude;
         bike.LastAddress = bikeCacheParameter.Address;
         bike.Status = bikeCacheParameter.Status ?? bike.Status;
         bike.IsRenting = bikeCacheParameter.IsRenting ?? bike.IsRenting;
         
-        await _cacheService.Add(RedisCacheKey.ManagerBikeIds, JsonSerializer.Serialize(bikes));
+        await _cacheService.Add(key, JsonSerializer.Serialize(bike));
     }
 
     private async Task CreateBikeRentalBooking(BikeCheckinDto bikeCheckinDto, string accountEmail)
