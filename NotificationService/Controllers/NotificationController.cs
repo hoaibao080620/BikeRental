@@ -24,4 +24,13 @@ public class NotificationController : ControllerBase
         var notifications = await _notificationRepository.GetNotifications(email);
         return Ok(notifications);
     }
+    
+    [HttpPost]
+    public async Task<IActionResult> MarkNotificationSeen()
+    {
+        var email = HttpContext.User.Claims.FirstOrDefault(x => 
+            x.Type == ClaimTypes.NameIdentifier)!.Value;
+        await _notificationRepository.MarkNotificationSeen(email);
+        return Ok();
+    }
 }

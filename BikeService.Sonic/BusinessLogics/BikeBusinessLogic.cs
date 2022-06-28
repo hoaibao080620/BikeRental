@@ -10,6 +10,7 @@ using BikeService.Sonic.Exceptions;
 using BikeService.Sonic.MessageQueue.Publisher;
 using BikeService.Sonic.Models;
 using BikeService.Sonic.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace BikeService.Sonic.BusinessLogics;
 

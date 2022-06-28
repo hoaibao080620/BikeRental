@@ -24,4 +24,11 @@ public class NotificationRepository : INotificationRepository
     {
         await _notificationCollection.InsertOneAsync(notification);
     }
+    
+    public async Task MarkNotificationSeen(string email)
+    {
+        var builder = Builders<Notification>.Update;
+        await _notificationCollection.UpdateManyAsync(n => n.NotificationEmail == email, builder.Set(
+            x => x.IsSeen, true));
+    }
 }
