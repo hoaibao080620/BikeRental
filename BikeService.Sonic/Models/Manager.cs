@@ -8,4 +8,5 @@ public class Manager : BaseEntity
     public List<BikeStationManager> BikeStationManagers { get; set; } = null!;
     public int ExternalId { get; set; }
     public bool IsSuperManager { get; set; }
+    public List<BikeStationColor> BikeStationColors { get; set; } = null!;
 }

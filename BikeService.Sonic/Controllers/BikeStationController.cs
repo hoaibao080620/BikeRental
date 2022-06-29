@@ -1,5 +1,7 @@
-﻿using BikeService.Sonic.BusinessLogics;
+﻿using System.Security.Claims;
+using BikeService.Sonic.BusinessLogics;
 using BikeService.Sonic.Dtos;
+using BikeService.Sonic.Dtos.BikeStation;
 using BikeService.Sonic.Validation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -56,6 +58,15 @@ public class BikeStationController : ControllerBase
             return BadRequest("Bike station has bike, cannot delete it!");
         
         await _bikeStationBusinessLogic.DeleteStationBike(id);
+        return Ok();
+    }
+    
+    [HttpPost]
+    public async Task<IActionResult> UpdateBikeStationColor([FromBody] BikeStationColorDto bikeStationColorDto)
+    {
+        var email = HttpContext.User.Claims.FirstOrDefault(x => 
+            x.Type == ClaimTypes.NameIdentifier)!.Value;
+        await _bikeStationBusinessLogic.UpdateBikeStationColor(bikeStationColorDto, email);
         return Ok();
     }
 }

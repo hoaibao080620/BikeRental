@@ -9,5 +9,7 @@ public interface IUnitOfWork
     IBikeRentalTrackingRepository BikeRentalTrackingRepository { get; }
     IBikeStationRepository BikeStationRepository { get; }
     IBikeStationManagerRepository BikeStationManagerRepository { get; }
+    IBikeStationColorRepository BikeStationColorRepository { get; }
+    IManagerRepository ManagerRepository { get; }
     Task<int> SaveChangesAsync();
 }

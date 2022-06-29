@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BikeService.Sonic.DAL;
 using BikeService.Sonic.Dtos;
+using BikeService.Sonic.Dtos.BikeStation;
 using BikeService.Sonic.Exceptions;
 using BikeService.Sonic.Models;
 using BikeService.Sonic.Services.Interfaces;
@@ -80,5 +81,31 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
         }).OrderBy(x => x.Distance).Select(x => x.BikeStation).FirstOrDefault();
 
         return nearestBikeLocation!;
+    }
+
+    public async Task UpdateBikeStationColor(BikeStationColorDto bikeStationColorDto, string email)
+    {
+        var bikeStationColor = (await _unitOfWork.BikeStationColorRepository.Find(x =>
+            x.Manager.Email == email && x.BikeStationId == bikeStationColorDto.BikeStationId)).FirstOrDefault();
+        
+        if (bikeStationColor is null)
+        {
+            var manager = (await _unitOfWork.ManagerRepository.Find(x => x.Email == email)).FirstOrDefault();
+            await _unitOfWork.BikeStationColorRepository.Add(new BikeStationColor
+            {
+                BikeStationId = bikeStationColorDto.BikeStationId,
+                Manager = manager!,
+                Color = bikeStationColorDto.Color,
+                CreatedOn = DateTime.UtcNow,
+                IsActive = true
+            });
+        }
+        else
+        {
+            bikeStationColor.Color = bikeStationColorDto.Color;
+            bikeStationColor.UpdatedOn = DateTime.UtcNow;
+        }
+
+        await _unitOfWork.SaveChangesAsync();
     }
 }

@@ -99,7 +99,6 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         var bikeStation = await _unitOfWork.BikeStationRepository.GetById(bikeCheckinDto.BikeStationId);
         bikeStation!.UsedParkingSpace++;
         
-        await _bikeLocationHub.NotifyBikeLocationHasChanged(managerEmails.FirstOrDefault());
         var pushEventToMapTask = _messageQueuePublisher.PublishBikeLocationChangeCommand(managerEmails);
         var pushNotificationToManagers = _messageQueuePublisher.PublishBikeCheckinNotificationCommand(
             new PushBikeCheckinNotification
