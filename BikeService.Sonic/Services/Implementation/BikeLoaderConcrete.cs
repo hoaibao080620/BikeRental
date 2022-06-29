@@ -38,6 +38,8 @@ public class BikeLoaderConcrete : IBikeLoaderAdapter
                 IsRenting = b.BikeLocationTrackings.Any(bt => bt.IsActive),
                 LastAddress = b.BikeLocationTrackings.FirstOrDefault() != null ? 
                     b.BikeLocationTrackings.FirstOrDefault()!.Address : null,
+                BikeStationColor = b.BikeStation!.BikeStationColors.FirstOrDefault() != null ? 
+                    b.BikeStation!.BikeStationColors.FirstOrDefault()!.Color : null
             }).FirstOrDefaultAsync() ?? throw new BikeNotFoundException(bikeId);
     }
 
