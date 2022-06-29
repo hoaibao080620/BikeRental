@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
-using Shared.Consts;
 using UserService.Clients;
 using UserService.DataAccess;
-using UserService.Dtos;
 using UserService.Dtos.User;
 using UserService.ExternalServices;
 using UserService.Models;
@@ -148,33 +146,33 @@ public class UserBusinessLogic : IUserBusinessLogic
     //     }
     // }
     
-    private async Task<string?> AddUserToOkta(UserInsertDto userInsertDto)
-    {
-        var group = userInsertDto.RoleId switch
-        {
-            UserRole.User => OktaGroup.UserGroup,
-            UserRole.Manager => OktaGroup.ManagerGroup,
-            UserRole.SysAdmin => OktaGroup.SysAdminGroup,
-            _ => OktaGroup.EveryoneGroup
-        };
-
-        var oktaUserId =  await _oktaClient.AddUserToOkta(new OktaUserInsertDto
-        {
-            FirstName = userInsertDto.FirstName,
-            LastName = userInsertDto.LastName,
-            Email = userInsertDto.Email,
-            Password = userInsertDto.Password,
-            PhoneNumber = userInsertDto.PhoneNumber,
-            GroupId = group
-        });
-
-        return oktaUserId;
-    }
-
-    private async Task DeleteOktaUser(string? oktaUserId)
-    {
-        await _oktaClient.DeleteOktaUser(oktaUserId);
-    }
+    // private async Task<string?> AddUserToOkta(UserInsertDto userInsertDto)
+    // {
+    //     var group = userInsertDto.RoleId switch
+    //     {
+    //         UserRole.User => OktaGroup.UserGroup,
+    //         UserRole.Manager => OktaGroup.ManagerGroup,
+    //         UserRole.SysAdmin => OktaGroup.SysAdminGroup,
+    //         _ => OktaGroup.EveryoneGroup
+    //     };
+    //
+    //     var oktaUserId =  await _oktaClient.AddUserToOkta(new OktaUserInsertDto
+    //     {
+    //         FirstName = userInsertDto.FirstName,
+    //         LastName = userInsertDto.LastName,
+    //         Email = userInsertDto.Email,
+    //         Password = userInsertDto.Password,
+    //         PhoneNumber = userInsertDto.PhoneNumber,
+    //         GroupId = group
+    //     });
+    //
+    //     return oktaUserId;
+    // }
+    //
+    // private async Task DeleteOktaUser(string? oktaUserId)
+    // {
+    //     await _oktaClient.DeleteOktaUser(oktaUserId);
+    // }
 
     private async Task SyncOktaGroups()
     {

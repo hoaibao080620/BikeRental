@@ -10,14 +10,6 @@ builder.Services.AddSingletonServices(builder.Configuration);
 builder.Services.AddElasticClient(builder.Configuration);
 builder.Services.AddOktaAuthenticationService(builder.Configuration);
 builder.Services.AddSignalR();
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("CorsPolicy", innerBuilder => innerBuilder
-        .WithOrigins("http://localhost:3000")
-        .AllowAnyMethod()
-        .AllowAnyHeader()
-        .AllowCredentials().SetIsOriginAllowed(_ => true));
-});
 builder.Services.AddDbContextService(builder.Configuration);
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddHttpClientToServices();
@@ -33,7 +25,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors("CorsPolicy");
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -3,11 +3,11 @@ using Shared.Models;
 
 namespace BikeService.Sonic.Models;
 
-public class BikeRentalBooking : BaseEntity
+public class BikeRentalTracking : BaseEntity
 {
     public DateTime CheckinOn { get; set; }
     public DateTime? CheckoutOn { get; set; }
-    public double Amount { get; set; }
+    public double TotalPoint { get; set; }
     public int AccountId { get; set; }
     [ForeignKey(nameof(AccountId))]
     public Account Account { get; set; } = null!;
