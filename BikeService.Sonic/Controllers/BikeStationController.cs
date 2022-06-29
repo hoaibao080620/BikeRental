@@ -62,6 +62,16 @@ public class BikeStationController : ControllerBase
         return Ok();
     }
     
+    [HttpGet]
+    public async Task<IActionResult> GetBikeStationColors()
+    {
+        var email = HttpContext.User.Claims.FirstOrDefault(x => 
+            x.Type == ClaimTypes.NameIdentifier)!.Value;
+        
+        await _bikeStationBusinessLogic.GetBikeStationColors(email);
+        return Ok();
+    }
+    
     [HttpPost]
     public async Task<IActionResult> UpdateBikeStationColor([FromBody] BikeStationColorDto bikeStationColorDto)
     {

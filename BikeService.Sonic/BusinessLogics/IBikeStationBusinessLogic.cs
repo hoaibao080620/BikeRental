@@ -12,4 +12,5 @@ public interface IBikeStationBusinessLogic
     Task UpdateStationBike(BikeStationUpdateDto bikeInsertDto);
     Task<BikeStationRetrieveDto> GetNearestBikeStationFromLocation(double longitude, double latitude);
     Task UpdateBikeStationColor(BikeStationColorDto bikeStationColor, string email);
+    Task<List<BikeStationColorRetrieveDto>> GetBikeStationColors(string email);
 }

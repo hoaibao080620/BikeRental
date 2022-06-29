@@ -108,4 +108,16 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
 
         await _unitOfWork.SaveChangesAsync();
     }
+
+    public async Task<List<BikeStationColorRetrieveDto>> GetBikeStationColors(string email)
+    {
+        return (await _unitOfWork.BikeStationRepository.All()).Select(x => new BikeStationColorRetrieveDto
+        {
+            BikeStationId = x.Id,
+            BikeStationName = x.Name,
+            Color = x.BikeStationColors.Any(bsc => bsc.BikeStationId == x.Id && bsc.Manager.Email == email) ?
+                x.BikeStationColors.FirstOrDefault(bsc => bsc.BikeStationId == x.Id && bsc.Manager.Email == email)!.Color :
+                null
+        }).ToList();
+    }
 }
