@@ -46,7 +46,7 @@ public class BikeLoaderConcrete : IBikeLoaderAdapter
     public async Task<List<int>> GetBikeIdsOfManager(string managerEmail)
     {
         var bikeIds = (await _unitOfWork.BikeStationManagerRepository
-                .Find(x => x.Manager.Email == managerEmail))
+                .Find(x => x.Manager.Email == managerEmail || x.Manager.IsSuperManager))
             .SelectMany(x => x.BikeStation.Bikes)
             .AsNoTracking()
             .Select(b => b.Id);
