@@ -68,8 +68,8 @@ public class BikeStationController : ControllerBase
         var email = HttpContext.User.Claims.FirstOrDefault(x => 
             x.Type == ClaimTypes.NameIdentifier)!.Value;
         
-        await _bikeStationBusinessLogic.GetBikeStationColors(email);
-        return Ok();
+        var bikeStationColors = await _bikeStationBusinessLogic.GetBikeStationColors(email);
+        return Ok(bikeStationColors);
     }
     
     [HttpPost]
