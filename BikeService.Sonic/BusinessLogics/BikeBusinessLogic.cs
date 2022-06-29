@@ -322,7 +322,6 @@ public class BikeBusinessLogic : IBikeBusinessLogic
     
     private async Task FinishBikeRentalBooking(BikeCheckoutDto bikeCheckoutDto, string accountEmail)
     {
-        var account = await GetAccountByEmail(accountEmail);
         var bikeRentalTracking = (await _unitOfWork.BikeRentalTrackingRepository.Find(b =>
             !b.CheckoutOn.HasValue && b.Account.Email == accountEmail))
             .OrderByDescending(b => b.CreatedOn).
