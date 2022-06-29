@@ -9,6 +9,7 @@ namespace BikeService.Sonic.Controllers;
 
 [ApiController]
 [Route("[controller]/[action]")]
+[Authorize]
 public class BikeStationController : ControllerBase
 {
     private readonly IBikeStationBusinessLogic _bikeStationBusinessLogic;
