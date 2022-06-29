@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Linq.Expressions;
+using AutoMapper;
 using BikeService.Sonic.DAL;
 using BikeService.Sonic.Dtos;
 using BikeService.Sonic.Dtos.BikeStation;
@@ -111,7 +112,14 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
 
     public async Task<List<BikeStationColorRetrieveDto>> GetBikeStationColors(string email)
     {
-        return (await _unitOfWork.BikeStationRepository.All()).Select(x => new BikeStationColorRetrieveDto
+        var manager = (await _unitOfWork.ManagerRepository.Find(x => x.Email == email)).FirstOrDefault();
+        
+        ArgumentNullException.ThrowIfNull(manager);
+        Expression<Func<BikeStation, bool>> expressionFilter = manager.IsSuperManager ?
+            _ => true :
+            x => x.BikeStationManagers.Any(bs => bs.ManagerId == manager.Id); 
+        
+        return (await _unitOfWork.BikeStationRepository.Find(expressionFilter)).Select(x => new BikeStationColorRetrieveDto
         {
             BikeStationId = x.Id,
             BikeStationName = x.Name,
