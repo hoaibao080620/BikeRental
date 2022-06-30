@@ -27,7 +27,8 @@ public class MessageQueuePublisher : IMessageQueuePublisher
             PhoneNumber = user.PhoneNumber,
             FirstName = user.FirstName,
             LastName = user.LastName,
-            MessageType = MessageType.UserAdded
+            MessageType = MessageType.UserAdded,
+            Role = user.RoleName
         };
         
         await _publisher.SendMessage(
@@ -44,7 +45,8 @@ public class MessageQueuePublisher : IMessageQueuePublisher
             PhoneNumber = user.PhoneNumber,
             FirstName = user.FirstName,
             LastName = user.LastName,
-            MessageType = MessageType.UserUpdated
+            MessageType = MessageType.UserUpdated,
+            Role = user.RoleName
         };
         
         await _publisher.SendMessage(

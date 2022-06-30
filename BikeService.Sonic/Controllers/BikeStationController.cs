@@ -73,12 +73,12 @@ public class BikeStationController : ControllerBase
     }
     
     [HttpPost]
-    public async Task<IActionResult> UpdateBikeStationColor([FromBody] BikeStationColorsChangeDto bikeStationColorsChangeDto)
+    public async Task<IActionResult> UpdateBikeStationColor([FromBody] List<BikeStationColorDto> bikeStationColors)
     {
         var email = HttpContext.User.Claims.FirstOrDefault(x => 
             x.Type == ClaimTypes.NameIdentifier)!.Value;
         
-        await _bikeStationBusinessLogic.UpdateBikeStationColor(bikeStationColorsChangeDto, email);
+        await _bikeStationBusinessLogic.UpdateBikeStationColor(bikeStationColors, email);
         return Ok();
     }
 }

@@ -84,9 +84,9 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
         return new BikeStationRetrieveDto();
     }
 
-    public async Task UpdateBikeStationColor(BikeStationColorsChangeDto bikeStationColors, string email)
+    public async Task UpdateBikeStationColor(List<BikeStationColorDto> bikeStationColors, string email)
     {
-        foreach (var bikeStationColorDto in bikeStationColors.BikeStationColors)
+        foreach (var bikeStationColorDto in bikeStationColors)
         {
             var bikeStationColor = (await _unitOfWork.BikeStationColorRepository.Find(x =>
                 x.Manager.Email == email && x.BikeStationId == bikeStationColorDto.BikeStationId)).FirstOrDefault();
