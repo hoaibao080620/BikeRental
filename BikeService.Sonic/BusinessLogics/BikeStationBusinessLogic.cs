@@ -84,27 +84,30 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
         return new BikeStationRetrieveDto();
     }
 
-    public async Task UpdateBikeStationColor(BikeStationColorDto bikeStationColorDto, string email)
+    public async Task UpdateBikeStationColor(BikeStationColorsChangeDto bikeStationColors, string email)
     {
-        var bikeStationColor = (await _unitOfWork.BikeStationColorRepository.Find(x =>
-            x.Manager.Email == email && x.BikeStationId == bikeStationColorDto.BikeStationId)).FirstOrDefault();
+        foreach (var bikeStationColorDto in bikeStationColors.BikeStationColors)
+        {
+            var bikeStationColor = (await _unitOfWork.BikeStationColorRepository.Find(x =>
+                x.Manager.Email == email && x.BikeStationId == bikeStationColorDto.BikeStationId)).FirstOrDefault();
         
-        if (bikeStationColor is null)
-        {
-            var manager = (await _unitOfWork.ManagerRepository.Find(x => x.Email == email)).FirstOrDefault();
-            await _unitOfWork.BikeStationColorRepository.Add(new BikeStationColor
+            if (bikeStationColor is null)
             {
-                BikeStationId = bikeStationColorDto.BikeStationId,
-                Manager = manager!,
-                Color = bikeStationColorDto.Color,
-                CreatedOn = DateTime.UtcNow,
-                IsActive = true
-            });
-        }
-        else
-        {
-            bikeStationColor.Color = bikeStationColorDto.Color;
-            bikeStationColor.UpdatedOn = DateTime.UtcNow;
+                var manager = (await _unitOfWork.ManagerRepository.Find(x => x.Email == email)).FirstOrDefault();
+                await _unitOfWork.BikeStationColorRepository.Add(new BikeStationColor
+                {
+                    BikeStationId = bikeStationColorDto.BikeStationId,
+                    Manager = manager!,
+                    Color = bikeStationColorDto.Color,
+                    CreatedOn = DateTime.UtcNow,
+                    IsActive = true
+                });
+            }
+            else
+            {
+                bikeStationColor.Color = bikeStationColorDto.Color;
+                bikeStationColor.UpdatedOn = DateTime.UtcNow;
+            }
         }
 
         await _unitOfWork.SaveChangesAsync();

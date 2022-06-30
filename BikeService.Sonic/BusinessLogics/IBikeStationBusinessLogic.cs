@@ -11,6 +11,6 @@ public interface IBikeStationBusinessLogic
     Task DeleteStationBike(int id);
     Task UpdateStationBike(BikeStationUpdateDto bikeInsertDto);
     Task<BikeStationRetrieveDto> GetNearestBikeStationFromLocation(double longitude, double latitude);
-    Task UpdateBikeStationColor(BikeStationColorDto bikeStationColor, string email);
+    Task UpdateBikeStationColor(BikeStationColorsChangeDto bikeStationColors, string email);
     Task<List<BikeStationColorRetrieveDto>> GetBikeStationColors(string email);
 }
