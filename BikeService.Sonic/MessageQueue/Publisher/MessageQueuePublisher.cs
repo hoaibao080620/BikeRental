@@ -1,4 +1,5 @@
 ﻿using BikeRental.MessageQueue.Commands;
+using BikeRental.MessageQueue.Events;
 using BikeRental.MessageQueue.MessageType;
 using BikeRental.MessageQueue.Publisher;
 using Newtonsoft.Json;
@@ -28,16 +29,16 @@ public class MessageQueuePublisher : IMessageQueuePublisher
         await _publisher.SendMessage(payload, topic);
     }
 
-    public async Task PublishBikeCheckinNotificationCommand(PushBikeCheckinNotification bikeCheckinNotification)
+    public async Task PublishBikeCheckedInEvent(BikeCheckedIn bikeCheckedIn)
     {
-        var payload = JsonConvert.SerializeObject(bikeCheckinNotification);
+        var payload = JsonConvert.SerializeObject(bikeCheckedIn);
         var topic = _configuration["MessageQueue:BikeTopic"];
         await _publisher.SendMessage(payload, topic);
     }
 
-    public async Task PublishBikeCheckoutNotificationCommand(PushBikeCheckoutNotification bikeCheckoutNotification)
+    public async Task PublishBikeCheckedOutEvent(BikeCheckedOut bikeCheckedOut)
     {
-        var payload = JsonConvert.SerializeObject(bikeCheckoutNotification);
+        var payload = JsonConvert.SerializeObject(bikeCheckedOut);
         var topic = _configuration["MessageQueue:BikeTopic"];
         await _publisher.SendMessage(payload, topic);
     }

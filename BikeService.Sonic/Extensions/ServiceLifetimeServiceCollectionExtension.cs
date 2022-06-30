@@ -35,7 +35,7 @@ public static class ServiceLifetimeServiceCollectionExtension
                 provider.GetRequiredService<ICacheService>()));
         
         serviceCollection.AddScoped<IUnitOfWork, UnitOfWork>();
-        serviceCollection.AddScoped<IPublisher, SqsPublisher>();
+        serviceCollection.AddScoped<IPublisher, SnsPublisher>();
         serviceCollection.AddScoped<IConsumer, SqsConsumer>();
         serviceCollection.AddScoped<IMessageQueuePublisher, MessageQueuePublisher>();
     }

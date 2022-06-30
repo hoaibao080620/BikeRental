@@ -3,10 +3,8 @@ using AutoMapper;
 using BikeService.Sonic.DAL;
 using BikeService.Sonic.Dtos;
 using BikeService.Sonic.Dtos.BikeStation;
-using BikeService.Sonic.Exceptions;
 using BikeService.Sonic.Models;
 using BikeService.Sonic.Services.Interfaces;
-using Geolocation;
 
 namespace BikeService.Sonic.BusinessLogics;
 
@@ -67,21 +65,23 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
 
     public async Task<BikeStationRetrieveDto> GetNearestBikeStationFromLocation(double longitude, double latitude)
     {
-        var bikeLocations = await GetAllStationBikes();
+        // var bikeLocations = await GetAllStationBikes();
+        //
+        // if (!bikeLocations.Any()) throw new NoBikeStationFoundException();
+        //
+        // var nearestBikeLocation = bikeLocations
+        //     .Select(x => new
+        // {
+        //     Distance = GeoCalculator.GetDistance(
+        //         latitude, longitude,
+        //         x.Latitude,
+        //         x.Longitude),
+        //     BikeStation = x
+        // }).OrderBy(x => x.Distance).Select(x => x.BikeStation).FirstOrDefault();
+        //
+        // return nearestBikeLocation!;
 
-        if (!bikeLocations.Any()) throw new NoBikeStationFoundException();
-        
-        var nearestBikeLocation = bikeLocations
-            .Select(x => new
-        {
-            Distance = GeoCalculator.GetDistance(
-                latitude, longitude,
-                x.Latitude,
-                x.Longitude),
-            BikeStation = x
-        }).OrderBy(x => x.Distance).Select(x => x.BikeStation).FirstOrDefault();
-
-        return nearestBikeLocation!;
+        return new BikeStationRetrieveDto();
     }
 
     public async Task UpdateBikeStationColor(BikeStationColorDto bikeStationColorDto, string email)

@@ -5,10 +5,10 @@ using Amazon.SimpleNotificationService.Model;
 
 namespace BikeRental.MessageQueue.Publisher;
 
-public class SqsPublisher : IPublisher
+public class SnsPublisher : IPublisher
 {
     private readonly IAmazonSimpleNotificationService _amazonSns; 
-    public SqsPublisher()
+    public SnsPublisher()
     {
         var basicCredentials = new BasicAWSCredentials("AKIA2JUZUHJXQBX37EUR", 
             "bP0ROTQSIv8nJr1P+OZ91duCzOhElC9ud2qG2db0");

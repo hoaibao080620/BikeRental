@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using BikeRental.MessageQueue.Commands;
+using BikeRental.MessageQueue.Events;
 using BikeRental.MessageQueue.Handlers;
 using NotificationService.Consts;
 using NotificationService.DAL;
@@ -21,7 +22,7 @@ public class BikeCheckoutCommandHandler : IMessageQueueHandler
     
     public async Task Handle(string message)
     {
-        var notificationCommand = JsonSerializer.Deserialize<PushBikeCheckoutNotification>(message);
+        var notificationCommand = JsonSerializer.Deserialize<BikeCheckedOut>(message);
         if(notificationCommand is null) return;
 
         var tasks = new List<Task>();
