@@ -97,9 +97,9 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         
         var pushEventToMapTask = _messageQueuePublisher.PublishBikeLocationChangeCommand(managerEmails);
         var pushNotificationToManagers = _messageQueuePublisher.PublishBikeCheckedInEvent(
-            new BikeCheckedIn()
+            new BikeCheckedIn
             {
-                // ManagerEmails = managerEmails,
+                ManagerEmails = managerEmails,
                 BikeId = bike.Id,
                 BikeStationId = bikeStation.Id,
                 BikeStationName = bikeStation.Name,
