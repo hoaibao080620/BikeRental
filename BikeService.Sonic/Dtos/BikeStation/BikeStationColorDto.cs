@@ -3,5 +3,5 @@
 public class BikeStationColorDto
 {
     public int BikeStationId { get; set; }
-    public string Color { get; set; } = null!;
+    public string? Color { get; set; } = null!;
 }
