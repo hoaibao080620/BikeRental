@@ -38,7 +38,17 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
     public async Task<List<BikeStationRetrieveDto>> GetAllStationBikes()
     {
         var stationBikes = await _unitOfWork.BikeStationRepository.All();
-        return _mapper.Map<List<BikeStationRetrieveDto>>(stationBikes);
+        return stationBikes.Select(x => new BikeStationRetrieveDto
+        {
+            Description = x.Description,
+            Color = x.BikeStationColors.Any() ? x.BikeStationColors.FirstOrDefault()!.Color : null,
+            Id = x.Id,
+            Address = x.Address,
+            Latitude = x.Latitude,
+            Longitude = x.Longitude,
+            Name = x.Name,
+            UsedParkingSpace = x.UsedParkingSpace
+        }).ToList();
     }
 
     public async Task AddStationBike(BikeStationInsertDto bikeInsertDto)
