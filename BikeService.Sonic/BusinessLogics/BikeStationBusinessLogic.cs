@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using AutoMapper;
+using BikeService.Sonic.Const;
 using BikeService.Sonic.DAL;
 using BikeService.Sonic.Dtos;
 using BikeService.Sonic.Dtos.Bike;
@@ -13,16 +14,19 @@ namespace BikeService.Sonic.BusinessLogics;
 public class BikeStationBusinessLogic : IBikeStationBusinessLogic
 {
     private readonly IGoogleMapService _googleMapService;
+    private readonly ICacheService _cacheService;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     public BikeStationBusinessLogic(
         IUnitOfWork unitOfWork,
         IMapper mapper,
-        IGoogleMapService googleMapService)
+        IGoogleMapService googleMapService,
+        ICacheService cacheService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _googleMapService = googleMapService;
+        _cacheService = cacheService;
     }
     
     public async Task<BikeStationRetrieveDto> GetStationBike(int id)
@@ -88,6 +92,10 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
 
     public async Task UpdateBikeStationColor(List<BikeStationColorDto> bikeStationColors, string email)
     {
+        var bikeIds = (await _unitOfWork.BikeRepository
+            .Find(x => x.BikeStationId.HasValue && bikeStationColors.Select(b => b.BikeStationId)
+                .Contains(x.BikeStationId.Value))).ToList();
+        
         var manager = (await _unitOfWork.ManagerRepository.Find(x => x.Email == email)).FirstOrDefault();
         foreach (var bikeStationColorDto in bikeStationColors)
         {
@@ -113,6 +121,11 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
         }
 
         await _unitOfWork.SaveChangesAsync();
+
+        foreach (var bikeId in bikeIds)
+        {
+            await _cacheService.Remove(string.Format(RedisCacheKey.SingleBike, bikeId));
+        }
     }
 
     public async Task<List<BikeStationColorRetrieveDto>> GetBikeStationColors(string email)
