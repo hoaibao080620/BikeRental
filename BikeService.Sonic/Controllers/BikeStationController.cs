@@ -81,4 +81,11 @@ public class BikeStationController : ControllerBase
         await _bikeStationBusinessLogic.UpdateBikeStationColor(bikeStationColors, email);
         return Ok();
     }
+
+    [HttpGet]
+    public async Task<IActionResult> GetBikeStationBike([FromQuery] int bikeStationId)
+    {
+        var bikes = await _bikeStationBusinessLogic.GetBikeStationBike(bikeStationId);
+        return Ok(bikes);
+    }
 }

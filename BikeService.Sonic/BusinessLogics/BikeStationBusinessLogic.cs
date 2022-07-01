@@ -2,9 +2,11 @@
 using AutoMapper;
 using BikeService.Sonic.DAL;
 using BikeService.Sonic.Dtos;
+using BikeService.Sonic.Dtos.Bike;
 using BikeService.Sonic.Dtos.BikeStation;
 using BikeService.Sonic.Models;
 using BikeService.Sonic.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace BikeService.Sonic.BusinessLogics;
 
@@ -86,6 +88,7 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
 
     public async Task UpdateBikeStationColor(List<BikeStationColorDto> bikeStationColors, string email)
     {
+        var manager = (await _unitOfWork.ManagerRepository.Find(x => x.Email == email)).FirstOrDefault();
         foreach (var bikeStationColorDto in bikeStationColors)
         {
             var bikeStationColor = (await _unitOfWork.BikeStationColorRepository.Find(x =>
@@ -93,7 +96,6 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
         
             if (bikeStationColor is null)
             {
-                var manager = (await _unitOfWork.ManagerRepository.Find(x => x.Email == email)).FirstOrDefault();
                 await _unitOfWork.BikeStationColorRepository.Add(new BikeStationColor
                 {
                     BikeStationId = bikeStationColorDto.BikeStationId,
@@ -129,6 +131,24 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
             Color = x.BikeStationColors.Any(bsc => bsc.BikeStationId == x.Id && bsc.Manager.Email == email) ?
                 x.BikeStationColors.FirstOrDefault(bsc => bsc.BikeStationId == x.Id && bsc.Manager.Email == email)!.Color :
                 null
+        }).ToList();
+    }
+
+    public async Task<List<BikeRetrieveDto>> GetBikeStationBike(int bikeStationId)
+    {
+        var bikes = await _unitOfWork.BikeRepository.Find(x => x.BikeStationId == bikeStationId);
+
+        return bikes.AsNoTracking().Select(x => new BikeRetrieveDto
+        {
+            Id = x.Id,
+            BikeStationId = x.BikeStationId,
+            BikeStationName = x.BikeStation!.Name,
+            LicensePlate = x.LicensePlate,
+            Description = x.Description,
+            IsActive = x.IsActive,
+            CreatedOn = x.CreatedOn,
+            UpdatedOn = x.UpdatedOn,
+            Status = x.Status
         }).ToList();
     }
 }
