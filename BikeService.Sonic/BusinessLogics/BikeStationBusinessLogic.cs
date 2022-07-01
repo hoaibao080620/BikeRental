@@ -104,7 +104,7 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
     {
         var bikeIds = (await _unitOfWork.BikeRepository
             .Find(x => x.BikeStationId.HasValue && bikeStationColors.Select(b => b.BikeStationId)
-                .Contains(x.BikeStationId.Value))).ToList();
+                .Contains(x.BikeStationId.Value))).Select(x => x.Id).ToList();
         
         var manager = (await _unitOfWork.ManagerRepository.Find(x => x.Email == email)).FirstOrDefault();
         foreach (var bikeStationColorDto in bikeStationColors)
