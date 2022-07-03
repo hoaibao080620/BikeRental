@@ -17,10 +17,10 @@ public static class WebApplicationExtension
         
         messageQueueSubscriptionManager.RegisterEventHandlerSubscription<BikeCheckinCommandHandler>(
             serviceProvider.CreateScope().ServiceProvider, 
-            MessageType.NotifyBikeCheckin);
+            MessageType.BikeCheckedIn);
         
         messageQueueSubscriptionManager.RegisterEventHandlerSubscription<BikeCheckoutCommandHandler>(
             serviceProvider.CreateScope().ServiceProvider, 
-            MessageType.NotifyBikeCheckout);
+            MessageType.BikeCheckedOut);
     }
 }

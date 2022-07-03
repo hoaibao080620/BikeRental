@@ -2,5 +2,5 @@
 
 public class UserDeleted : BaseMessage
 {
-    public int UserId { get; set; }
+    public string UserId { get; set; } = null!;
 }

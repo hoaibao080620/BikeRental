@@ -1,6 +1,6 @@
 ﻿using BikeService.Sonic.Dtos;
-using BikeService.Sonic.Dtos.BikeOperation;
-using BikeService.Sonic.Models;
+using BikeService.Sonic.Dtos.Bike;
+using BikeService.Sonic.Dtos.BikeStation;
 
 namespace BikeService.Sonic.BusinessLogics;
 
@@ -12,4 +12,7 @@ public interface IBikeStationBusinessLogic
     Task DeleteStationBike(int id);
     Task UpdateStationBike(BikeStationUpdateDto bikeInsertDto);
     Task<BikeStationRetrieveDto> GetNearestBikeStationFromLocation(double longitude, double latitude);
+    Task UpdateBikeStationColor(List<BikeStationColorDto> bikeStationColors, string email);
+    Task<List<BikeStationColorRetrieveDto>> GetBikeStationColors(string email);
+    Task<List<BikeRetrieveDto>> GetBikeStationBike(int bikeStationId);
 }

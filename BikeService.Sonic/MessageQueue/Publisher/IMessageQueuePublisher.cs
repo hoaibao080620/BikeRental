@@ -1,10 +1,10 @@
-﻿using BikeRental.MessageQueue.Commands;
+﻿using BikeRental.MessageQueue.Events;
 
 namespace BikeService.Sonic.MessageQueue.Publisher;
 
 public interface IMessageQueuePublisher
 {
     Task PublishBikeLocationChangeCommand(List<string> managerEmails);
-    Task PublishBikeCheckinNotificationCommand(PushBikeCheckinNotification bikeCheckinNotification);
-    Task PublishBikeCheckoutNotificationCommand(PushBikeCheckoutNotification bikeCheckoutNotification);
+    Task PublishBikeCheckedInEvent(BikeCheckedIn bikeCheckedIn);
+    Task PublishBikeCheckedOutEvent(BikeCheckedOut bikeCheckedOut);
 }

@@ -102,4 +102,15 @@ public class BikeController : ControllerBase
         await _importService.Import(Request.Form.Files[0]);
         return Ok();
     }
+
+    [HttpGet]
+    [Route("[action]")]
+    public async Task<IActionResult> GetRentingStatus()
+    {
+        var email = HttpContext.User.Claims.FirstOrDefault(x => 
+            x.Type == ClaimTypes.NameIdentifier)!.Value;
+        var rentingStatus = await _bikeBusinessLogic.GetBikeRentingStatus(email);
+
+        return Ok(rentingStatus);
+    }
 }

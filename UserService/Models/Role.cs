@@ -1,14 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Shared.Models;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace UserService.Models;
 
-public class Role : BaseEntity
+public class Role
 {
-    [MaxLength(100)]
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string Id { get; set; } = null!;
+
     public string Name { get; set; } = null!;
     public string OktaRoleId { get; set; } = null!;
-    [MaxLength(1000)]
     public string? Description { get; set; }
-    public virtual ICollection<User> Users { get; set; } = null!;
+    public DateTime CreatedOn { get; set; }
+    public DateTime? UpdatedOn { get; set; }
 }

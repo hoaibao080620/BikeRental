@@ -1,4 +1,4 @@
-﻿using AccountService.DataAccess.Interfaces;
+﻿using AccountService.DataAccess;
 using AccountService.Models;
 using BikeRental.MessageQueue.Events;
 using BikeRental.MessageQueue.Handlers;
@@ -8,42 +8,28 @@ namespace AccountService.MessageQueueHandlers;
 
 public class UserCreatedEventHandler : IMessageQueueHandler
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IMongoService _mongoService;
 
-    public UserCreatedEventHandler(IUnitOfWork unitOfWork)
+    public UserCreatedEventHandler(IMongoService mongoService)
     {
-        _unitOfWork = unitOfWork;
+        _mongoService = mongoService;
     }
     
     public async Task Handle(string message)
     {
         var userCreatedMessage = JsonConvert.DeserializeObject<UserCreated>(message);
         if(userCreatedMessage is null) return;
-
-        var user = await AddUser(userCreatedMessage);
-        await _unitOfWork.AccountRepository.Add(new Account
+        
+        await _mongoService.AddAccount(new Account
         {
-            AccountCode = Guid.NewGuid(),
             CreatedOn = DateTime.UtcNow,
             IsActive = true,
-            User = user
-        });
-        
-        await _unitOfWork.SaveChangesAsync();
-    }
-
-    private async Task<User> AddUser(UserCreated userCreatedMessage)
-    {
-        var user = new User
-        {
-            ExternalId = userCreatedMessage.Id,
             FirstName = userCreatedMessage.FirstName,
             LastName = userCreatedMessage.LastName,
+            Email = userCreatedMessage.Email,
             PhoneNumber = userCreatedMessage.PhoneNumber,
-            Email = userCreatedMessage.Email
-        };
-        
-        await _unitOfWork.UserRepository.Add(user);
-        return user;
+            Point = 0,
+            ExternalUserId = userCreatedMessage.Id
+        });
     }
 }

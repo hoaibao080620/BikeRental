@@ -6,8 +6,10 @@ public interface IUnitOfWork
     IBikeLocationTrackingRepository BikeLocationTrackingRepository { get; }
     IAccountRepository AccountRepository { get; }
     IBikeRentalTrackingHistoryRepository BikeRentalTrackingHistoryRepository { get; }
-    IBikeRentalBookingRepository BikeRentalBookingRepository { get; }
+    IBikeRentalTrackingRepository BikeRentalTrackingRepository { get; }
     IBikeStationRepository BikeStationRepository { get; }
     IBikeStationManagerRepository BikeStationManagerRepository { get; }
+    IBikeStationColorRepository BikeStationColorRepository { get; }
+    IManagerRepository ManagerRepository { get; }
     Task<int> SaveChangesAsync();
 }

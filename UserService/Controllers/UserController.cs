@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UserService.BusinessLogic;
@@ -8,30 +8,41 @@ namespace UserService.Controllers;
 
 [Route("[controller]")]
 [ApiController]
-// [Authorize]
+[Authorize]
 public class UserController : ControllerBase
 {
     private readonly IUserBusinessLogic _userBusinessLogic;
-    private readonly IMapper _mapper;
 
-    public UserController(IUserBusinessLogic userBusinessLogic, IMapper mapper)
+    public UserController(IUserBusinessLogic userBusinessLogic)
     {
         _userBusinessLogic = userBusinessLogic;
-        _mapper = mapper;
     }
     
     [HttpGet]
+    [Route("[action]")]
+    public async Task<IActionResult> GetUserProfile()
+    {
+        var email = HttpContext.User.Claims.FirstOrDefault(x => 
+            x.Type == ClaimTypes.NameIdentifier)!.Value;
+        var user = await _userBusinessLogic.GetUserProfile(email);
+        return Ok(user);
+    }
+
+    [HttpGet]
     public async Task<IActionResult> GetUsers()
     {
-        var users = await _userBusinessLogic.GetUsers();
+        var email = HttpContext.User.Claims.FirstOrDefault(x => 
+            x.Type == ClaimTypes.NameIdentifier)!.Value;
+        var users = await _userBusinessLogic.GetUsers(email);
         return Ok(users);
     }
     
-    [HttpGet("{userId:int}")]
-    public async Task<IActionResult> GetUser(int userId)
+    [HttpGet("{userId}")]
+    public async Task<IActionResult> GetUser(string userId)
     {
-        var user = await _userBusinessLogic.GetUserById(userId);
-        return Ok(_mapper.Map<UserRetrieveDto>(user));
+        var users = await _userBusinessLogic.GetUserById(userId);
+
+        return Ok(users);
     }
     
     [HttpPost]
@@ -40,16 +51,16 @@ public class UserController : ControllerBase
         await _userBusinessLogic.AddUser(userInsertDto);
         return Ok();
     }
-
-    [HttpPut("{userId:int}")]
-    public async Task<IActionResult> UpdateUser(int userId, [FromBody] UserUpdateDto userUpdateDto)
+    
+    [HttpPut("{userId}")]
+    public async Task<IActionResult> UpdateUser(string userId, [FromBody] UserUpdateDto userUpdateDto)
     {
         await _userBusinessLogic.UpdateUser(userId, userUpdateDto);
         return Ok();
     }
     
-    [HttpDelete("{userId:int}")]
-    public async Task<IActionResult> DeleteUser(int userId)
+    [HttpDelete("{userId}")]
+    public async Task<IActionResult> DeleteUser(string userId)
     {
         await _userBusinessLogic.DeleteUser(userId);
         return Ok();

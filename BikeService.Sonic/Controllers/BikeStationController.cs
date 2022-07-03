@@ -1,5 +1,7 @@
-﻿using BikeService.Sonic.BusinessLogics;
+﻿using System.Security.Claims;
+using BikeService.Sonic.BusinessLogics;
 using BikeService.Sonic.Dtos;
+using BikeService.Sonic.Dtos.BikeStation;
 using BikeService.Sonic.Validation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +11,7 @@ namespace BikeService.Sonic.Controllers;
 
 [ApiController]
 [Route("[controller]/[action]")]
+[Authorize]
 public class BikeStationController : ControllerBase
 {
     private readonly IBikeStationBusinessLogic _bikeStationBusinessLogic;
@@ -59,5 +62,32 @@ public class BikeStationController : ControllerBase
         
         await _bikeStationBusinessLogic.DeleteStationBike(id);
         return Ok();
+    }
+    
+    [HttpGet]
+    public async Task<IActionResult> GetBikeStationColors()
+    {
+        var email = HttpContext.User.Claims.FirstOrDefault(x => 
+            x.Type == ClaimTypes.NameIdentifier)!.Value;
+        
+        var bikeStationColors = await _bikeStationBusinessLogic.GetBikeStationColors(email);
+        return Ok(bikeStationColors);
+    }
+    
+    [HttpPost]
+    public async Task<IActionResult> UpdateBikeStationColor([FromBody] List<BikeStationColorDto> bikeStationColors)
+    {
+        var email = HttpContext.User.Claims.FirstOrDefault(x => 
+            x.Type == ClaimTypes.NameIdentifier)!.Value;
+        
+        await _bikeStationBusinessLogic.UpdateBikeStationColor(bikeStationColors, email);
+        return Ok();
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetBikeStationBike([FromQuery] int bikeStationId)
+    {
+        var bikes = await _bikeStationBusinessLogic.GetBikeStationBike(bikeStationId);
+        return Ok(bikes);
     }
 }

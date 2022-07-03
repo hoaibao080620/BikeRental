@@ -1,5 +1,4 @@
-﻿using System.Text;
-using System.Text.Json;
+﻿using System.Text.Json;
 using BikeService.Sonic.Const;
 using BikeService.Sonic.Dtos.Bike;
 using BikeService.Sonic.Services.Interfaces;
@@ -7,25 +6,25 @@ using Microsoft.Extensions.Caching.Distributed;
 
 namespace BikeService.Sonic.Decorators;
 
-public class BikeRepositoryAdapterWithCachingDecorator : IBikeRepositoryAdapter
+public class BikeLoaderAdapterWithCachingDecorator : IBikeLoaderAdapter
 {
-    private readonly IBikeRepositoryAdapter _bikeRepositoryAdapter;
+    private readonly IBikeLoaderAdapter _bikeLoaderAdapter;
     private readonly IDistributedCache _distributedCache;
-    private readonly IGoogleMapService _googleMapService;
+    private readonly ICacheService _cacheService;
 
-    public BikeRepositoryAdapterWithCachingDecorator(
-        IBikeRepositoryAdapter bikeRepositoryAdapter, 
+    public BikeLoaderAdapterWithCachingDecorator(
+        IBikeLoaderAdapter bikeLoaderAdapter, 
         IDistributedCache distributedCache,
-        IGoogleMapService googleMapService)
+        ICacheService cacheService)
     {
-        _bikeRepositoryAdapter = bikeRepositoryAdapter;
+        _bikeLoaderAdapter = bikeLoaderAdapter;
         _distributedCache = distributedCache;
-        _googleMapService = googleMapService;
+        _cacheService = cacheService;
     }
 
-    public async Task<BikeRetrieveDto?> GetBike(int bikeId)
+    public async Task<BikeRetrieveDto> GetBike(int bikeId)
     {
-        var key = string.Format(RedisCacheKey.SingleBikeStation, bikeId);
+        var key = string.Format(RedisCacheKey.SingleBike, bikeId);
         var cache = await _distributedCache.GetStringAsync(key);
         if (cache is not null)
         {
@@ -33,53 +32,24 @@ public class BikeRepositoryAdapterWithCachingDecorator : IBikeRepositoryAdapter
             return bikes!;
         }
 
-        var bike = await _bikeRepositoryAdapter.GetBike(bikeId);
+        var bike = await _bikeLoaderAdapter.GetBike(bikeId);
+        await _cacheService.Add(key, JsonSerializer.Serialize(bike));
 
-        if (bike?.LastLongitude != null || bike?.LastLatitude != null || !string.IsNullOrEmpty(bike?.LastAddress))
-        {
-            bike.LastAddress =
-                await _googleMapService.GetAddressOfLocation(bike.LastLongitude!.Value,
-                    bike.LastLatitude!.Value);
-        }
-        
-        await _distributedCache.SetAsync(
-            key, 
-            Encoding.ASCII.GetBytes(JsonSerializer.Serialize(bike)), 
-            new DistributedCacheEntryOptions
-            {
-                AbsoluteExpiration = DateTimeOffset.UtcNow.AddHours(1)
-            });
         return bike;
     }
 
-    public async Task<List<BikeRetrieveDto>> GetBikes(string managerEmail)
+    public async Task<List<int>> GetBikeIdsOfManager(string managerEmail)
     {
-        var cache = await _distributedCache.GetStringAsync(RedisCacheKey.BikeStationIds);
+        var key = string.Format(RedisCacheKey.ManagerBikeIds, managerEmail);
+        var cache = await _distributedCache.GetStringAsync(key);
         if (cache is not null)
         {
-            var bikes = JsonSerializer.Deserialize<List<BikeRetrieveDto>>(cache);
-            return bikes!;
+            var bikeIds = JsonSerializer.Deserialize<List<int>>(cache);
+            return bikeIds!;
         }
         
-        var bikesFromDb = await _bikeRepositoryAdapter.GetBikes(managerEmail);
-        foreach (var bike in bikesFromDb)
-        {
-            if(!bike.LastLongitude.HasValue || !bike.LastLatitude.HasValue || !string.IsNullOrEmpty(bike.LastAddress)) continue;
-            
-            bike.LastAddress =
-                await _googleMapService.GetAddressOfLocation(bike.LastLongitude!.Value,
-                    bike.LastLatitude!.Value);
-        }
-        
-        await _distributedCache.SetAsync(
-            RedisCacheKey.BikeStationIds, 
-            Encoding.ASCII.GetBytes( JsonSerializer.Serialize(bikesFromDb)), 
-            new DistributedCacheEntryOptions
-            {
-                AbsoluteExpiration = DateTimeOffset.UtcNow.AddHours(1),
-                SlidingExpiration = TimeSpan.FromMinutes(45)
-            });
-
-        return bikesFromDb;
+        var bikeIdsFromDb = await _bikeLoaderAdapter.GetBikeIdsOfManager(managerEmail);
+        await _cacheService.Add(key, JsonSerializer.Serialize(bikeIdsFromDb));
+        return bikeIdsFromDb;
     }
 }

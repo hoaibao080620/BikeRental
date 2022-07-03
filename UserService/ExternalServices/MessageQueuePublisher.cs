@@ -27,13 +27,14 @@ public class MessageQueuePublisher : IMessageQueuePublisher
             PhoneNumber = user.PhoneNumber,
             FirstName = user.FirstName,
             LastName = user.LastName,
-            MessageType = MessageType.UserAdded
+            MessageType = MessageType.UserAdded,
+            Role = user.RoleName
         };
         
         await _publisher.SendMessage(
             JsonConvert.SerializeObject(message), 
             _configuration["Topic:UserTopic"], 
-            GetUserGroupMessageAttributeValues(user.Role.Name));
+            GetUserGroupMessageAttributeValues(user.RoleName));
     }
     
     public async Task PublishUserUpdatedEventToMessageQueue(User user)
@@ -44,13 +45,14 @@ public class MessageQueuePublisher : IMessageQueuePublisher
             PhoneNumber = user.PhoneNumber,
             FirstName = user.FirstName,
             LastName = user.LastName,
-            MessageType = MessageType.UserUpdated
+            MessageType = MessageType.UserUpdated,
+            Role = user.RoleName
         };
         
         await _publisher.SendMessage(
             JsonConvert.SerializeObject(message), 
             _configuration["Topic:UserTopic"], 
-            GetUserGroupMessageAttributeValues(user.Role.Name)
+            GetUserGroupMessageAttributeValues(user.RoleName)
             );
     }
     
@@ -65,7 +67,7 @@ public class MessageQueuePublisher : IMessageQueuePublisher
         await _publisher.SendMessage(
             JsonConvert.SerializeObject(message), 
             _configuration["Topic:UserTopic"],
-            GetUserGroupMessageAttributeValues(user.Role.Name));
+            GetUserGroupMessageAttributeValues(user.RoleName));
     }
 
     private static Dictionary<string, MessageAttributeValue> GetUserGroupMessageAttributeValues(string group)

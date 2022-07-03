@@ -13,4 +13,5 @@ public class BikeStation : BaseEntity
     public int UsedParkingSpace { get; set; }
     public List<Bike> Bikes { get; set; } = null!;
     public List<BikeStationManager> BikeStationManagers { get; set; } = null!;
+    public List<BikeStationColor> BikeStationColors { get; set; } = null!;
 }

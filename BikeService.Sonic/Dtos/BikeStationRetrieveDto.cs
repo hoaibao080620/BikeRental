@@ -13,4 +13,5 @@ public class BikeStationRetrieveDto
     public int ParkingSpace { get; set; }
     public int UsedParkingSpace { get; set; }
     public List<BikeRetrieveDto>? Bikes { get; set; }
+    public string? Color { get; set; }
 }

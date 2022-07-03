@@ -19,8 +19,8 @@ public class MessageQueueSubscriptionManager : IMessageQueueSubscriptionManager
 
     public IMessageQueueHandler GetHandler(string messageType)
     {
-        if (!_messageQueueHandlers.ContainsKey(messageType)) throw new InvalidOperationException("This event has not register");
-
-        return _messageQueueHandlers[messageType];
+        return !_messageQueueHandlers.ContainsKey(messageType) ? 
+            new EmptyMessageQueueHandler() : 
+            _messageQueueHandlers[messageType];
     }
 }

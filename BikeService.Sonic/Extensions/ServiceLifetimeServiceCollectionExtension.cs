@@ -26,17 +26,16 @@ public static class ServiceLifetimeServiceCollectionExtension
         serviceCollection.AddScoped<IBikeStationRepository, BikeStationRepository>();
         serviceCollection.AddScoped<IBikeStationBusinessLogic, BikeStationBusinessLogic>();
         serviceCollection.AddScoped<IBikeStationValidation, BikeStationValidation>();
-
-        serviceCollection.AddScoped<IBikeRepositoryAdapter, BikeRepositoryConcrete>();
-        serviceCollection.Decorate<IBikeRepositoryAdapter>((inner, provider) => 
-            new BikeRepositoryAdapterWithCachingDecorator(
+        serviceCollection.AddScoped<ICacheService, RedisCacheService>();
+        serviceCollection.AddScoped<IBikeLoaderAdapter, BikeLoaderConcrete>();
+        serviceCollection.Decorate<IBikeLoaderAdapter>((inner, provider) => 
+            new BikeLoaderAdapterWithCachingDecorator(
                 inner, 
                 provider.GetRequiredService<IDistributedCache>(),
-                provider.GetRequiredService<IGoogleMapService>()));
-
-        serviceCollection.AddScoped<ICacheService, RedisCacheService>();
+                provider.GetRequiredService<ICacheService>()));
+        
         serviceCollection.AddScoped<IUnitOfWork, UnitOfWork>();
-        serviceCollection.AddScoped<IPublisher, SqsPublisher>();
+        serviceCollection.AddScoped<IPublisher, SnsPublisher>();
         serviceCollection.AddScoped<IConsumer, SqsConsumer>();
         serviceCollection.AddScoped<IMessageQueuePublisher, MessageQueuePublisher>();
     }

@@ -2,6 +2,6 @@
 
 public class RedisCacheKey
 {
-    public const string BikeStationIds = "BikeStations:Ids";
-    public const string SingleBikeStation = "BikeStation:Id:{0}";
+    public const string ManagerBikeIds = "BikeIds:{0}";
+    public const string SingleBike = "Bike:Id:{0}";
 }

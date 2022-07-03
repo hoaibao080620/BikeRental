@@ -16,6 +16,8 @@ public class BikeRetrieveDto
     public double? LastLatitude { get; set; }
 
     public bool IsRenting { get; set; }
+
+    public string? BikeStationColor { get; set; }
     // public DateTime LastCheckin { get; set; }
     // public DateTime LastCheckinUsername { get; set; }
 }

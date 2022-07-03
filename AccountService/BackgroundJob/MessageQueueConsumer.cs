@@ -33,7 +33,7 @@ public class MessageQueueConsumer : BackgroundService
 
         while (!cancellationToken.IsCancellationRequested)
         {
-            var receiveMessages = await consumer.ReceiveMessages(_configuration["BikeRental.MessageQueue:AccountQueue"]);
+            var receiveMessages = await consumer.ReceiveMessages(_configuration["MessageQueue:AccountQueue"]);
             foreach (var message in receiveMessages)
             {
                 var messageType = (JsonConvert.DeserializeObject(message.Body) as JObject)?["MessageType"]?.ToString();
