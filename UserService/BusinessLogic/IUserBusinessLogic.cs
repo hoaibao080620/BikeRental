@@ -5,11 +5,11 @@ namespace UserService.BusinessLogic;
 
 public interface IUserBusinessLogic
 {
-    // Task<IEnumerable<UserRetrieveDto>> GetUsers();
-    // Task<UserRetrieveDto?> GetUserById(int id);
-    // Task AddUser(UserInsertDto user);
-    // Task UpdateUser(int userId, UserUpdateDto user);
-    // Task DeleteUser(int id);
+    Task<List<UserRetrieveDto>> GetUsers(string email);
+    Task<UserRetrieveDto?> GetUserById(string id);
+    Task AddUser(UserInsertDto user);
+    Task UpdateUser(string userId, UserUpdateDto user);
+    Task DeleteUser(string id);
     public Task<UserProfileDto?> GetUserProfile(string email);
     public Task SyncOktaUsers();
 }

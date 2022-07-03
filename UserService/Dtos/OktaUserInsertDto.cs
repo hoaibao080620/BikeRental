@@ -7,5 +7,5 @@ public class OktaUserInsertDto
     public string Password { get; set; } = null!;
     public string? GroupId { get; set; }
     public string Email { get; set; } = null!;
-    public string PhoneNumber { get; set; } = null!;
+    public string? PhoneNumber { get; set; } = null!;
 }

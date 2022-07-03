@@ -32,8 +32,18 @@ public class MongoService : IMongoService
         await _userCollection.InsertOneAsync(user);
     }
 
-    public async Task<User?> FindUser(Expression<Func<User, bool>> expression)
+    public async Task<List<User>> FindUser(Expression<Func<User, bool>> expression)
     {
-        return await _userCollection.Find(expression).FirstOrDefaultAsync();
+        return await _userCollection.Find(expression).ToListAsync();
+    }
+
+    public async Task UpdateUser(string userId, UpdateDefinition<User> builder)
+    {
+        await _userCollection.UpdateOneAsync(x => x.Id == userId, builder);
+    }
+
+    public async Task DeleteUser(string id)
+    {
+        await _userCollection.DeleteOneAsync(x => x.Id == id);
     }
 }
