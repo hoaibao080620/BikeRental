@@ -118,7 +118,14 @@ public class BikeController : ControllerBase
     [Route("[action]")]
     public async Task<IActionResult> DeleteBikes([FromQuery] string bikeIds)
     {
-        await _bikeBusinessLogic.DeleteBikes(bikeIds.Split(",").Select(int.Parse).ToList());
-        return NoContent();
+        try
+        {
+            await _bikeBusinessLogic.DeleteBikes(bikeIds.Split(",").Select(int.Parse).ToList());
+            return NoContent();
+        }
+        catch (InvalidOperationException exception)
+        {
+            return BadRequest(exception.Message);
+        }
     }
 }

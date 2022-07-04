@@ -234,6 +234,9 @@ public class BikeBusinessLogic : IBikeBusinessLogic
     public async Task DeleteBikes(List<int> bikeIds)
     {
         var bikes = (await _unitOfWork.BikeRepository.Find(x => bikeIds.Contains(x.Id))).ToList();
+        if (bikes.Any(x => x.Status == BikeStatus.InUsed || x.BikeStationId.HasValue))
+            throw new InvalidOperationException("Cannot delete bike with status in used or belong to a bike station");
+        
         foreach (var bike in bikes)
         {
             await _cacheService.Remove(string.Format(RedisCacheKey.SingleBike, bike.Id));
