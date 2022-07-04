@@ -15,4 +15,5 @@ public interface IBikeStationBusinessLogic
     Task UpdateBikeStationColor(List<BikeStationColorDto> bikeStationColors, string email);
     Task<List<BikeStationColorRetrieveDto>> GetBikeStationColors(string email);
     Task<List<BikeRetrieveDto>> GetBikeStationBike(int bikeStationId);
+    Task<List<BikeStationRetrieveDto>> GetBikeStationsNearMe(BikeStationRetrieveParameter bikeStationRetrieveParameter);
 }

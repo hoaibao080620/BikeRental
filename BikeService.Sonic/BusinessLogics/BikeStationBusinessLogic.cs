@@ -5,6 +5,7 @@ using BikeService.Sonic.DAL;
 using BikeService.Sonic.Dtos;
 using BikeService.Sonic.Dtos.Bike;
 using BikeService.Sonic.Dtos.BikeStation;
+using BikeService.Sonic.Dtos.GoogleMapAPI;
 using BikeService.Sonic.Models;
 using BikeService.Sonic.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -38,7 +39,7 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
     public async Task<List<BikeStationRetrieveDto>> GetAllStationBikes()
     {
         var stationBikes = await _unitOfWork.BikeStationRepository.All();
-        return stationBikes.Select(x => new BikeStationRetrieveDto
+        var bikeStations = stationBikes.Select(x => new BikeStationRetrieveDto
         {
             Description = x.Description,
             Color = x.BikeStationColors.Any() ? x.BikeStationColors.FirstOrDefault()!.Color : null,
@@ -49,6 +50,8 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
             Name = x.Name,
             UsedParkingSpace = x.UsedParkingSpace
         }).ToList();
+
+        return bikeStations;
     }
 
     public async Task AddStationBike(BikeStationInsertDto bikeInsertDto)
@@ -173,5 +176,28 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
             UpdatedOn = x.UpdatedOn,
             Status = x.Status
         }).ToList();
+    }
+
+    public async Task<List<BikeStationRetrieveDto>> GetBikeStationsNearMe(BikeStationRetrieveParameter bikeStationRetrieveParameter)
+    {
+        var bikeStations = await GetAllStationBikes();
+        var originLocation = new GoogleMapLocation
+        {
+            Longitude = bikeStationRetrieveParameter.Longitude,
+            Latitude = bikeStationRetrieveParameter.Latitude
+        };
+        
+        foreach (var bikeStation in bikeStations)
+        {
+            var destination = new GoogleMapLocation
+            {
+                Latitude = bikeStation.Latitude,
+                Longitude = bikeStation.Longitude
+            };
+
+            bikeStation.Distance = await _googleMapService.GetDistanceBetweenTwoLocations(originLocation, destination);
+        }
+
+        return bikeStations;
     }
 }

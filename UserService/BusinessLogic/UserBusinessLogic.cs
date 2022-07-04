@@ -117,7 +117,8 @@ public class UserBusinessLogic : IUserBusinessLogic
                 Email = email,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                Role = user.RoleName
+                Role = user.RoleName,
+                PhoneNumber = user.PhoneNumber
             }
             : null;
     }
