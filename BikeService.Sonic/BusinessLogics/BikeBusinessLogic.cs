@@ -68,6 +68,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
     {
         var bike = _mapper.Map<Bike>(bikeInsertDto);
         bike.UpdatedOn = DateTime.UtcNow;
+        await _cacheService.Remove(string.Format(RedisCacheKey.SingleBike, bike.Id));
         await _unitOfWork.BikeRepository.Update(bike);
         await _unitOfWork.SaveChangesAsync();
     }
@@ -235,9 +236,10 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         var bikes = (await _unitOfWork.BikeRepository.Find(x => bikeIds.Contains(x.Id))).ToList();
         foreach (var bike in bikes)
         {
+            await _cacheService.Remove(string.Format(RedisCacheKey.SingleBike, bike.Id));
             await _unitOfWork.BikeRepository.Delete(bike);
         }
-
+        
         await _unitOfWork.SaveChangesAsync();
     }
 
