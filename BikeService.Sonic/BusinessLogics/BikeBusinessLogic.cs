@@ -230,6 +230,17 @@ public class BikeBusinessLogic : IBikeBusinessLogic
             };
     }
 
+    public async Task DeleteBikes(List<int> bikeIds)
+    {
+        var bikes = (await _unitOfWork.BikeRepository.Find(x => bikeIds.Contains(x.Id))).ToList();
+        foreach (var bike in bikes)
+        {
+            await _unitOfWork.BikeRepository.Delete(bike);
+        }
+
+        await _unitOfWork.SaveChangesAsync();
+    }
+
     private async Task<Bike> GetBikeById(int bikeId)
     {
         var bike = await _unitOfWork.BikeRepository.GetById(bikeId) ?? throw new BikeNotFoundException(bikeId);
