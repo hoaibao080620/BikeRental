@@ -41,7 +41,8 @@ public class UserBusinessLogic : IUserBusinessLogic
             Email = u.Email,
             FirstName = u.FirstName,
             LastName = u.LastName,
-            PhoneNumber = u.PhoneNumber
+            PhoneNumber = u.PhoneNumber,
+            DateOfBirth = u.DateOfBirth
         }).ToList();
     }
 
@@ -57,7 +58,8 @@ public class UserBusinessLogic : IUserBusinessLogic
             Email = user.Email,
             FirstName = user.FirstName,
             LastName = user.LastName,
-            PhoneNumber = user.PhoneNumber
+            PhoneNumber = user.PhoneNumber,
+            DateOfBirth = user.DateOfBirth
         };
     }
 
