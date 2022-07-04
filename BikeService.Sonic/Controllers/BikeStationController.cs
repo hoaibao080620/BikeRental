@@ -88,4 +88,11 @@ public class BikeStationController : ControllerBase
         var bikes = await _bikeStationBusinessLogic.GetBikeStationBike(bikeStationId);
         return Ok(bikes);
     }
+    
+    [HttpGet]
+    public async Task<IActionResult> GetBikeStationsNearMe([FromQuery] BikeStationRetrieveParameter bikeStationRetrieveParameter)
+    {
+        var bikeStations = await _bikeStationBusinessLogic.GetBikeStationsNearMe(bikeStationRetrieveParameter);
+        return Ok(bikeStations);
+    }
 }
