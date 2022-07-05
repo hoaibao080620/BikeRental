@@ -180,7 +180,7 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
 
     public async Task<List<BikeStationRetrieveDto>> GetBikeStationsNearMe(BikeStationRetrieveParameter bikeStationRetrieveParameter)
     {
-        var bikeStations = await GetAllStationBikes();
+        var bikeStations = (await GetAllStationBikes()).Take(bikeStationRetrieveParameter.Limit).ToList();
         var originLocation = new GoogleMapLocation
         {
             Longitude = bikeStationRetrieveParameter.Longitude,
