@@ -217,7 +217,6 @@ public class UserBusinessLogic : IUserBusinessLogic
             FirstName = userInsertDto.FirstName,
             LastName = userInsertDto.LastName,
             Email = userInsertDto.Email,
-            Password = userInsertDto.Password,
             PhoneNumber = userInsertDto.PhoneNumber,
             GroupId = group.OktaRoleId
         });
