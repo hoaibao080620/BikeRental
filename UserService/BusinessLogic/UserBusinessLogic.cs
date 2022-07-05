@@ -65,9 +65,10 @@ public class UserBusinessLogic : IUserBusinessLogic
 
     public async Task AddUser(UserInsertDto user)
     {
+        user.RoleName ??= "Users";
         var userAdded = new User
         {
-            RoleName = user.RoleName ?? "Users",
+            RoleName = user.RoleName,
             Address = user.Address,
             Email = user.Email,
             FirstName = user.FirstName,
@@ -103,7 +104,9 @@ public class UserBusinessLogic : IUserBusinessLogic
 
     public async Task DeleteUser(string id)
     {
+        var user = (await _mongoService.FindUser(x => x.Id == id)).FirstOrDefault();
         await _mongoService.DeleteUser(id);
+        await DeleteOktaUser(user?.OktaUserId);
     }
 
     public async Task<UserProfileDto?> GetUserProfile(string email)
