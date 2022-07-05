@@ -32,13 +32,6 @@ public class OktaClient : IOktaClient
                     login = oktaUserInsertDto.Email,
                     mobilePhone =  oktaUserInsertDto.PhoneNumber
                 },
-                credentials = new
-                {
-                    password = new
-                    {
-                        value = oktaUserInsertDto.Password
-                    }
-                },
                 groupIds = new List<string>
                 {
                     oktaUserInsertDto.GroupId

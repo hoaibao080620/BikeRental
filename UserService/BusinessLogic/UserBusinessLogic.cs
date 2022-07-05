@@ -50,7 +50,7 @@ public class UserBusinessLogic : IUserBusinessLogic
     {
         var user = (await _mongoService.FindUser(x => x.Id == id)).FirstOrDefault();
 
-        return user is null ? null : new UserRetrieveDto()
+        return user is null ? null : new UserRetrieveDto
         {
             Id = user.Id,
             RoleName = user.RoleName,
