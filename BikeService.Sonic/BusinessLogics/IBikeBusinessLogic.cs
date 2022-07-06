@@ -1,5 +1,6 @@
 ﻿using BikeService.Sonic.Dtos.Bike;
 using BikeService.Sonic.Dtos.BikeOperation;
+using BikeService.Sonic.Dtos.History;
 
 namespace BikeService.Sonic.BusinessLogics;
 
@@ -15,4 +16,5 @@ public interface IBikeBusinessLogic
     Task UpdateBikeLocation(BikeLocationDto bikeLocationDto);
     Task<BikeRentingStatus> GetBikeRentingStatus(string accountEmail);
     Task DeleteBikes(List<int> bikeIds);
+    Task<List<BikeRentingHistory>> GetBikeRentingHistories(string email);
 }

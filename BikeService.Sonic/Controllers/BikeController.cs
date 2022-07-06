@@ -128,4 +128,15 @@ public class BikeController : ControllerBase
             return BadRequest(exception.Message);
         }
     }
+
+    [HttpGet]
+    [Route("[action]")]
+    public async Task<IActionResult> GetBikeRentingHistory()
+    {
+        var email = HttpContext.User.Claims.FirstOrDefault(x => 
+            x.Type == ClaimTypes.NameIdentifier)!.Value;
+
+        var histories = await _bikeBusinessLogic.GetBikeRentingHistories(email);
+        return Ok(histories);
+    }
 }

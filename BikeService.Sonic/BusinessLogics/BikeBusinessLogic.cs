@@ -6,10 +6,12 @@ using BikeService.Sonic.Const;
 using BikeService.Sonic.DAL;
 using BikeService.Sonic.Dtos.Bike;
 using BikeService.Sonic.Dtos.BikeOperation;
+using BikeService.Sonic.Dtos.History;
 using BikeService.Sonic.Exceptions;
 using BikeService.Sonic.MessageQueue.Publisher;
 using BikeService.Sonic.Models;
 using BikeService.Sonic.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace BikeService.Sonic.BusinessLogics;
 
@@ -244,6 +246,58 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         }
         
         await _unitOfWork.SaveChangesAsync();
+    }
+
+    public async Task<List<BikeRentingHistory>> GetBikeRentingHistories(string email)
+    {
+        var manager = (await _unitOfWork.ManagerRepository.Find(x => x.Email == email)).FirstOrDefault()!;
+
+        var bikeRentingHistories = (await _unitOfWork.BikeRentalTrackingRepository
+            .Find(x =>
+                manager.IsSuperManager ||
+                x.Bike.BikeStation!.BikeStationManagers.Any(b => b.Manager.Email == email)
+                && x.IsActive
+            ))
+            .AsNoTracking()
+            .Select(x => new BikeRentingHistory
+            {
+                Id = x.Id,
+                BikeId = x.BikeId,
+                BikePlate = x.Bike.LicensePlate,
+                AccountEmail = x.Account.Email,
+                BikeStationName = x.Bike.BikeStation!.Name,
+                CheckedInOn = x.CheckinOn,
+                CheckedOutOn = x.CheckoutOn,
+                TotalTime = x.CheckoutOn.HasValue ? x.CheckoutOn.Value.Subtract(x.CheckinOn).TotalMinutes : null
+            });
+
+        return bikeRentingHistories.ToList();
+    }
+    
+    public async Task<List<BikeRentingHistory>> GetBikeLocationHistories(string email)
+    {
+        var manager = (await _unitOfWork.ManagerRepository.Find(x => x.Email == email)).FirstOrDefault()!;
+
+        var bikeRentingHistories = (await _unitOfWork.BikeRentalTrackingRepository
+                .Find(x =>
+                    manager.IsSuperManager ||
+                    x.Bike.BikeStation!.BikeStationManagers.Any(b => b.Manager.Email == email)
+                    && x.IsActive
+                ))
+            .AsNoTracking()
+            .Select(x => new BikeRentingHistory
+            {
+                Id = x.Id,
+                BikeId = x.BikeId,
+                BikePlate = x.Bike.LicensePlate,
+                AccountEmail = x.Account.Email,
+                BikeStationName = x.Bike.BikeStation!.Name,
+                CheckedInOn = x.CheckinOn,
+                CheckedOutOn = x.CheckoutOn,
+                TotalTime = x.CheckoutOn.HasValue ? x.CheckoutOn.Value.Subtract(x.CheckinOn).TotalMinutes : null
+            });
+
+        return bikeRentingHistories.ToList();
     }
 
     private async Task<Bike> GetBikeById(int bikeId)
