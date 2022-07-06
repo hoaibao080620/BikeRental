@@ -5,6 +5,8 @@ using BikeService.Sonic.Dtos.BikeStation;
 using BikeService.Sonic.Validation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Service;
+
 namespace BikeService.Sonic.Controllers;
 
 [ApiController]
