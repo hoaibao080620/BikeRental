@@ -11,5 +11,6 @@ public interface IUnitOfWork
     IBikeStationManagerRepository BikeStationManagerRepository { get; }
     IBikeStationColorRepository BikeStationColorRepository { get; }
     IManagerRepository ManagerRepository { get; }
+    IBikeReportRepository BikeReportRepository { get; }
     Task<int> SaveChangesAsync();
 }

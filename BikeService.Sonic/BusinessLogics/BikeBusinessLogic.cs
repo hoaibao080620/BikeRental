@@ -95,7 +95,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
             bikeCheckinDto.Latitude);
         ArgumentNullException.ThrowIfNull(address);
         
-        var bikeStation = await _unitOfWork.BikeStationRepository.GetById(bikeCheckinDto.BikeStationId);
+        var bikeStation = await _unitOfWork.BikeStationRepository.GetById(bike.BikeStationId!.Value);
         bikeStation!.UsedParkingSpace++;
         
         var pushEventToMapTask = _messageQueuePublisher.PublishBikeLocationChangeCommand(managerEmails);
@@ -143,7 +143,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         bike.Status = BikeStatus.Available;
         bike.BikeStationId = bikeCheckout.BikeStationId;
 
-        var bikeStation = await _unitOfWork.BikeStationRepository.GetById(bikeCheckout.BikeStationId);
+        var bikeStation = await _unitOfWork.BikeStationRepository.GetById(bikeCheckout.BikeStationId!.Value);
 
         var address = await _googleMapService.GetAddressOfLocation(
             bikeCheckout.Longitude,
@@ -221,9 +221,9 @@ public class BikeBusinessLogic : IBikeBusinessLogic
                 IsRenting = true,
                 BikeId = x.BikeId,
                 LicensePlate = x.Bike.LicensePlate,
-                LastLatitude = x.Bike.BikeLocationTrackings.FirstOrDefault(x => x.IsActive).Latitude,
-                LastLongitude = x.Bike.BikeLocationTrackings.FirstOrDefault(x => x.IsActive).Longitude,
-                LastAddress = x.Bike.BikeLocationTrackings.FirstOrDefault(x => x.IsActive).Address,
+                LastLatitude = x.Bike.BikeLocationTrackings.FirstOrDefault(b => b.IsActive)!.Latitude,
+                LastLongitude = x.Bike.BikeLocationTrackings.FirstOrDefault(b => b.IsActive)!.Longitude,
+                LastAddress = x.Bike.BikeLocationTrackings.FirstOrDefault(b => b.IsActive)!.Address,
             }).FirstOrDefault()!
             : new BikeRentingStatus
             {

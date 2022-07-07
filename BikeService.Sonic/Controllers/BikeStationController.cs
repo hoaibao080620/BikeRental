@@ -5,7 +5,6 @@ using BikeService.Sonic.Dtos.BikeStation;
 using BikeService.Sonic.Validation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Shared.Service;
 
 namespace BikeService.Sonic.Controllers;
 
@@ -96,5 +95,15 @@ public class BikeStationController : ControllerBase
     {
         var bikeStations = await _bikeStationBusinessLogic.GetBikeStationsNearMe(bikeStationRetrieveParameter);
         return Ok(bikeStations);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> AssignBikesToStation([FromBody] BikeStationBikeAssignDto bikeAssignDto)
+    {
+        var errorMessage = await _bikeStationValidation.IsAssignBikesValid(bikeAssignDto.BikeIds, bikeAssignDto.BikeStationId);
+        if (errorMessage is not null) return BadRequest(errorMessage);
+        await _bikeStationBusinessLogic.AssignBikesToBikeStation(bikeAssignDto);
+
+        return Ok();
     }
 }

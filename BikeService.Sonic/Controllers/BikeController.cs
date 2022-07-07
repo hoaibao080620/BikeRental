@@ -86,6 +86,9 @@ public class BikeController : ControllerBase
     [Route("[action]")]
     public async Task<IActionResult> Checkout(BikeCheckoutDto bikeCheckoutDto)
     {
+        if (bikeCheckoutDto.BikeStationId is null)
+            return BadRequest("You have to scan QR code of station before scan bike QR code");
+        
         var email = HttpContext.User.Claims.FirstOrDefault(x => 
             x.Type == ClaimTypes.NameIdentifier)!.Value;
         

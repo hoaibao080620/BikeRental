@@ -200,4 +200,16 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
 
         return bikeStations;
     }
+
+    public async Task AssignBikesToBikeStation(BikeStationBikeAssignDto bikeAssignDto)
+    {
+        var bikes = await _unitOfWork.BikeRepository.Find(x => bikeAssignDto.BikeIds.Contains(x.Id));
+
+        foreach (var bike in bikes.ToList())
+        {
+            bike.BikeStationId = bikeAssignDto.BikeStationId;
+        }
+
+        await _unitOfWork.SaveChangesAsync();
+    }
 }

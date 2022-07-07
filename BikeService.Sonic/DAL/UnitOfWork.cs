@@ -14,6 +14,7 @@ public class UnitOfWork : IUnitOfWork
     public IBikeStationManagerRepository BikeStationManagerRepository { get; }
     public IBikeStationColorRepository BikeStationColorRepository { get; }
     public IManagerRepository ManagerRepository { get; }
+    public IBikeReportRepository BikeReportRepository { get; }
 
     public UnitOfWork(BikeServiceDbContext bikeServiceDbContext)
     {
@@ -27,6 +28,7 @@ public class UnitOfWork : IUnitOfWork
         BikeStationManagerRepository ??= new BikeStationManagerRepository(bikeServiceDbContext);
         BikeStationColorRepository ??= new BikeStationColorRepository(bikeServiceDbContext);
         ManagerRepository ??= new ManagerRepository(bikeServiceDbContext);
+        BikeReportRepository ??= new BikeReportRepository(bikeServiceDbContext);
     }
     
     public async Task<int> SaveChangesAsync()

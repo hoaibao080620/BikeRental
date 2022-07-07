@@ -32,7 +32,7 @@ public class ValidationController : ControllerBase
         var authToken = Environment.GetEnvironmentVariable("Twilio_Account_Auth_Token");
 
         TwilioClient.Init(accountSid, authToken);
-
+        
         var verificationCheck = await VerificationCheckResource.CreateAsync(
             to: $"+{phoneNumber}",
             code: verificationCode,

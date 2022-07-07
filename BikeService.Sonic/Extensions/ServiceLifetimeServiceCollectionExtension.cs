@@ -38,6 +38,7 @@ public static class ServiceLifetimeServiceCollectionExtension
         serviceCollection.AddScoped<IPublisher, SnsPublisher>();
         serviceCollection.AddScoped<IConsumer, SqsConsumer>();
         serviceCollection.AddScoped<IMessageQueuePublisher, MessageQueuePublisher>();
+        serviceCollection.AddScoped<IBikeReportBusinessLogic, BikeReportBusinessLogic>();
     }
     
     public static void AddSingletonServices(this IServiceCollection serviceCollection, IConfiguration configuration)
