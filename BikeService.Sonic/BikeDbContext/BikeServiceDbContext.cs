@@ -18,4 +18,5 @@ public class BikeServiceDbContext : DbContext
     public DbSet<BikeStationManager> BikeStationManager { get; set; } = null!;
     public DbSet<BikeLocationTrackingHistory> BikeLocationTrackingHistory { get; set; } = null!;
     public DbSet<BikeRentalTracking> BikeRentalBooking { get; set; } = null!;
+    public DbSet<BikeReport> BikeReport { get; set; } = null!;
 }

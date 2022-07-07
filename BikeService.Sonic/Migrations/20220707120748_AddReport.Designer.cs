@@ -3,6 +3,7 @@ using System;
 using BikeService.Sonic.BikeDbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BikeService.Sonic.Migrations
 {
     [DbContext(typeof(BikeServiceDbContext))]
-    partial class BikeServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220707120748_AddReport")]
+    partial class AddReport
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -270,67 +272,6 @@ namespace BikeService.Sonic.Migrations
                     b.ToTable("bike_rental_booking", (string)null);
                 });
 
-            modelBuilder.Entity("BikeService.Sonic.Models.BikeReport", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AccountId")
-                        .HasColumnType("integer")
-                        .HasColumnName("account_id");
-
-                    b.Property<int>("BikeId")
-                        .HasColumnType("integer")
-                        .HasColumnName("bike_id");
-
-                    b.Property<DateTime?>("CompletedOn")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("completed_on");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_on");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_active");
-
-                    b.Property<bool>("IsResolved")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_resolved");
-
-                    b.Property<int>("ManagerId")
-                        .HasColumnType("integer")
-                        .HasColumnName("manager_id");
-
-                    b.Property<string>("ReportDescription")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("report_description");
-
-                    b.Property<DateTime?>("UpdatedOn")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_on");
-
-                    b.HasKey("Id")
-                        .HasName("pk_bike_report");
-
-                    b.HasIndex("AccountId")
-                        .HasDatabaseName("ix_bike_report_account_id");
-
-                    b.HasIndex("BikeId")
-                        .HasDatabaseName("ix_bike_report_bike_id");
-
-                    b.HasIndex("ManagerId")
-                        .HasDatabaseName("ix_bike_report_manager_id");
-
-                    b.ToTable("bike_report", (string)null);
-                });
-
             modelBuilder.Entity("BikeService.Sonic.Models.BikeStation", b =>
                 {
                     b.Property<int>("Id")
@@ -576,36 +517,6 @@ namespace BikeService.Sonic.Migrations
                     b.Navigation("Account");
 
                     b.Navigation("Bike");
-                });
-
-            modelBuilder.Entity("BikeService.Sonic.Models.BikeReport", b =>
-                {
-                    b.HasOne("BikeService.Sonic.Models.Account", "Account")
-                        .WithMany()
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_bike_report_user_account_id");
-
-                    b.HasOne("BikeService.Sonic.Models.Bike", "Bike")
-                        .WithMany()
-                        .HasForeignKey("BikeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_bike_report_bike_bike_id");
-
-                    b.HasOne("BikeService.Sonic.Models.Manager", "CompletedBy")
-                        .WithMany()
-                        .HasForeignKey("ManagerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_bike_report_manager_manager_id");
-
-                    b.Navigation("Account");
-
-                    b.Navigation("Bike");
-
-                    b.Navigation("CompletedBy");
                 });
 
             modelBuilder.Entity("BikeService.Sonic.Models.BikeStationColor", b =>
