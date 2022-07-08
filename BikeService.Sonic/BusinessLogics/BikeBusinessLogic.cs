@@ -67,11 +67,13 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         bike.Status = BikeStatus.Available;
         await _unitOfWork.BikeRepository.Add(bike);
         await _unitOfWork.SaveChangesAsync();
+        var bikeStation = bike.BikeStationId.HasValue ?
+            await _unitOfWork.BikeStationRepository.GetById(bike.BikeStationId.Value) : null;
         await _messageQueuePublisher.PublishBikeCreatedEvent(new BikeCreated
         {
             Id = bike.Id,
             BikeStationId = bike.BikeStationId,
-            BikeStationName = bike.BikeStation?.Name,
+            BikeStationName = bikeStation?.Name,
             Description = bike.Description,
             LicensePlate = bike.LicensePlate,
             Status = bike.Status,
@@ -267,9 +269,9 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         {
             await _cacheService.Remove(string.Format(RedisCacheKey.SingleBike, bike.Id));
             await _unitOfWork.BikeRepository.Delete(bike);
+            await _unitOfWork.SaveChangesAsync();
+            await _messageQueuePublisher.PublishBikeDeletedEvent(bike.Id);
         }
-        
-        await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task<List<BikeRentingHistory>> GetBikeRentingHistories(string email)
