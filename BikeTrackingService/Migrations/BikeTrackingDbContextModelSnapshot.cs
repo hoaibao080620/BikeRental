@@ -239,6 +239,10 @@ namespace BikeTrackingService.Migrations
                         .HasColumnType("text")
                         .HasColumnName("bike_station_name");
 
+                    b.Property<string>("Color")
+                        .HasColumnType("text")
+                        .HasColumnName("color");
+
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_on");
@@ -270,9 +274,9 @@ namespace BikeTrackingService.Migrations
                         .HasColumnName("updated_on");
 
                     b.HasKey("Id")
-                        .HasName("pk_bike");
+                        .HasName("pk_bikes");
 
-                    b.ToTable("bike", (string)null);
+                    b.ToTable("bikes", (string)null);
                 });
 
             modelBuilder.Entity("BikeService.Sonic.Models.BikeLocationTracking", b =>
@@ -282,7 +286,7 @@ namespace BikeTrackingService.Migrations
                         .HasForeignKey("BikeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_bike_location_tracking_bike_bike_id");
+                        .HasConstraintName("fk_bike_location_tracking_bikes_bike_id");
 
                     b.Navigation("Bike");
                 });
@@ -294,7 +298,7 @@ namespace BikeTrackingService.Migrations
                         .HasForeignKey("BikeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_bike_location_tracking_history_bike_bike_id");
+                        .HasConstraintName("fk_bike_location_tracking_history_bikes_bike_id");
 
                     b.HasOne("BikeService.Sonic.Models.BikeRentalTracking", "BikeRentalTracking")
                         .WithMany()
@@ -322,7 +326,7 @@ namespace BikeTrackingService.Migrations
                         .HasForeignKey("BikeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_bike_rental_booking_bike_bike_id");
+                        .HasConstraintName("fk_bike_rental_booking_bikes_bike_id");
 
                     b.Navigation("Account");
 

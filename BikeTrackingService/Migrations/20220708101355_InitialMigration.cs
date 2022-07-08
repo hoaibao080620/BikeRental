@@ -6,12 +6,12 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace BikeTrackingService.Migrations
 {
-    public partial class InitialCommit : Migration
+    public partial class InitialMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "bike",
+                name: "bikes",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
@@ -20,6 +20,7 @@ namespace BikeTrackingService.Migrations
                     description = table.Column<string>(type: "text", nullable: true),
                     bike_station_id = table.Column<int>(type: "integer", nullable: true),
                     bike_station_name = table.Column<string>(type: "text", nullable: true),
+                    color = table.Column<string>(type: "text", nullable: true),
                     status = table.Column<string>(type: "text", nullable: false),
                     external_id = table.Column<int>(type: "integer", nullable: false),
                     created_on = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -28,7 +29,7 @@ namespace BikeTrackingService.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_bike1", x => x.id);
+                    table.PrimaryKey("pk_bikes", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -68,9 +69,9 @@ namespace BikeTrackingService.Migrations
                 {
                     table.PrimaryKey("pk_bike_location_tracking", x => x.id);
                     table.ForeignKey(
-                        name: "fk_bike_location_tracking_bike_bike_id",
+                        name: "fk_bike_location_tracking_bikes_bike_id",
                         column: x => x.bike_id,
-                        principalTable: "bike",
+                        principalTable: "bikes",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -94,9 +95,9 @@ namespace BikeTrackingService.Migrations
                 {
                     table.PrimaryKey("pk_bike_rental_booking", x => x.id);
                     table.ForeignKey(
-                        name: "fk_bike_rental_booking_bike_bike_id",
+                        name: "fk_bike_rental_booking_bikes_bike_id",
                         column: x => x.bike_id,
-                        principalTable: "bike",
+                        principalTable: "bikes",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -126,15 +127,15 @@ namespace BikeTrackingService.Migrations
                 {
                     table.PrimaryKey("pk_bike_location_tracking_history", x => x.id);
                     table.ForeignKey(
-                        name: "fk_bike_location_tracking_history_bike_bike_id",
-                        column: x => x.bike_id,
-                        principalTable: "bike",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "fk_bike_location_tracking_history_bike_rental_booking_bike_ren",
                         column: x => x.bike_rental_tracking_id,
                         principalTable: "bike_rental_booking",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "fk_bike_location_tracking_history_bikes_bike_id",
+                        column: x => x.bike_id,
+                        principalTable: "bikes",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -177,7 +178,7 @@ namespace BikeTrackingService.Migrations
                 name: "bike_rental_booking");
 
             migrationBuilder.DropTable(
-                name: "bike");
+                name: "bikes");
 
             migrationBuilder.DropTable(
                 name: "user");

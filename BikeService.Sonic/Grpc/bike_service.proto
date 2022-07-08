@@ -1,0 +1,13 @@
+﻿syntax = "proto3";
+
+service BikeServiceGrpc {
+  rpc GetBikeIdsOfManager (GetBikeIdsRequest) returns (GetBikeIdsResponse);
+}
+
+message GetBikeIdsRequest {
+  string managerEmail = 1;
+}
+
+message GetBikeIdsResponse {
+  repeated int32 bikeIds = 1;
+}

@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using BikeService.Sonic.DAL;
+using BikeService.Sonic.Dtos;
 using BikeService.Sonic.Dtos.Bike;
 using BikeService.Sonic.Models;
 using Microsoft.EntityFrameworkCore;
@@ -29,7 +30,7 @@ public class BikeReportBusinessLogic : IBikeReportBusinessLogic
             IsResolved = false,
             ReportDescription = bikeReportInsertDto.ReportDescription,
             AccountId = account.Id,
-            ManagerId = manager!.ManagerId
+            AssignToId = manager!.ManagerId
         });
 
         await _unitOfWork.SaveChangesAsync();
@@ -42,7 +43,7 @@ public class BikeReportBusinessLogic : IBikeReportBusinessLogic
 
         if (manager is not null)
         {
-            expression = x => manager.IsSuperManager || x.ManagerId == manager.Id;
+            expression = x => manager.IsSuperManager || x.AssignToId == manager.Id;
         }
         else
         {
@@ -58,7 +59,7 @@ public class BikeReportBusinessLogic : IBikeReportBusinessLogic
                 BikeId = x.BikeId,
                 AccountReport = x.Account.Email,
                 BikeLicensePlate = x.Bike.LicensePlate,
-                CompletedBy = x.CompletedBy.Email,
+                CompletedBy = x.AssignTo.Email,
                 CompletedOn = x.CompletedOn,
                 IsResolved = x.IsResolved,
                 ReportDescription = x.ReportDescription,
@@ -66,22 +67,14 @@ public class BikeReportBusinessLogic : IBikeReportBusinessLogic
             }).ToList();
     }
 
-    public async Task<List<BikeReportRetriveDto>> GetUserReport(string userEmail)
+    public async Task MarkReportAsResolve(MarkReportAsResolveDto markReportAsResolveDto)
     {
-        return (await _unitOfWork.BikeReportRepository
-                .Find(x => x.Account.Email == userEmail))
-            .AsNoTracking()
-            .Select(x => new BikeReportRetriveDto
-            {
-                Id = x.Id,
-                BikeId = x.BikeId,
-                AccountReport = x.Account.Email,
-                BikeLicensePlate = x.Bike.LicensePlate,
-                CompletedBy = x.CompletedBy.Email,
-                CompletedOn = x.CompletedOn,
-                IsResolved = x.IsResolved,
-                ReportDescription = x.ReportDescription,
-                ReportOn = x.CreatedOn
-            }).ToList();
+        var bikeReport = await _unitOfWork.BikeReportRepository.GetById(markReportAsResolveDto.BikeReportId);
+        if (bikeReport is null) return;
+        
+        bikeReport.CompletedOn = DateTime.UtcNow;
+        bikeReport.IsResolved = true;
+        bikeReport.UpdatedOn = DateTime.UtcNow;
+        await _unitOfWork.SaveChangesAsync();
     }
 }

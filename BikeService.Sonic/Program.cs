@@ -1,8 +1,10 @@
 using BikeService.Sonic.Extensions;
+using BikeService.Sonic.GrpcServices;
 using BikeService.Sonic.Services.Implementation;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddGrpc();
 builder.Services.AddControllers();
 builder.Services.AddRedisCache(builder.Configuration);
 builder.Services.AddScopedServices();
@@ -31,5 +33,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapHub<BikeLocationHub>("/bikeLocationHub");
+app.MapGrpcService<BikeGrpcService>();
 
 app.Run();

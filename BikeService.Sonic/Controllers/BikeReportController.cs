@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using BikeService.Sonic.BusinessLogics;
+using BikeService.Sonic.Dtos;
 using BikeService.Sonic.Dtos.Bike;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace BikeService.Sonic.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("[controller]/[action]")]
 [Authorize]
 public class BikeReportController : ControllerBase
 {
@@ -35,6 +36,13 @@ public class BikeReportController : ControllerBase
             x.Type == ClaimTypes.NameIdentifier)!.Value;
 
         await _bikeReportBusinessLogic.CreateReport(bikeReportInsertDto, email);
+        return Ok();
+    }
+
+    [HttpPut]
+    public async Task<IActionResult> MarkReportAsResolve([FromBody] MarkReportAsResolveDto markReportAsResolveDto)
+    {
+        await _bikeReportBusinessLogic.MarkReportAsResolve(markReportAsResolveDto);
         return Ok();
     }
 }

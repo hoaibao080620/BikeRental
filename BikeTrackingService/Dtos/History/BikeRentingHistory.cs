@@ -1,11 +1,10 @@
-﻿namespace BikeService.Sonic.Dtos.History;
+﻿namespace BikeTrackingService.Dtos.History;
 
 public class BikeRentingHistory
 {
     public int Id { get; set; }
     public int BikeId { get; set; }
     public string BikePlate { get; set; } = null!;
-    public string BikeStationName { get; set; } = null!;
     public DateTime CheckedInOn { get; set; }
     public DateTime? CheckedOutOn { get; set; }
     public double? TotalTime { get; set; }

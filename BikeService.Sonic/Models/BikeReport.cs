@@ -9,9 +9,9 @@ public class BikeReport : BaseEntity
     [ForeignKey(nameof(BikeId))]
     public Bike Bike { get; set; } = null!;
 
-    public int ManagerId { get; set; }
-    [ForeignKey(nameof(ManagerId))]
-    public Manager CompletedBy { get; set; } = null!;
+    public int AssignToId { get; set; }
+    [ForeignKey(nameof(AssignToId))]
+    public Manager AssignTo { get; set; } = null!;
     public DateTime? CompletedOn { get; set; }
     public int AccountId { get; set; }
     [ForeignKey(nameof(AccountId))]

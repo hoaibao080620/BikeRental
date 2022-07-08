@@ -14,12 +14,17 @@ builder.Services.AddOktaAuthenticationService(builder.Configuration);
 builder.Services.AddDbContextService(builder.Configuration); 
 builder.Services.AddHttpClientToServices();
 builder.Services.RunMigrations();
+builder.Services.AddGrpcClient<BikeServiceGrpc.BikeServiceGrpcClient>(c =>
+{
+    c.Address = new Uri("https://bike-service-13062022.herokuapp.com");
+});
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

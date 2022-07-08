@@ -20,10 +20,8 @@ public static class ServiceLifetimeServiceCollectionExtension
     {
         serviceCollection.AddScoped<IElasticSearchService, ElasticSearchService>();
         serviceCollection.AddScoped<IBikeLocationHub, BikeLocationHub>();
-        serviceCollection.AddScoped<IBikeStationManagerRepository, BikeStationManagerRepository>();
         serviceCollection.AddScoped<IBikeBusinessLogic, BikeBusinessLogic>();
         serviceCollection.AddScoped<IImportService, BikeCsvImportService>();
-        serviceCollection.AddScoped<IBikeStationRepository, BikeStationRepository>();
         serviceCollection.AddScoped<IBikeStationBusinessLogic, BikeStationBusinessLogic>();
         serviceCollection.AddScoped<IBikeStationValidation, BikeStationValidation>();
         serviceCollection.AddScoped<ICacheService, RedisCacheService>();

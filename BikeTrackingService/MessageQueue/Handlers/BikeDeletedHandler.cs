@@ -21,5 +21,6 @@ public class BikeDeletedHandler : IMessageQueueHandler
 
         if (bike is null) return;
         await _unitOfWork.BikeRepository.Delete(bike);
+        await _unitOfWork.SaveChangesAsync();
     }
 }
