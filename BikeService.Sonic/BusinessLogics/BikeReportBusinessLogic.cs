@@ -76,6 +76,7 @@ public class BikeReportBusinessLogic : IBikeReportBusinessLogic
         bikeReport.CompletedOn = DateTime.UtcNow;
         bikeReport.Status = markReportAsResolveDto.Status;
         bikeReport.UpdatedOn = DateTime.UtcNow;
+        bikeReport.ManagerFeedback = markReportAsResolveDto.ManagerFeedback;
         await _unitOfWork.SaveChangesAsync();
     }
 }
