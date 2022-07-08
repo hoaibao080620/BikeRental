@@ -86,6 +86,8 @@ public class BikeBusinessLogic : IBikeBusinessLogic
     {
         var bike = _mapper.Map<Bike>(bikeInsertDto);
         bike.UpdatedOn = DateTime.UtcNow;
+        var bikeStation = bike.BikeStationId.HasValue ?
+            await _unitOfWork.BikeStationRepository.GetById(bike.BikeStationId.Value) : null;
         await _cacheService.Remove(string.Format(RedisCacheKey.SingleBike, bike.Id));
         await _unitOfWork.BikeRepository.Update(bike);
         await _unitOfWork.SaveChangesAsync();
@@ -93,7 +95,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         {
             Id = bike.Id,
             BikeStationId = bike.BikeStationId,
-            BikeStationName = bike.BikeStation?.Name,
+            BikeStationName = bikeStation?.Name,
             Description = bike.Description,
             LicensePlate = bike.LicensePlate,
             MessageType = MessageType.BikeUpdated
