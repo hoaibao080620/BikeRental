@@ -7,5 +7,5 @@ public interface IBikeReportBusinessLogic
 {
     Task CreateReport(BikeReportInsertDto bikeReportInsertDto, string accountEmail);
     Task<List<BikeReportRetriveDto>> GetBikeReports(string email);
-    Task MarkReportAsResolve(MarkReportAsResolveDto markReportAsResolveDto);
+    Task UpdateReportStatus(MarkReportAsResolveDto markReportAsResolveDto);
 }

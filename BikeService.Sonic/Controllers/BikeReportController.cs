@@ -42,7 +42,7 @@ public class BikeReportController : ControllerBase
     [HttpPut]
     public async Task<IActionResult> MarkReportAsResolve([FromBody] MarkReportAsResolveDto markReportAsResolveDto)
     {
-        await _bikeReportBusinessLogic.MarkReportAsResolve(markReportAsResolveDto);
+        await _bikeReportBusinessLogic.UpdateReportStatus(markReportAsResolveDto);
         return Ok();
     }
 }

@@ -18,5 +18,5 @@ public class BikeReport : BaseEntity
     public Account Account { get; set; } = null!;
 
     public string ReportDescription { get; set; } = null!;
-    public bool IsResolved { get; set; }
+    public string Status { get; set; } = null!;
 }

@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using BikeService.Sonic.Const;
 using BikeService.Sonic.DAL;
 using BikeService.Sonic.Dtos;
 using BikeService.Sonic.Dtos.Bike;
@@ -27,7 +28,7 @@ public class BikeReportBusinessLogic : IBikeReportBusinessLogic
             CreatedOn = DateTime.UtcNow,
             IsActive = true,
             BikeId = bikeReportInsertDto.BikeId,
-            IsResolved = false,
+            Status = BikeReportStatus.NoFix,
             ReportDescription = bikeReportInsertDto.ReportDescription,
             AccountId = account.Id,
             AssignToId = manager!.ManagerId
@@ -61,19 +62,19 @@ public class BikeReportBusinessLogic : IBikeReportBusinessLogic
                 BikeLicensePlate = x.Bike.LicensePlate,
                 CompletedBy = x.AssignTo.Email,
                 CompletedOn = x.CompletedOn,
-                IsResolved = x.IsResolved,
+                Status = x.Status,
                 ReportDescription = x.ReportDescription,
                 ReportOn = x.CreatedOn
             }).ToList();
     }
 
-    public async Task MarkReportAsResolve(MarkReportAsResolveDto markReportAsResolveDto)
+    public async Task UpdateReportStatus(MarkReportAsResolveDto markReportAsResolveDto)
     {
         var bikeReport = await _unitOfWork.BikeReportRepository.GetById(markReportAsResolveDto.BikeReportId);
         if (bikeReport is null) return;
         
         bikeReport.CompletedOn = DateTime.UtcNow;
-        bikeReport.IsResolved = true;
+        bikeReport.Status = markReportAsResolveDto.Status;
         bikeReport.UpdatedOn = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync();
     }
