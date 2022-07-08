@@ -52,7 +52,6 @@ public class BikeController : ControllerBase
     public async Task<IActionResult> UpdateBike(BikeUpdateDto bikeUpdateDto)
     {
         await _bikeBusinessLogic.UpdateBike(bikeUpdateDto);
-
         return Ok();
     }
     

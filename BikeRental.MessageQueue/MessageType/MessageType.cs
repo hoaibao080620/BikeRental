@@ -11,4 +11,7 @@ public class MessageType
     public const string BikeLocationChanged = "BikeLocationChanged";
     public const string PaymentSucceeded = "PaymentSucceeded";
     public const string PaymentFailed = "PaymentFailed";
+    public const string BikeCreated = "BikeCreated";
+    public const string BikeUpdated = "BikeUpdated";
+    public const string BikeDeleted = "BikeDeleted";
 }

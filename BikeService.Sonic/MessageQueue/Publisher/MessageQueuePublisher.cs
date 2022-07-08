@@ -42,4 +42,28 @@ public class MessageQueuePublisher : IMessageQueuePublisher
         var topic = _configuration["MessageQueue:BikeTopic"];
         await _publisher.SendMessage(payload, topic);
     }
+
+    public async Task PublishBikeCreatedEvent(BikeCreated bikeCreated)
+    {
+        var payload = JsonConvert.SerializeObject(bikeCreated);
+        var topic = _configuration["MessageQueue:BikeTopic"];
+        await _publisher.SendMessage(payload, topic);
+    }
+
+    public async Task PublishBikeUpdatedEvent(BikeUpdated bikeUpdated)
+    {
+        var payload = JsonConvert.SerializeObject(bikeUpdated);
+        var topic = _configuration["MessageQueue:BikeTopic"];
+        await _publisher.SendMessage(payload, topic);
+    }
+
+    public async Task PublishBikeDeletedEvent(int bikeId)
+    {
+        var payload = JsonConvert.SerializeObject(new BikeDeleted
+        {
+            Id = bikeId
+        });
+        var topic = _configuration["MessageQueue:BikeTopic"];
+        await _publisher.SendMessage(payload, topic);
+    }
 }
