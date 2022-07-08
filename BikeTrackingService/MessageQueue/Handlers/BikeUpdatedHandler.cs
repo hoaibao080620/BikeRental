@@ -17,13 +17,15 @@ public class BikeUpdatedHandler : IMessageQueueHandler
     public async Task Handle(string message)
     {
         var payload = JsonConvert.DeserializeObject<BikeUpdated>(message);
-        var bike = (await _unitOfWork.BikeRepository.Find(x => x.ExternalId == payload.Id)).First();
+        var bike = (await _unitOfWork.BikeRepository.Find(x => x.ExternalId == payload.Id)).FirstOrDefault();
+        if (bike is null) return;
 
-        bike.BikeStationId = payload.BikeStationId;
-        bike.BikeStationName = payload.BikeStationName;
+        bike.BikeStationId = payload.BikeStationId ?? bike.BikeStationId;
+        bike.BikeStationName = payload.BikeStationName ?? bike.BikeStationName;
         bike.UpdatedOn = DateTime.UtcNow;
-        bike.Description = payload.Description;
-        bike.LicensePlate = payload.LicensePlate;
+        bike.Description = payload.Description ?? bike.Description;
+        bike.LicensePlate = payload.LicensePlate ?? bike.LicensePlate;
+        bike.Color = payload.Color ?? bike.Color;
 
         await _unitOfWork.SaveChangesAsync();
     }

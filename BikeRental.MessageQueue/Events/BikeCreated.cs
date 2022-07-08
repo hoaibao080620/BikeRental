@@ -8,4 +8,5 @@ public class BikeCreated : BaseMessage
     public int? BikeStationId { get; set; }
     public string? BikeStationName { get; set; }
     public string Status { get; set; } = null!;
+    public string? Color { get; set; }
 }

@@ -60,6 +60,9 @@ public class BikeBusinessLogic : IBikeBusinessLogic
 
     public async Task AddBike(BikeInsertDto bikeInsertDto)
     {
+        var bikeStationColor = (await _unitOfWork.BikeStationColorRepository
+            .Find(x => x.BikeStationId == bikeInsertDto.BikeStationId)).FirstOrDefault();
+            
         var bike = _mapper.Map<Bike>(bikeInsertDto);
         bike.Status = BikeStatus.Available;
         await _unitOfWork.BikeRepository.Add(bike);
@@ -72,7 +75,8 @@ public class BikeBusinessLogic : IBikeBusinessLogic
             Description = bike.Description,
             LicensePlate = bike.LicensePlate,
             Status = bike.Status,
-            MessageType = MessageType.BikeCreated
+            MessageType = MessageType.BikeCreated,
+            Color = bikeStationColor?.Color
         });
     }
 
