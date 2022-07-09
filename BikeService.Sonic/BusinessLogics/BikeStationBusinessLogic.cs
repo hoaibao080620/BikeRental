@@ -107,6 +107,24 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
 
     public async Task UpdateBikeStationColor(List<BikeStationColorDto> bikeStationColors, string email)
     {
+        var bikesColor = (await _unitOfWork.BikeRepository
+            .Find(x => x.BikeStationId.HasValue && bikeStationColors.Select(b => b.BikeStationId)
+                .Contains(x.BikeStationId.Value))).Select(x => new
+        {
+            BikeId = x.Id,
+            Color = x.BikeStation!.BikeStationColors.Any(b => b.BikeStationId == x.BikeStationId) ?
+                x.BikeStation!.BikeStationColors.First().Color : null
+        }).ToList();
+        
+        foreach (var bikeColor in bikesColor)
+        {
+            await _messageQueuePublisher.PublishBikeUpdatedEvent(new BikeUpdated
+            {
+                Id = bikeColor.BikeId,
+                Color = bikeColor.Color
+            }); 
+        }
+        
         var manager = (await _unitOfWork.ManagerRepository.Find(x => x.Email == email)).FirstOrDefault();
         foreach (var bikeStationColorDto in bikeStationColors)
         {
@@ -132,24 +150,6 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
         }
 
         await _unitOfWork.SaveChangesAsync();
-        
-        var bikesColor = (await _unitOfWork.BikeRepository
-            .Find(x => x.BikeStationId.HasValue && bikeStationColors.Select(b => b.BikeStationId)
-                .Contains(x.BikeStationId.Value))).Select(x => new
-        {
-            BikeId = x.Id,
-            Color = x.BikeStation!.BikeStationColors.Any(b => b.BikeStationId == x.BikeStationId) ?
-                x.BikeStation!.BikeStationColors.First().Color : null
-        }).ToList();
-        
-        foreach (var bikeColor in bikesColor)
-        {
-            await _messageQueuePublisher.PublishBikeUpdatedEvent(new BikeUpdated
-            {
-                Id = bikeColor.BikeId,
-                Color = bikeColor.Color
-            }); 
-        }
     }
 
     public async Task<List<BikeStationColorRetrieveDto>> GetBikeStationColors(string email)
