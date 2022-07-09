@@ -20,9 +20,9 @@ public class BikeStationValidation : IBikeStationValidation
     public async Task<string?> IsAssignBikesValid(List<int> bikeIds, int bikeStationId)
     {
         var isBikesStatusInvalid = await _unitOfWork.BikeRepository
-            .Exists(x => bikeIds.Contains(x.Id) && x.Status == BikeStatus.InUsed || x.BikeStationId.HasValue);
+            .Exists(x => bikeIds.Contains(x.Id) && x.Status == BikeStatus.InUsed);
 
-        if (isBikesStatusInvalid) return "Bike assign have to have available status and not belong to any bike station";
+        if (isBikesStatusInvalid) return "Bike assign have to have available status!";
         //
         //
         // var isBikeStationEnoughSpace = (await _unitOfWork.BikeStationRepository.GetById(bikeStationId)).ParkingSpace;
