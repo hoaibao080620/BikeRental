@@ -1,15 +1,15 @@
 ﻿using BikeService.Sonic.DAL;
-using BikeService.Sonic.Models;
 using BikeTrackingService.BikeTrackingServiceDbContext;
+using BikeTrackingService.Models;
 using Shared.Repositories;
 
 namespace BikeTrackingService.DAL;
 
-public class BikeRentalTrackingHistoryRepository : 
+public class BikeLocationTrackingHistoryRepository : 
     RepositoryGeneric<BikeLocationTrackingHistory, BikeTrackingDbContext>, 
-    IBikeRentalTrackingHistoryRepository
+    IBikeLocationTrackingHistoryRepository
 {
-    public BikeRentalTrackingHistoryRepository(BikeTrackingDbContext context) : base(context)
+    public BikeLocationTrackingHistoryRepository(BikeTrackingDbContext context) : base(context)
     {
     }
 }

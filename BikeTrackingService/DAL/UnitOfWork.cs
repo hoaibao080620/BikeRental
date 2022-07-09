@@ -9,7 +9,7 @@ public class UnitOfWork : IUnitOfWork
     public IBikeRepository BikeRepository { get; }
     public IBikeLocationTrackingRepository BikeLocationTrackingRepository { get; }
     public IAccountRepository AccountRepository { get; }
-    public IBikeRentalTrackingHistoryRepository BikeRentalTrackingHistoryRepository { get; }
+    public IBikeLocationTrackingHistoryRepository BikeLocationTrackingHistoryRepository { get; }
     public IBikeRentalTrackingRepository BikeRentalTrackingRepository { get; }
 
 
@@ -19,7 +19,7 @@ public class UnitOfWork : IUnitOfWork
         BikeRepository ??= new BikeRepository(bikeTrackingDbContext);
         BikeLocationTrackingRepository ??= new BikeLocationTrackingRepository(bikeTrackingDbContext);
         AccountRepository ??= new AccountRepository(bikeTrackingDbContext);
-        BikeRentalTrackingHistoryRepository ??= new BikeRentalTrackingHistoryRepository(bikeTrackingDbContext);
+        BikeLocationTrackingHistoryRepository ??= new BikeLocationTrackingHistoryRepository(bikeTrackingDbContext);
         BikeRentalTrackingRepository ??= new BikeRentalTrackingRepository(bikeTrackingDbContext);
     }
     

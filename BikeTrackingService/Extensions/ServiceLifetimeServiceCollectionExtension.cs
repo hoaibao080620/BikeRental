@@ -4,6 +4,7 @@ using BikeRental.MessageQueue.SubscriptionManager;
 using BikeService.Sonic.DAL;
 using BikeTrackingService.BLL;
 using BikeTrackingService.DAL;
+using BikeTrackingService.MessageQueue.Publisher;
 
 namespace BikeTrackingService.Extensions;
 
@@ -23,7 +24,7 @@ public static class ServiceLifetimeServiceCollectionExtension
         serviceCollection.AddScoped<IPublisher, SnsPublisher>();
         serviceCollection.AddScoped<IConsumer, SqsConsumer>();
         serviceCollection.AddScoped<IBikeTrackingBusinessLogic, BikeTrackingBusinessLogic>();
-        // serviceCollection.AddScoped<IMessageQueuePublisher, MessageQueuePublisher>();
+        serviceCollection.AddScoped<IMessageQueuePublisher, MessageQueuePublisher>();
     }
     
     public static void AddSingletonServices(this IServiceCollection serviceCollection)

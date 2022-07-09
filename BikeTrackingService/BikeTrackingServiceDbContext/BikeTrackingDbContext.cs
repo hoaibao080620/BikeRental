@@ -1,5 +1,4 @@
-﻿using BikeService.Sonic.Models;
-using BikeTrackingService.Models;
+﻿using BikeTrackingService.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace BikeTrackingService.BikeTrackingServiceDbContext;

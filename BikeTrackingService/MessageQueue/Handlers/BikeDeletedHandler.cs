@@ -1,6 +1,7 @@
 ﻿using BikeRental.MessageQueue.Events;
 using BikeRental.MessageQueue.Handlers;
 using BikeService.Sonic.DAL;
+using BikeTrackingService.DAL;
 using Newtonsoft.Json;
 
 namespace BikeTrackingService.MessageQueue.Handlers;
@@ -17,7 +18,7 @@ public class BikeDeletedHandler : IMessageQueueHandler
     public async Task Handle(string message)
     {
         var payload = JsonConvert.DeserializeObject<BikeDeleted>(message);
-        var bike = (await _unitOfWork.BikeRepository.Find(x => x.ExternalId == payload.Id)).FirstOrDefault();
+        var bike = await _unitOfWork.BikeRepository.GetById(payload.Id);
 
         if (bike is null) return;
         await _unitOfWork.BikeRepository.Delete(bike);

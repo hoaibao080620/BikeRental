@@ -1,6 +1,7 @@
 ﻿using BikeRental.MessageQueue.Events;
 using BikeRental.MessageQueue.Handlers;
 using BikeService.Sonic.DAL;
+using BikeTrackingService.DAL;
 using BikeTrackingService.Models;
 using Newtonsoft.Json;
 
@@ -20,7 +21,7 @@ public class BikeCreatedHandler : IMessageQueueHandler
 
         await _unitOfWork.BikeRepository.Add(new Bike
         {
-            ExternalId = payload.Id,
+            Id = payload.Id,
             BikeStationId = payload.BikeStationId,
             BikeStationName = payload.BikeStationName,
             CreatedOn = DateTime.UtcNow,

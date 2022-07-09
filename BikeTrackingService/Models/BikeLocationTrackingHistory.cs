@@ -1,8 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using BikeTrackingService.Models;
 using Shared.Models;
 
-namespace BikeService.Sonic.Models;
+namespace BikeTrackingService.Models;
 
 public class BikeLocationTrackingHistory : BaseEntity
 {

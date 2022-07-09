@@ -37,8 +37,4 @@
         
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="GrpcServices" />
-    </ItemGroup>
-
 </Project>

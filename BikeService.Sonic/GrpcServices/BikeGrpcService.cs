@@ -1,5 +1,6 @@
 ﻿using BikeService.Sonic.DAL;
 using Grpc.Core;
+using Microsoft.EntityFrameworkCore;
 
 namespace BikeService.Sonic.GrpcServices;
 
@@ -33,6 +34,18 @@ public class BikeGrpcService : BikeServiceGrpc.BikeServiceGrpcBase
             {
                 bikeIds
             }
+        };
+    }
+
+    public override async Task<GetManagerEmailsResponse> GetManagerEmailsOfBikeId(GetManagerEmailsRequest request, ServerCallContext context)
+    {
+        var managerEmails = (await _unitOfWork.BikeStationManagerRepository
+                .Find(x => x.BikeStation.Bikes.Any(b => b.Id == request.BikeId)))
+            .AsNoTracking().Select(x => x.Manager.Email).ToList();
+
+        return new GetManagerEmailsResponse
+        {
+            ManagerEmails = {managerEmails}
         };
     }
 }

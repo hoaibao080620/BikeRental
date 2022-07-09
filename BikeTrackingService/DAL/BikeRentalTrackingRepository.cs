@@ -1,6 +1,6 @@
 ﻿using BikeService.Sonic.DAL;
-using BikeService.Sonic.Models;
 using BikeTrackingService.BikeTrackingServiceDbContext;
+using BikeTrackingService.Models;
 using Shared.Repositories;
 
 namespace BikeTrackingService.DAL;

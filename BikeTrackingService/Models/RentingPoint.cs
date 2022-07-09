@@ -1,6 +1,6 @@
 ﻿using Shared.Models;
 
-namespace BikeService.Sonic.Models;
+namespace BikeTrackingService.Models;
 
 public class RentingPrice : BaseEntity
 {

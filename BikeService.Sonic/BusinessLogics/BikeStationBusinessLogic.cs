@@ -171,8 +171,6 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
             BikeStationName = x.BikeStation!.Name,
             LicensePlate = x.LicensePlate,
             Description = x.Description,
-            IsActive = x.IsActive,
-            CreatedOn = x.CreatedOn,
             UpdatedOn = x.UpdatedOn,
             Status = x.Status
         }).ToList();

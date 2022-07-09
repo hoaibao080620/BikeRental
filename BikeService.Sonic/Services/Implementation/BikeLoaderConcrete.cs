@@ -25,21 +25,10 @@ public class BikeLoaderConcrete : IBikeLoaderAdapter
                 BikeStationId = b.BikeStationId,
                 BikeStationName = b.BikeStation != null ? b.BikeStation.Name : null,
                 Id = b.Id,
-                CreatedOn = b.CreatedOn,
-                IsActive = b.IsActive,
                 Description = b.Description,
                 LicensePlate = b.LicensePlate,
                 Status = b.Status,
-                UpdatedOn = b.UpdatedOn,
-                LastLongitude = b.BikeLocationTrackings.FirstOrDefault() != null ? 
-                    b.BikeLocationTrackings.FirstOrDefault()!.Longitude : null,
-                LastLatitude = b.BikeLocationTrackings.FirstOrDefault() != null ? 
-                    b.BikeLocationTrackings.FirstOrDefault()!.Latitude : null,
-                IsRenting = b.BikeLocationTrackings.Any(bt => bt.IsActive),
-                LastAddress = b.BikeLocationTrackings.FirstOrDefault() != null ? 
-                    b.BikeLocationTrackings.FirstOrDefault()!.Address : null,
-                BikeStationColor = b.BikeStation!.BikeStationColors.FirstOrDefault() != null ? 
-                    b.BikeStation!.BikeStationColors.FirstOrDefault()!.Color : null
+                UpdatedOn = b.UpdatedOn
             }).FirstOrDefaultAsync() ?? throw new BikeNotFoundException(bikeId);
     }
 

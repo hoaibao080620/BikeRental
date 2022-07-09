@@ -18,7 +18,6 @@ namespace BikeService.Sonic.BusinessLogics;
 public class BikeBusinessLogic : IBikeBusinessLogic
 {
     private readonly IMapper _mapper;
-    private readonly IBikeLoaderAdapter _bikeLoaderAdapter;
     private readonly IGoogleMapService _googleMapService;
     private readonly ICacheService _cacheService;
     private readonly IUnitOfWork _unitOfWork;
@@ -26,14 +25,12 @@ public class BikeBusinessLogic : IBikeBusinessLogic
 
     public BikeBusinessLogic(
         IMapper mapper,
-        IBikeLoaderAdapter bikeLoaderAdapter,
         IGoogleMapService googleMapService,
         ICacheService cacheService,
         IUnitOfWork unitOfWork,
         IMessageQueuePublisher messageQueuePublisher)
     {
         _mapper = mapper;
-        _bikeLoaderAdapter = bikeLoaderAdapter;
         _googleMapService = googleMapService;
         _cacheService = cacheService;
         _unitOfWork = unitOfWork;
@@ -42,20 +39,38 @@ public class BikeBusinessLogic : IBikeBusinessLogic
 
     public async Task<BikeRetrieveDto?> GetBike(int id)
     {
-        return await _bikeLoaderAdapter.GetBike(id);
+        var bike = await (await _unitOfWork.BikeRepository.Find(x => x.Id == id))
+            .AsNoTracking().Select(b => new BikeRetrieveDto
+            {
+                BikeStationId = b.BikeStationId,
+                BikeStationName = b.BikeStation != null ? b.BikeStation.Name : null,
+                Id = b.Id,
+                Description = b.Description,
+                LicensePlate = b.LicensePlate,
+                Status = b.Status,
+                UpdatedOn = b.UpdatedOn
+            }).FirstOrDefaultAsync() ?? throw new BikeNotFoundException(id);
+        
+        return bike;
     }
 
     public async Task<List<BikeRetrieveDto>> GetBikes(string managerEmail)
     {
-        var bikeIds = await _bikeLoaderAdapter.GetBikeIdsOfManager(managerEmail);
-        var bikes = new List<BikeRetrieveDto>();
-        foreach (var bikeId in bikeIds)
-        {
-            var bike = await _bikeLoaderAdapter.GetBike(bikeId);
-            bikes.Add(bike);
-        }
+        var bikes = await (await _unitOfWork.BikeRepository
+                .Find(x => x.BikeStation != null && x.BikeStation.BikeStationManagers
+                    .Any(b => b.Manager.Email == managerEmail)))
+                .AsNoTracking().Select(b => new BikeRetrieveDto
+                {
+                    BikeStationId = b.BikeStationId,
+                    BikeStationName = b.BikeStation != null ? b.BikeStation.Name : null,
+                    Id = b.Id,
+                    Description = b.Description,
+                    LicensePlate = b.LicensePlate,
+                    Status = b.Status,
+                    UpdatedOn = b.UpdatedOn
+                }).ToListAsync();
         
-        return bikes.ToList();
+        return bikes;
     }
 
     public async Task AddBike(BikeInsertDto bikeInsertDto)
@@ -225,15 +240,15 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         var updateBikeTracking = UpdateBikeRentalTracking(bikeLocationDto);
         
         var pushEventTask = _messageQueuePublisher.PublishBikeLocationChangeCommand(managerEmails);
-        var updateBikeCache = UpdateBikeCache(new BikeCacheParameter
-        {
-            BikeId = bike.Id,
-            Longitude = bikeLocationDto.Longitude,
-            Latitude = bikeLocationDto.Latitude,
-            Address = bikeLocationDto.Address
-        });
+        // var updateBikeCache = UpdateBikeCache(new BikeCacheParameter
+        // {
+        //     BikeId = bike.Id,
+        //     Longitude = bikeLocationDto.Longitude,
+        //     Latitude = bikeLocationDto.Latitude,
+        //     Address = bikeLocationDto.Address
+        // });
 
-        await Task.WhenAll(pushEventTask, updateBikeCache, updateBikeTracking);
+        await Task.WhenAll(pushEventTask, updateBikeTracking);
         await _unitOfWork.SaveChangesAsync();
     }
 
@@ -411,12 +426,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         if (bikeCache is null) return;
         var bike = JsonSerializer.Deserialize<BikeRetrieveDto>(bikeCache);
         ArgumentNullException.ThrowIfNull(bike);
-        bike.LastLatitude = bikeCacheParameter.Latitude;
-        bike.LastLongitude = bikeCacheParameter.Longitude;
-        bike.LastAddress = bikeCacheParameter.Address;
         bike.Status = bikeCacheParameter.Status ?? bike.Status;
-        bike.IsRenting = bikeCacheParameter.IsRenting ?? bike.IsRenting;
-        
         await _cacheService.Add(key, JsonSerializer.Serialize(bike));
     }
 
