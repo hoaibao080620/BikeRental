@@ -25,21 +25,21 @@ public class MessageQueuePublisher : IMessageQueuePublisher
             MessageType = MessageType.NotifyBikeLocationChange
         });
 
-        var topic = _configuration["MessageQueue:BikeTopic"];
+        var topic = _configuration["MessageQueue:BikeTrackingTopic"];
         await _publisher.SendMessage(payload, topic);
     }
 
     public async Task PublishBikeCheckedInEvent(BikeCheckedIn bikeCheckedIn)
     {
         var payload = JsonConvert.SerializeObject(bikeCheckedIn);
-        var topic = _configuration["MessageQueue:BikeTopic"];
+        var topic = _configuration["MessageQueue:BikeTrackingTopic"];
         await _publisher.SendMessage(payload, topic);
     }
 
     public async Task PublishBikeCheckedOutEvent(BikeCheckedOut bikeCheckedOut)
     {
         var payload = JsonConvert.SerializeObject(bikeCheckedOut);
-        var topic = _configuration["MessageQueue:BikeTopic"];
+        var topic = _configuration["MessageQueue:BikeTrackingTopic"];
         await _publisher.SendMessage(payload, topic);
     }
 }

@@ -8,6 +8,7 @@ using BikeTrackingService.Dtos.History;
 using BikeTrackingService.MessageQueue.Publisher;
 using BikeTrackingService.Models;
 using BikeTrackingService.Services;
+using Grpc.Net.ClientFactory;
 using Microsoft.EntityFrameworkCore;
 
 namespace BikeTrackingService.BLL;
@@ -20,12 +21,12 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
     private readonly IMessageQueuePublisher _messageQueuePublisher;
 
     public BikeTrackingBusinessLogic(
-        BikeServiceGrpc.BikeServiceGrpcClient bikeServiceGrpc,
+        GrpcClientFactory grpcClientFactory,
         IUnitOfWork unitOfWork,
         IGoogleMapService googleMapService,
         IMessageQueuePublisher messageQueuePublisher)
     {
-        _bikeServiceGrpc = bikeServiceGrpc;
+        _bikeServiceGrpc = grpcClientFactory.CreateClient<BikeServiceGrpc.BikeServiceGrpcClient>("BikeService");
         _unitOfWork = unitOfWork;
         _googleMapService = googleMapService;
         _messageQueuePublisher = messageQueuePublisher;

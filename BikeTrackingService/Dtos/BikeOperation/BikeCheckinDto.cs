@@ -1,4 +1,4 @@
-﻿namespace BikeService.Sonic.Dtos.BikeOperation;
+﻿namespace BikeTrackingService.Dtos.BikeOperation;
 
 public class BikeCheckinDto
 {

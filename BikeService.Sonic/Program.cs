@@ -30,9 +30,9 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.UseGrpcWeb();
 app.MapControllers();
 app.MapHub<BikeLocationHub>("/bikeLocationHub");
-app.MapGrpcService<BikeGrpcService>();
+app.MapGrpcService<BikeGrpcService>().EnableGrpcWeb();
 
 app.Run();

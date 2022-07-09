@@ -28,7 +28,6 @@ public class BikeCreatedHandler : IMessageQueueHandler
             Description = payload.Description,
             IsActive = true,
             LicensePlate = payload.LicensePlate,
-            Status = payload.Status,
             Color = payload.Color
         });
 
