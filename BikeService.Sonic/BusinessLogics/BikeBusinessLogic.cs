@@ -50,7 +50,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
 
     public async Task<List<BikeRetrieveDto>> GetBikes(string managerEmail)
     {
-        var bikes = await (await _unitOfWork.BikeRepository
+        var bikes = (await _unitOfWork.BikeRepository
                 .Find(x => x.BikeStation != null && x.BikeStation.BikeStationManagers
                     .Any(b => b.Manager.Email == managerEmail)))
                 .AsNoTracking().Select(b => new BikeRetrieveDto
@@ -62,7 +62,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
                     LicensePlate = b.LicensePlate,
                     Status = b.Status,
                     UpdatedOn = b.UpdatedOn
-                }).ToListAsync();
+                }).ToList();
         
         return bikes;
     }

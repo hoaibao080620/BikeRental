@@ -13,11 +13,12 @@ public class NotificationRepository : INotificationRepository
         _notificationCollection = mongoDatabase.GetCollection<Notification>(MongoDbCollection.Notification);
     }
     
-    public async Task<List<Notification>> GetNotifications(string email)
+    public Task<List<Notification>> GetNotifications(string email)
     {
-        var notifications = await _notificationCollection.Find(x =>
-            x.NotificationEmail == email && x.IsHidden == false).ToListAsync();
-        return notifications;
+        var notifications = _notificationCollection.Find(x =>
+            x.NotificationEmail == email && x.IsHidden == false).ToList();
+        
+        return Task.FromResult(notifications);
     }
 
     public async Task AddNotification(Notification notification)

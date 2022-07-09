@@ -11,13 +11,13 @@ public class BikeStationManagerRepository : RepositoryGeneric<BikeStationManager
     {
     }
 
-    public async Task<List<string>> GetManagerEmailsByBikeId(int bikeId)
+    public Task<List<string>> GetManagerEmailsByBikeId(int bikeId)
     {
-        var managerEmails = await Context.BikeStationManager
+        var managerEmails = Context.BikeStationManager
             .Where(b => b.BikeStation.Bikes.Any(x => x.Id == bikeId))
             .Select(x => x.Manager.Email)
-            .ToListAsync();
+            .ToList();
 
-        return managerEmails!;
+        return Task.FromResult(managerEmails);
     }
 }
