@@ -303,7 +303,7 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
             IsActive = true,
             Latitude = bikeCheckoutDto.Latitude,
             Longitude = bikeCheckoutDto.Longitude,
-            Address = bikeCheckoutDto.Address!,
+            Address = address,
             BikeRentalTracking = finishBikeRentalTracking
         });
     }

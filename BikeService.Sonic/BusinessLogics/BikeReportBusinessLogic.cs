@@ -19,7 +19,6 @@ public class BikeReportBusinessLogic : IBikeReportBusinessLogic
     
     public async Task CreateReport(BikeReportInsertDto bikeReportInsertDto, string accountEmail)
     {
-        var account = (await _unitOfWork.AccountRepository.Find(x => x.Email == accountEmail)).First();
         var manager = (await _unitOfWork.BikeStationManagerRepository
             .Find(x => x.BikeStation.Bikes.Any(b => x.Id == bikeReportInsertDto.BikeId))).FirstOrDefault();
 
@@ -30,7 +29,7 @@ public class BikeReportBusinessLogic : IBikeReportBusinessLogic
             BikeId = bikeReportInsertDto.BikeId,
             Status = BikeReportStatus.NoFix,
             ReportDescription = bikeReportInsertDto.ReportDescription,
-            AccountId = account.Id,
+            AccountEmail = accountEmail,
             AssignToId = manager!.ManagerId
         });
 
@@ -48,7 +47,7 @@ public class BikeReportBusinessLogic : IBikeReportBusinessLogic
         }
         else
         {
-            expression = x => x.Account.Email == email;
+            expression = x => x.AccountEmail == email;
         }
 
         return (await _unitOfWork.BikeReportRepository
@@ -58,7 +57,7 @@ public class BikeReportBusinessLogic : IBikeReportBusinessLogic
             {
                 Id = x.Id,
                 BikeId = x.BikeId,
-                AccountReport = x.Account.Email,
+                AccountReport = x.AccountEmail,
                 BikeLicensePlate = x.Bike.LicensePlate,
                 CompletedBy = x.AssignTo.Email,
                 CompletedOn = x.CompletedOn,

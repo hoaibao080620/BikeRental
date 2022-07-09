@@ -62,38 +62,6 @@ public class BikeController : ControllerBase
         return Ok();
     }
 
-    [HttpPost]
-    [Route("[action]")]
-    public async Task<IActionResult> UpdateBikeLocation(BikeLocationDto bikeLocationDto)
-    {
-        await _bikeBusinessLogic.UpdateBikeLocation(bikeLocationDto);
-        return Ok();
-    }
-    
-    [HttpPost]
-    [Route("[action]")]
-    public async Task<IActionResult> Checking(BikeCheckinDto bikeCheckinDto)
-    {
-        var email = HttpContext.User.Claims.FirstOrDefault(x => 
-            x.Type == ClaimTypes.NameIdentifier)!.Value;
-        
-        await _bikeBusinessLogic.BikeChecking(bikeCheckinDto, email);
-        return Ok();
-    }
-    
-    [HttpPost]
-    [Route("[action]")]
-    public async Task<IActionResult> Checkout(BikeCheckoutDto bikeCheckoutDto)
-    {
-        if (bikeCheckoutDto.BikeStationId is null)
-            return BadRequest("You have to scan QR code of station before scan bike QR code");
-        
-        var email = HttpContext.User.Claims.FirstOrDefault(x => 
-            x.Type == ClaimTypes.NameIdentifier)!.Value;
-        
-        await _bikeBusinessLogic.BikeCheckout(bikeCheckoutDto, email);
-        return Ok();
-    }
     
     [HttpPost]
     [Route("[action]")]
@@ -105,16 +73,16 @@ public class BikeController : ControllerBase
         return Ok();
     }
 
-    [HttpGet]
-    [Route("[action]")]
-    public async Task<IActionResult> GetRentingStatus()
-    {
-        var email = HttpContext.User.Claims.FirstOrDefault(x => 
-            x.Type == ClaimTypes.NameIdentifier)!.Value;
-        var rentingStatus = await _bikeBusinessLogic.GetBikeRentingStatus(email);
-
-        return Ok(rentingStatus);
-    }
+    // [HttpGet]
+    // [Route("[action]")]
+    // public async Task<IActionResult> GetRentingStatus()
+    // {
+    //     var email = HttpContext.User.Claims.FirstOrDefault(x => 
+    //         x.Type == ClaimTypes.NameIdentifier)!.Value;
+    //     var rentingStatus = await _bikeBusinessLogic.GetBikeRentingStatus(email);
+    //
+    //     return Ok(rentingStatus);
+    // }
     
     [HttpDelete]
     [Route("[action]")]
@@ -129,16 +97,5 @@ public class BikeController : ControllerBase
         {
             return BadRequest(exception.Message);
         }
-    }
-
-    [HttpGet]
-    [Route("[action]")]
-    public async Task<IActionResult> GetBikeRentingHistory()
-    {
-        var email = HttpContext.User.Claims.FirstOrDefault(x => 
-            x.Type == ClaimTypes.NameIdentifier)!.Value;
-
-        var histories = await _bikeBusinessLogic.GetBikeRentingHistories(email);
-        return Ok(histories);
     }
 }

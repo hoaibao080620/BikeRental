@@ -97,7 +97,7 @@ public class BikeStationController : ControllerBase
         return Ok(bikeStations);
     }
 
-    [HttpPost]
+    [HttpPut]
     public async Task<IActionResult> AssignBikesToStation([FromBody] BikeStationBikeAssignDto bikeAssignDto)
     {
         var errorMessage = await _bikeStationValidation.IsAssignBikesValid(bikeAssignDto.BikeIds, bikeAssignDto.BikeStationId);
@@ -107,9 +107,24 @@ public class BikeStationController : ControllerBase
         return Ok();
     }
 
-    // [HttpGet]
-    // public async Task<IActionResult> GetAssignManager()
-    // {
-    //     
-    // }
+    [HttpGet]
+    public async Task<IActionResult> GetAssignableBikeStation([FromQuery] int totalBikeAssign)
+    {
+        var bikeStations = await _bikeStationBusinessLogic.GetAssignableBikeStations(totalBikeAssign);
+        return Ok(bikeStations);
+    }
+    
+    [HttpGet]
+    public async Task<IActionResult> GetAssignableManager()
+    {
+        var managers = await _bikeStationBusinessLogic.GetAssignableManagers();
+        return Ok(managers);
+    }
+    
+    [HttpPut]
+    public async Task<IActionResult> AssignBikeStationsToManager([FromBody] BikeStationManagerAssignDto bikeAssignDto)
+    {
+        await _bikeStationBusinessLogic.AssignBikeStationsToManager(bikeAssignDto);
+        return Ok();
+    }
 }

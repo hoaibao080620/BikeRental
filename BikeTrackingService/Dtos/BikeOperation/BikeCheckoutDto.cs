@@ -1,4 +1,4 @@
-﻿namespace BikeService.Sonic.Dtos.BikeOperation;
+﻿namespace BikeTrackingService.Dtos.BikeOperation;
 
 public class BikeCheckoutDto
 {
@@ -7,5 +7,4 @@ public class BikeCheckoutDto
     public double Latitude { get; set; }
     public int? BikeStationId { get; set; } = null;
     public DateTime CheckoutOn { get; set; } = DateTime.UtcNow;
-    public string? Address { get; set; }
 }

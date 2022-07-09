@@ -17,4 +17,7 @@ public interface IBikeStationBusinessLogic
     Task<List<BikeRetrieveDto>> GetBikeStationBike(int bikeStationId);
     Task<List<BikeStationRetrieveDto>> GetBikeStationsNearMe(BikeStationRetrieveParameter bikeStationRetrieveParameter);
     Task AssignBikesToBikeStation(BikeStationBikeAssignDto bikeAssignDto);
+    Task<List<BikeStationAssignDto>> GetAssignableBikeStations(int totalBikeAssign);
+    Task<List<AssignableManager>> GetAssignableManagers();
+    Task AssignBikeStationsToManager(BikeStationManagerAssignDto bikeStationManagerAssign);
 }

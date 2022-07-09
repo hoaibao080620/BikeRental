@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-using BikeService.Sonic.Dtos.BikeOperation;
 using BikeTrackingService.BLL;
 using BikeTrackingService.Dtos.BikeOperation;
 using Microsoft.AspNetCore.Authorization;
@@ -35,7 +34,7 @@ public class BikeTrackingController : ControllerBase
         var email = HttpContext.User.Claims.FirstOrDefault(x => 
             x.Type == ClaimTypes.NameIdentifier)!.Value;
 
-        var histories = await _bikeTrackingBusinessLogic.GetBikeRentingHistories(email);
+        var histories = await _bikeTrackingBusinessLogic.GetBikesTracking(email);
         return Ok(histories);
     }
     
