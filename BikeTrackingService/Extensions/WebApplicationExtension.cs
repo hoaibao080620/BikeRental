@@ -22,5 +22,9 @@ public static class WebApplicationExtension
         messageQueueSubscriptionManager.RegisterEventHandlerSubscription<BikeDeletedHandler>(
             serviceProvider.CreateScope().ServiceProvider, 
             MessageType.BikeDeleted);
+        
+        messageQueueSubscriptionManager.RegisterEventHandlerSubscription<BikeStationColorUpdatedHandler>(
+            serviceProvider.CreateScope().ServiceProvider, 
+            MessageType.BikeStationColorUpdated);
     }
 }
