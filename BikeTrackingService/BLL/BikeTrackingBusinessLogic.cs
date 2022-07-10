@@ -211,6 +211,30 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
         await _unitOfWork.SaveChangesAsync();
     }
 
+    public async Task<BikeRentingStatus> GetBikeRentingStatus(string accountEmail)
+    {
+        var rentingStatus = await _unitOfWork.BikeRentalTrackingRepository
+            .Find(b => !b.CheckoutOn.HasValue);
+    
+        return rentingStatus.Any()
+            ? rentingStatus.Select(x => new BikeRentingStatus
+            {
+                AccountEmail = accountEmail,
+                IsRenting = true,
+                BikeId = x.BikeId,
+                LicensePlate = x.Bike.LicensePlate,
+                LastLatitude = x.Bike.BikeLocationTrackings.FirstOrDefault(b => b.IsActive)!.Latitude,
+                LastLongitude = x.Bike.BikeLocationTrackings.FirstOrDefault(b => b.IsActive)!.Longitude,
+                LastAddress = x.Bike.BikeLocationTrackings.FirstOrDefault(b => b.IsActive)!.Address,
+            }).FirstOrDefault()!
+            : new BikeRentingStatus
+            {
+                AccountEmail = accountEmail,
+                IsRenting = false,
+                BikeId = null
+            };
+    }
+
     private async Task<Bike> GetBikeById(int bikeId)
     {
         var bike = await _unitOfWork.BikeRepository.GetById(bikeId) ?? throw new InvalidOperationException();

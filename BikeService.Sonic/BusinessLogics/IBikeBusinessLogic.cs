@@ -9,6 +9,5 @@ public interface IBikeBusinessLogic
     Task AddBike(BikeInsertDto bikeInsertDto);
     Task UpdateBike(BikeUpdateDto bikeInsertDto);
     Task DeleteBike(int id);
-    // Task<BikeRentingStatus> GetBikeRentingStatus(string accountEmail);
     Task DeleteBikes(List<int> bikeIds);
 }

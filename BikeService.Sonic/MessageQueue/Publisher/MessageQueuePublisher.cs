@@ -1,6 +1,4 @@
-﻿using BikeRental.MessageQueue.Commands;
-using BikeRental.MessageQueue.Events;
-using BikeRental.MessageQueue.MessageType;
+﻿using BikeRental.MessageQueue.Events;
 using BikeRental.MessageQueue.Publisher;
 using Newtonsoft.Json;
 
@@ -16,45 +14,17 @@ public class MessageQueuePublisher : IMessageQueuePublisher
         _publisher = publisher;
         _configuration = configuration;
     }
-    
-    public async Task PublishBikeLocationChangeCommand(List<string> managerEmails)
-    {
-        var payload = JsonConvert.SerializeObject(new NotifyBikeLocationChange
-        {
-            ManagerEmails = managerEmails,
-            MessageType = MessageType.NotifyBikeLocationChange
-        });
-
-        var topic = _configuration["MessageQueue:BikeTopic"];
-        await _publisher.SendMessage(payload, topic);
-    }
-
-    public async Task PublishBikeCheckedInEvent(BikeCheckedIn bikeCheckedIn)
-    {
-        var payload = JsonConvert.SerializeObject(bikeCheckedIn);
-        var topic = _configuration["MessageQueue:BikeTopic"];
-        await _publisher.SendMessage(payload, topic);
-    }
-
-    public async Task PublishBikeCheckedOutEvent(BikeCheckedOut bikeCheckedOut)
-    {
-        var payload = JsonConvert.SerializeObject(bikeCheckedOut);
-        var topic = _configuration["MessageQueue:BikeTopic"];
-        await _publisher.SendMessage(payload, topic);
-    }
 
     public async Task PublishBikeCreatedEvent(BikeCreated bikeCreated)
     {
         var payload = JsonConvert.SerializeObject(bikeCreated);
-        var topic = _configuration["MessageQueue:BikeTopic"];
-        await _publisher.SendMessage(payload, topic);
+        await SendMessage(payload);
     }
 
     public async Task PublishBikeUpdatedEvent(BikeUpdated bikeUpdated)
     {
         var payload = JsonConvert.SerializeObject(bikeUpdated);
-        var topic = _configuration["MessageQueue:BikeTopic"];
-        await _publisher.SendMessage(payload, topic);
+        await SendMessage(payload);
     }
 
     public async Task PublishBikeDeletedEvent(int bikeId)
@@ -63,6 +33,17 @@ public class MessageQueuePublisher : IMessageQueuePublisher
         {
             Id = bikeId
         });
+        await SendMessage(payload);
+    }
+
+    public async Task PublishBikeStationColorUpdatedEvent(BikeStationColorUpdated bikeStationColorUpdated)
+    {
+        var payload = JsonConvert.SerializeObject(bikeStationColorUpdated);
+        await SendMessage(payload);
+    }
+
+    private async Task SendMessage(string payload)
+    {
         var topic = _configuration["MessageQueue:BikeTopic"];
         await _publisher.SendMessage(payload, topic);
     }

@@ -72,17 +72,6 @@ public class BikeController : ControllerBase
         return Ok();
     }
 
-    // [HttpGet]
-    // [Route("[action]")]
-    // public async Task<IActionResult> GetRentingStatus()
-    // {
-    //     var email = HttpContext.User.Claims.FirstOrDefault(x => 
-    //         x.Type == ClaimTypes.NameIdentifier)!.Value;
-    //     var rentingStatus = await _bikeBusinessLogic.GetBikeRentingStatus(email);
-    //
-    //     return Ok(rentingStatus);
-    // }
-    
     [HttpDelete]
     [Route("[action]")]
     public async Task<IActionResult> DeleteBikes([FromQuery] string bikeIds)

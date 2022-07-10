@@ -12,6 +12,7 @@ using BikeService.Sonic.MessageQueue.Publisher;
 using BikeService.Sonic.Models;
 using BikeService.Sonic.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using BikeStationColor = BikeRental.MessageQueue.Events.BikeStationColor;
 
 namespace BikeService.Sonic.BusinessLogics;
 
@@ -108,25 +109,6 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
 
     public async Task UpdateBikeStationColor(List<BikeStationColorDto> bikeStationColors, string email)
     {
-        var bikesColor = (await _unitOfWork.BikeRepository
-            .Find(x => x.BikeStationId.HasValue && bikeStationColors.Select(b => b.BikeStationId)
-                .Contains(x.BikeStationId.Value))).Select(x => new
-        {
-            BikeId = x.Id,
-            Color = x.BikeStation!.BikeStationColors.Any() ?
-                x.BikeStation!.BikeStationColors.First().Color : null
-        }).ToList();
-        
-        foreach (var bikeColor in bikesColor)
-        {
-            await _messageQueuePublisher.PublishBikeUpdatedEvent(new BikeUpdated
-            {
-                Id = bikeColor.BikeId,
-                Color = bikeColor.Color,
-                MessageType = MessageType.BikeUpdated
-            }); 
-        }
-        
         var manager = (await _unitOfWork.ManagerRepository.Find(x => x.Email == email)).FirstOrDefault();
         foreach (var bikeStationColorDto in bikeStationColors)
         {
@@ -135,7 +117,7 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
         
             if (bikeStationColor is null)
             {
-                await _unitOfWork.BikeStationColorRepository.Add(new BikeStationColor
+                await _unitOfWork.BikeStationColorRepository.Add(new Models.BikeStationColor
                 {
                     BikeStationId = bikeStationColorDto.BikeStationId,
                     Manager = manager!,
@@ -152,6 +134,19 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
         }
 
         await _unitOfWork.SaveChangesAsync();
+        await _messageQueuePublisher.PublishBikeStationColorUpdatedEvent(new BikeStationColorUpdated
+        {
+            BikeStationColors = bikeStationColors.Select(x => new BikeStationColor
+            {
+                BikeStationId = x.BikeStationId,
+                Color = x.Color
+            }).ToList(),
+            ManagerEmails = new List<string>
+            {
+                email
+            },
+            MessageType = MessageType.BikeStationColorUpdated
+        });
     }
 
     public async Task<List<BikeStationColorRetrieveDto>> GetBikeStationColors(string email)

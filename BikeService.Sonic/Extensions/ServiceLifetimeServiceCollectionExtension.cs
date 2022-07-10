@@ -19,7 +19,6 @@ public static class ServiceLifetimeServiceCollectionExtension
     public static void AddScopedServices(this IServiceCollection serviceCollection)
     {
         serviceCollection.AddScoped<IElasticSearchService, ElasticSearchService>();
-        serviceCollection.AddScoped<IBikeLocationHub, BikeLocationHub>();
         serviceCollection.AddScoped<IBikeBusinessLogic, BikeBusinessLogic>();
         serviceCollection.AddScoped<IImportService, BikeCsvImportService>();
         serviceCollection.AddScoped<IBikeStationBusinessLogic, BikeStationBusinessLogic>();

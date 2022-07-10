@@ -12,4 +12,5 @@ public interface IBikeTrackingBusinessLogic
     Task BikeChecking(BikeCheckinDto bikeCheckinDto, string accountEmail);
     Task BikeCheckout(BikeCheckoutDto bikeCheckingDto, string accountEmail);
     Task UpdateBikeLocation(BikeLocationDto bikeLocationDto);
+    Task<BikeRentingStatus> GetBikeRentingStatus(string accountEmail);
 }

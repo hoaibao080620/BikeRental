@@ -1,6 +1,5 @@
 using BikeService.Sonic.Extensions;
 using BikeService.Sonic.GrpcServices;
-using BikeService.Sonic.Services.Implementation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +10,6 @@ builder.Services.AddScopedServices();
 builder.Services.AddSingletonServices(builder.Configuration);
 builder.Services.AddElasticClient(builder.Configuration);
 builder.Services.AddOktaAuthenticationService(builder.Configuration);
-builder.Services.AddSignalR();
 builder.Services.AddDbContextService(builder.Configuration);
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddHttpClientToServices();
@@ -32,7 +30,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseGrpcWeb();
 app.MapControllers();
-app.MapHub<BikeLocationHub>("/bikeLocationHub");
 app.MapGrpcService<BikeGrpcService>().EnableGrpcWeb();
 
 app.Run();

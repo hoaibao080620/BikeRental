@@ -67,4 +67,14 @@ public class BikeTrackingController : ControllerBase
         await _bikeTrackingBusinessLogic.BikeCheckout(bikeCheckoutDto, email);
         return Ok();
     }
+    
+    [HttpGet]
+    public async Task<IActionResult> GetRentingStatus()
+    {
+        var email = HttpContext.User.Claims.FirstOrDefault(x => 
+            x.Type == ClaimTypes.NameIdentifier)!.Value;
+        var rentingStatus = await _bikeTrackingBusinessLogic.GetBikeRentingStatus(email);
+    
+        return Ok(rentingStatus);
+    }
 }
