@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using AutoMapper;
 using BikeRental.MessageQueue.Events;
+using BikeRental.MessageQueue.MessageType;
 using BikeService.Sonic.Const;
 using BikeService.Sonic.DAL;
 using BikeService.Sonic.Dtos;
@@ -112,7 +113,7 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
                 .Contains(x.BikeStationId.Value))).Select(x => new
         {
             BikeId = x.Id,
-            Color = x.BikeStation!.BikeStationColors.Any(b => b.BikeStationId == x.BikeStationId) ?
+            Color = x.BikeStation!.BikeStationColors.Any() ?
                 x.BikeStation!.BikeStationColors.First().Color : null
         }).ToList();
         
@@ -121,7 +122,8 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
             await _messageQueuePublisher.PublishBikeUpdatedEvent(new BikeUpdated
             {
                 Id = bikeColor.BikeId,
-                Color = bikeColor.Color
+                Color = bikeColor.Color,
+                MessageType = MessageType.BikeUpdated
             }); 
         }
         
@@ -237,7 +239,8 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
                 Id = bikeUpdated.Id,
                 Color = bikeUpdated.Color,
                 BikeStationId = bikeUpdated.BikeStationId,
-                BikeStationName = bikeUpdated.BikeStationName
+                BikeStationName = bikeUpdated.BikeStationName,
+                MessageType = MessageType.BikeUpdated
             }); 
         }
     }

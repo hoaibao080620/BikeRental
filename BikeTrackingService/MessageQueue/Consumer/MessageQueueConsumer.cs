@@ -38,7 +38,7 @@ public class MessageQueueConsumer : BackgroundService
             {
                 var messageType = (JsonConvert.DeserializeObject(message.Body) as JObject)?["MessageType"]?.ToString();
                 
-                if(messageType is null) continue;
+                if(string.IsNullOrEmpty(messageType)) continue;
                 
                 var messageHandler = _messageQueueSubscriptionManager.GetHandler(messageType);
                 await messageHandler.Handle(message.Body);

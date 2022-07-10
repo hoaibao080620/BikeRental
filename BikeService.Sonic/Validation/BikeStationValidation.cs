@@ -23,9 +23,11 @@ public class BikeStationValidation : IBikeStationValidation
             .Exists(x => bikeIds.Contains(x.Id) && x.Status == BikeStatus.InUsed);
 
         if (isBikesStatusInvalid) return "Bike assign have to have available status!";
-        //
-        //
-        // var isBikeStationEnoughSpace = (await _unitOfWork.BikeStationRepository.GetById(bikeStationId)).ParkingSpace;
-        return null;
+
+        var bikeStation = await _unitOfWork.BikeStationRepository.GetById(bikeStationId);
+        ArgumentNullException.ThrowIfNull(bikeStation);
+
+        var isBikeStationEnoughSpace = bikeStation.ParkingSpace - bikeStation.UsedParkingSpace > bikeIds.Count;
+        return isBikeStationEnoughSpace ? null : "Bike Station doesn't have enough space!";
     }
 }

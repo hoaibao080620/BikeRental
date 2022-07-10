@@ -153,7 +153,6 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         
         foreach (var bike in bikes)
         {
-            await _cacheService.Remove(string.Format(RedisCacheKey.SingleBike, bike.Id));
             await _unitOfWork.BikeRepository.Delete(bike);
             await _unitOfWork.SaveChangesAsync();
             await _messageQueuePublisher.PublishBikeDeletedEvent(bike.Id);

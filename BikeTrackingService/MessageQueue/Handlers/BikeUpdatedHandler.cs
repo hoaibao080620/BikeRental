@@ -1,6 +1,5 @@
 ﻿using BikeRental.MessageQueue.Events;
 using BikeRental.MessageQueue.Handlers;
-using BikeService.Sonic.DAL;
 using BikeTrackingService.DAL;
 using Newtonsoft.Json;
 
