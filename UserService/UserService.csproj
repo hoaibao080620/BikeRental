@@ -9,7 +9,7 @@
     <ItemGroup>
         <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
         <PackageReference Include="AWSSDK.SQS" Version="3.7.2.49" />
-        <PackageReference Include="BikeRental.MessageQueue" Version="1.3.2-alpha" />
+        <PackageReference Include="BikeRental.MessageQueue" Version="1.4.0-alpha" />
         <PackageReference Include="BikeRental.Shared" Version="1.2.0-alpha" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.4" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.4" />
@@ -24,6 +24,11 @@
         <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.1" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
         <PackageReference Include="Twilio" Version="5.76.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\BikeRental.MessageQueue\BikeRental.MessageQueue.csproj" />
+      <ProjectReference Include="..\BikeRental.Shared\BikeRental.Shared.csproj" />
     </ItemGroup>
 
 </Project>

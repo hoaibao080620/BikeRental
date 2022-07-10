@@ -14,7 +14,7 @@ public static class ServiceLifetimeServiceCollectionExtension
     {
         serviceCollection.AddAutoMapper(typeof(Program));
         serviceCollection.AddScoped<IConsumer, SqsConsumer>();
-        serviceCollection.AddScoped<IPublisher, SqsPublisher>();
+        serviceCollection.AddScoped<IPublisher, SnsPublisher>();
         serviceCollection.AddScoped<IMongoService, MongoService>();
     }
     
@@ -32,13 +32,17 @@ public static class ServiceLifetimeServiceCollectionExtension
             serviceProvider.CreateScope().ServiceProvider, 
             MessageType.UserAdded);
         
-        // messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserUpdatedEventHandler>(
-        //     serviceProvider.CreateScope().ServiceProvider, 
-        //     MessageType.UserUpdated);
-        //
-        // messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserDeletedEventHandler>(
-        //     serviceProvider.CreateScope().ServiceProvider, 
-        //     MessageType.UserDeleted);
+        messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserUpdatedEventHandler>(
+            serviceProvider.CreateScope().ServiceProvider, 
+            MessageType.UserUpdated);
+        
+        messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserDeletedEventHandler>(
+            serviceProvider.CreateScope().ServiceProvider, 
+            MessageType.UserDeleted);
+        
+        messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserRoleUpdatedHandler>(
+            serviceProvider.CreateScope().ServiceProvider, 
+            MessageType.UserRoleUpdated);
     }
     
     public static void AddMongoDb(this IServiceCollection serviceCollection, IConfiguration configuration)

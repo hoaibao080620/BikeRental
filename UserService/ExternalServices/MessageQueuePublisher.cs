@@ -1,8 +1,7 @@
-﻿using Amazon.SimpleNotificationService.Model;
-using BikeRental.MessageQueue.Events;
+﻿using BikeRental.MessageQueue.Events;
+using BikeRental.MessageQueue.MessageType;
 using BikeRental.MessageQueue.Publisher;
 using Newtonsoft.Json;
-using Shared.Consts;
 using UserService.Models;
 
 namespace UserService.ExternalServices;
@@ -31,10 +30,7 @@ public class MessageQueuePublisher : IMessageQueuePublisher
             Role = user.RoleName
         };
         
-        await _publisher.SendMessage(
-            JsonConvert.SerializeObject(message), 
-            _configuration["Topic:UserTopic"], 
-            GetUserGroupMessageAttributeValues(user.RoleName));
+        await _publisher.SendMessage(JsonConvert.SerializeObject(message), _configuration["Topic:UserTopic"]);
     }
     
     public async Task PublishUserUpdatedEventToMessageQueue(User user)
@@ -51,9 +47,8 @@ public class MessageQueuePublisher : IMessageQueuePublisher
         
         await _publisher.SendMessage(
             JsonConvert.SerializeObject(message), 
-            _configuration["Topic:UserTopic"], 
-            GetUserGroupMessageAttributeValues(user.RoleName)
-            );
+            _configuration["Topic:UserTopic"]
+        );
     }
     
     public async Task PublishUserDeletedEventToMessageQueue(User user)
@@ -66,21 +61,14 @@ public class MessageQueuePublisher : IMessageQueuePublisher
         
         await _publisher.SendMessage(
             JsonConvert.SerializeObject(message), 
-            _configuration["Topic:UserTopic"],
-            GetUserGroupMessageAttributeValues(user.RoleName));
+            _configuration["Topic:UserTopic"]);
     }
 
-    private static Dictionary<string, MessageAttributeValue> GetUserGroupMessageAttributeValues(string group)
+    public async Task PublishUserRoleUpdatedEvent(UserRoleUpdated userRoleUpdated)
     {
-        return new Dictionary<string, MessageAttributeValue>
-        {
-            {
-                "user_group", new MessageAttributeValue
-                {
-                    DataType = "String",
-                    StringValue = group
-                }
-            }
-        };
+        var topic = _configuration["Topic:UserTopic"];
+        var payload = JsonConvert.SerializeObject(userRoleUpdated);
+
+        await _publisher.SendMessage(payload, topic);
     }
 }

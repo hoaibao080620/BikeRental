@@ -1,6 +1,5 @@
 using BikeTrackingService.Extensions;
 using BikeTrackingService.MessageQueue.Consumer;
-using Grpc.Net.Client;
 using Grpc.Net.Client.Web;
 
 var builder = WebApplication.CreateBuilder(args);

@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using BikeRental.MessageQueue.Events;
+using BikeRental.MessageQueue.MessageType;
 using MongoDB.Driver;
 using Shared.Consts;
 using UserService.Clients;
@@ -15,18 +16,15 @@ public class UserBusinessLogic : IUserBusinessLogic
     private readonly IOktaClient _oktaClient;
     private readonly IMessageQueuePublisher _messageQueuePublisher;
     private readonly IMongoService _mongoService;
-    private readonly IMapper _mapper;
 
     public UserBusinessLogic(
         IOktaClient oktaClient,
         IMessageQueuePublisher messageQueuePublisher,
-        IMongoService mongoService,
-        IMapper mapper)
+        IMongoService mongoService)
     {
         _oktaClient = oktaClient;
         _messageQueuePublisher = messageQueuePublisher;
         _mongoService = mongoService;
-        _mapper = mapper;
     }
 
     public async Task<List<UserRetrieveDto>> GetUsers(string email)
@@ -65,7 +63,7 @@ public class UserBusinessLogic : IUserBusinessLogic
 
     public async Task AddUser(UserInsertDto user)
     {
-        user.RoleName ??= "Users";
+        user.RoleName ??= UserRole.User;
         var userAdded = new User
         {
             RoleName = user.RoleName,
@@ -80,7 +78,6 @@ public class UserBusinessLogic : IUserBusinessLogic
         };
         
         await _mongoService.AddUser(userAdded);
-        
         await _messageQueuePublisher.PublishUserAddedEventToMessageQueue(userAdded);
         var oktaUserId = await AddUserToOkta(user);
 
@@ -90,6 +87,8 @@ public class UserBusinessLogic : IUserBusinessLogic
 
     public async Task UpdateUser(string userId, UserUpdateDto user)
     {
+        var userUpdated = (await _mongoService.FindUser(x => x.Id == userId)).First();
+        var originalRole = userUpdated.RoleName;
         var builder = Builders<User>.Update
             .Set(x => x.FirstName, user.FirstName)
             .Set(x => x.LastName, user.LastName)
@@ -100,6 +99,25 @@ public class UserBusinessLogic : IUserBusinessLogic
             .Set(x => x.UpdatedOn, DateTime.UtcNow);
         
         await _mongoService.UpdateUser(userId, builder);
+        
+        var newUserUpdated = (await _mongoService.FindUser(x => x.Id == userId)).First();
+        await _messageQueuePublisher.PublishUserUpdatedEventToMessageQueue(newUserUpdated);
+
+        if (originalRole != user.RoleName)
+        {
+            await UpdateOktaUserGroup(originalRole, newUserUpdated.RoleName, newUserUpdated.OktaUserId!);
+            await _messageQueuePublisher.PublishUserRoleUpdatedEvent(new UserRoleUpdated
+            {
+                OriginalRole = originalRole,
+                Email = newUserUpdated.Email,
+                UserId = newUserUpdated.Id,
+                NewRole = newUserUpdated.RoleName,
+                MessageType = MessageType.UserRoleUpdated,
+                FirstName = newUserUpdated.FirstName,
+                LastName = newUserUpdated.LastName,
+                PhoneNumber = newUserUpdated.PhoneNumber
+            });
+        }
     }
 
     public async Task DeleteUser(string id)
@@ -107,6 +125,10 @@ public class UserBusinessLogic : IUserBusinessLogic
         var user = (await _mongoService.FindUser(x => x.Id == id)).FirstOrDefault();
         await _mongoService.DeleteUser(id);
         await DeleteOktaUser(user?.OktaUserId);
+        await _messageQueuePublisher.PublishUserDeletedEventToMessageQueue(new User
+        {
+            Id = id
+        });
     }
 
     public async Task<UserProfileDto?> GetUserProfile(string email)
@@ -159,58 +181,6 @@ public class UserBusinessLogic : IUserBusinessLogic
         }
     }
 
-    // public async Task<IEnumerable<UserRetrieveDto>> GetUsers()
-    // {
-    //     var users = await _unitOfWork.UserRepository.All();
-    //     return _mapper.Map<List<UserRetrieveDto>>(users);
-    // }
-    //
-    // public async Task<UserRetrieveDto?> GetUserById(int id)
-    // {
-    //     var user = await _unitOfWork.UserRepository.GetById(id);
-    //     if (user is null) throw new UserNotFoundException(id);
-    //     
-    //     return _mapper.Map<UserRetrieveDto>(user);
-    // }
-    
-
-    // public async Task UpdateUser(int userId, UserUpdateDto userUpdateDto)
-    // {
-    //     var user = await _unitOfWork.UserRepository.GetById(userId);
-    //     if(user is null) throw new UserNotFoundException(userId);
-    //     
-    //     _mapper.Map(userUpdateDto, user);
-    //     user.UpdatedOn = DateTime.UtcNow;
-    //     
-    //     await _unitOfWork.UserRepository.Update(user);
-    //     var isUpdated = await _unitOfWork.SaveChangesAsync() > 0;
-    //     
-    //     if (isUpdated)
-    //     {
-    //         await _messageQueuePublisher.PublishUserUpdatedEventToMessageQueue(user);
-    //     }
-    // }
-
-    // public async Task DeleteUser(int id)
-    // {
-    //     var user = await _unitOfWork.UserRepository.GetById(id);
-    //     if (user is null) throw new UserNotFoundException(id);
-    //
-    //     await _unitOfWork.UserRepository.Delete(user);
-    //     var isDeleted = await _unitOfWork.SaveChangesAsync() > 0;
-    //
-    //     if (isDeleted)
-    //     {
-    //         var tasks = new List<Task>
-    //         {
-    //             _messageQueuePublisher.PublishUserDeletedEventToMessageQueue(user),
-    //             DeleteOktaUser(user.OktaUserId)
-    //         };
-    //
-    //         await Task.WhenAll(tasks);
-    //     }
-    // }
-    
     private async Task<string?> AddUserToOkta(UserInsertDto userInsertDto)
     {
         var group = (await _mongoService.GetRoles()).FirstOrDefault(x => x.Name == userInsertDto.RoleName)!;
@@ -245,5 +215,12 @@ public class UserBusinessLogic : IUserBusinessLogic
                 Name = group.Profile.Name
             });
         }
+    }
+    
+    private async Task UpdateOktaUserGroup(string originalRoleName, string newRoleName, string oktaUserId)
+    {
+        var originalGroup = (await _mongoService.GetRoles()).FirstOrDefault(x => x.Name == originalRoleName)!;
+        var newGroup = (await _mongoService.GetRoles()).FirstOrDefault(x => x.Name == newRoleName)!;
+        await _oktaClient.UpdateOktaUserRole(originalGroup.OktaRoleId, newGroup.OktaRoleId, oktaUserId);
     }
 }

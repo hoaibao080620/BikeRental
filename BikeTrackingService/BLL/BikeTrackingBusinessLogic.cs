@@ -51,6 +51,7 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
                 AccountEmail = x.Account.Email,
                 CheckedInOn = x.CheckinOn,
                 CheckedOutOn = x.CheckoutOn,
+                AccountPhone = x.Account.PhoneNumber,
                 TotalTime = x.CheckoutOn.HasValue ? x.CheckoutOn.Value.Subtract(x.CheckinOn).TotalMinutes : null
             }).ToList();
 

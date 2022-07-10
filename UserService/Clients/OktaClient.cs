@@ -72,4 +72,12 @@ public class OktaClient : IOktaClient
 
         await _httpClient.DeleteAsync($"{_baseUrl}/api/v1/users/{oktaUserId}");
     }
+
+    public async Task UpdateOktaUserRole(string oldGroupId, string newGroupId, string oktaUserId)
+    {
+        await _httpClient.DeleteAsync($"{_baseUrl}/api/v1/groups/{oldGroupId}/users/{oktaUserId}");
+        await _httpClient.PutAsJsonAsync(
+            $"{_baseUrl}/api/v1/groups/{newGroupId}/users/{oktaUserId}", 
+            string.Empty);
+    }
 }

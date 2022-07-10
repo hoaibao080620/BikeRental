@@ -8,7 +8,7 @@ namespace UserService.Controllers;
 
 [Route("[controller]")]
 [ApiController]
-[Authorize]
+// [Authorize]
 public class UserController : ControllerBase
 {
     private readonly IUserBusinessLogic _userBusinessLogic;
@@ -41,7 +41,6 @@ public class UserController : ControllerBase
     public async Task<IActionResult> GetUser(string userId)
     {
         var users = await _userBusinessLogic.GetUserById(userId);
-
         return Ok(users);
     }
     

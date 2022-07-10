@@ -2,7 +2,8 @@
 
 public class UserRole
 {
-    public const int User = 1;
-    public const int Manager = 2;
-    public const int SysAdmin = 3;
+    public const string User = "Users";
+    public const string Manager = "Managers";
+    public const string SuperManager = "SuperManagers";
+    public const string SysAdmin = "SysAdmins";
 }

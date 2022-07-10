@@ -15,4 +15,5 @@ public class MessageType
     public const string BikeUpdated = "BikeUpdated";
     public const string BikeDeleted = "BikeDeleted";
     public const string BikeStationColorUpdated = "BikeStationColorUpdated";
+    public const string UserRoleUpdated = "UserRoleUpdated";
 }

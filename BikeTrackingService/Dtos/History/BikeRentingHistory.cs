@@ -9,4 +9,5 @@ public class BikeRentingHistory
     public DateTime? CheckedOutOn { get; set; }
     public double? TotalTime { get; set; }
     public string AccountEmail { get; set; } = null!;
+    public string AccountPhone { get; set; } = null!;
 }

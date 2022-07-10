@@ -3,6 +3,7 @@ using AccountService.Models;
 using BikeRental.MessageQueue.Events;
 using BikeRental.MessageQueue.Handlers;
 using Newtonsoft.Json;
+using Shared.Consts;
 
 namespace AccountService.MessageQueueHandlers;
 
@@ -18,7 +19,7 @@ public class UserCreatedEventHandler : IMessageQueueHandler
     public async Task Handle(string message)
     {
         var userCreatedMessage = JsonConvert.DeserializeObject<UserCreated>(message);
-        if(userCreatedMessage is null) return;
+        if(userCreatedMessage?.Role != UserRole.User) return;
         
         await _mongoService.AddAccount(new Account
         {
