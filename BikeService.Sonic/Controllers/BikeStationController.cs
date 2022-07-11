@@ -84,7 +84,7 @@ public class BikeStationController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetBikeStationBike([FromQuery] int bikeStationId)
+    public async Task<IActionResult> GetBikesInStationBike([FromQuery] int bikeStationId)
     {
         var bikes = await _bikeStationBusinessLogic.GetBikeStationBike(bikeStationId);
         return Ok(bikes);
