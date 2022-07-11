@@ -8,7 +8,7 @@ public static class ServiceLifetimeServiceCollectionExtension
 {
     public static void AddSingletonService(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddSingleton<IPublisher, SqsPublisher>();
+        serviceCollection.AddSingleton<IPublisher, SnsPublisher>();
         serviceCollection.AddSingleton<IMessageQueuePublisher, MessageQueuePublisher>();
     }
 
