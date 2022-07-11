@@ -45,6 +45,7 @@ public class UserController : ControllerBase
     }
     
     [HttpPost]
+    [AllowAnonymous]
     public async Task<IActionResult> AddUser([FromBody] UserInsertDto userInsertDto)
     {
         await _userBusinessLogic.AddUser(userInsertDto);
