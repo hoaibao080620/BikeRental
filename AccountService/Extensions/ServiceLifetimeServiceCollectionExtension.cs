@@ -1,5 +1,6 @@
 ﻿using AccountService.DataAccess;
 using AccountService.MessageQueueHandlers;
+using AccountService.Publisher;
 using BikeRental.MessageQueue.Consumer;
 using BikeRental.MessageQueue.MessageType;
 using BikeRental.MessageQueue.Publisher;
@@ -16,6 +17,7 @@ public static class ServiceLifetimeServiceCollectionExtension
         serviceCollection.AddScoped<IConsumer, SqsConsumer>();
         serviceCollection.AddScoped<IPublisher, SnsPublisher>();
         serviceCollection.AddScoped<IMongoService, MongoService>();
+        serviceCollection.AddScoped<IMessageQueuePublisher, MessageQueuePublisher>();
     }
     
     public static void AddSingletonServices(this IServiceCollection serviceCollection)
@@ -43,6 +45,10 @@ public static class ServiceLifetimeServiceCollectionExtension
         messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserRoleUpdatedHandler>(
             serviceProvider.CreateScope().ServiceProvider, 
             MessageType.UserRoleUpdated);
+        
+        messageQueueSubscriptionManager.RegisterEventHandlerSubscription<BikeCheckedOutEventHandler>(
+            serviceProvider.CreateScope().ServiceProvider, 
+            MessageType.BikeCheckedOut);
     }
     
     public static void AddMongoDb(this IServiceCollection serviceCollection, IConfiguration configuration)

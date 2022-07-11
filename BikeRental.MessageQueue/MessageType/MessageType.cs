@@ -16,4 +16,6 @@ public class MessageType
     public const string BikeDeleted = "BikeDeleted";
     public const string BikeStationColorUpdated = "BikeStationColorUpdated";
     public const string UserRoleUpdated = "UserRoleUpdated";
+    public const string AccountPointSubtracted = "AccountPointSubtracted";
+    public const string AccountPointLimitExceeded = "AccountPointLimitExceeded";
 }

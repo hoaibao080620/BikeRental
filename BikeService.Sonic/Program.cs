@@ -14,6 +14,7 @@ builder.Services.AddDbContextService(builder.Configuration);
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddHttpClientToServices();
 builder.Services.RunMigrations();
+builder.Services.RegisterMessageHandlers();
 
 
 // App pipelines

@@ -1,4 +1,5 @@
 ﻿using BikeRental.MessageQueue.Consumer;
+using BikeRental.MessageQueue.MessageType;
 using BikeRental.MessageQueue.Publisher;
 using BikeService.Sonic.BusinessLogics;
 using BikeService.Sonic.DAL;
@@ -6,6 +7,7 @@ using BikeService.Sonic.Services.Implementation;
 using BikeService.Sonic.Services.Interfaces;
 using BikeRental.MessageQueue.SubscriptionManager;
 using BikeService.Sonic.Decorators;
+using BikeService.Sonic.MessageQueue.Handlers;
 using BikeService.Sonic.MessageQueue.Publisher;
 using BikeService.Sonic.Validation;
 using Microsoft.Extensions.Caching.Distributed;
@@ -46,20 +48,20 @@ public static class ServiceLifetimeServiceCollectionExtension
 
     public static void RegisterMessageHandlers(this IServiceCollection serviceCollection)
     {
-        // var serviceProvider = serviceCollection.BuildServiceProvider();
-        // var messageQueueSubscriptionManager = serviceProvider.GetRequiredService<IMessageQueueSubscriptionManager>();
-        //
-        // messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserCreatedEventHandler>(
-        //     serviceProvider.CreateScope().ServiceProvider, 
-        //     MessageType.UserAdded);
-        //
-        // messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserUpdatedEventHandler>(
-        //     serviceProvider.CreateScope().ServiceProvider, 
-        //     MessageType.UserUpdated);
-        //
-        // messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserDeletedEventHandler>(
-        //     serviceProvider.CreateScope().ServiceProvider, 
-        //     MessageType.UserDeleted);
+        var serviceProvider = serviceCollection.BuildServiceProvider();
+        var messageQueueSubscriptionManager = serviceProvider.GetRequiredService<IMessageQueueSubscriptionManager>();
+        
+        messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserCreatedEventHandler>(
+            serviceProvider.CreateScope().ServiceProvider, 
+            MessageType.UserAdded);
+        
+        messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserDeletedEventHandler>(
+            serviceProvider.CreateScope().ServiceProvider, 
+            MessageType.UserDeleted);
+        
+        messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserRoleUpdatedHandler>(
+            serviceProvider.CreateScope().ServiceProvider, 
+            MessageType.UserRoleUpdated);
     }
     
     public static void AddElasticClient(this IServiceCollection serviceCollection, IConfiguration configuration)

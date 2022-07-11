@@ -26,7 +26,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService", "Noti
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaymentService", "PaymentService\PaymentService.csproj", "{FF66D1C1-5FFA-4C51-A09D-41E475944EE1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BikeTrackingService", "BikeTrackingService\BikeTrackingService.csproj", "{369C8E62-9956-4DF0-9C4B-0372B012DBE9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BikeBookingService", "BikeBookingService\BikeBookingService.csproj", "{369C8E62-9956-4DF0-9C4B-0372B012DBE9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
