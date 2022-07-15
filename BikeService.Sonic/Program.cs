@@ -1,3 +1,4 @@
+using BikeService.Sonic.BackgroundJob;
 using BikeService.Sonic.Extensions;
 using BikeService.Sonic.GrpcServices;
 
@@ -5,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddGrpc();
 builder.Services.AddControllers();
+builder.Services.AddHostedService<MessageQueueConsumer>();
 builder.Services.AddRedisCache(builder.Configuration);
 builder.Services.AddScopedServices();
 builder.Services.AddSingletonServices(builder.Configuration);
