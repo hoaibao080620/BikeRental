@@ -50,7 +50,7 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "bike-rental-account-service",
+          "Host": "bike-rental-account-service.herokuapp.com",
           "Port": 443
         }
       ],
