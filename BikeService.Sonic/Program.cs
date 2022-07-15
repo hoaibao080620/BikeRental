@@ -6,7 +6,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddGrpc();
 builder.Services.AddControllers();
-builder.Services.AddHostedService<MessageQueueConsumer>();
 builder.Services.AddRedisCache(builder.Configuration);
 builder.Services.AddScopedServices();
 builder.Services.AddSingletonServices(builder.Configuration);
@@ -17,6 +16,7 @@ builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddHttpClientToServices();
 builder.Services.RunMigrations();
 builder.Services.RegisterMessageHandlers();
+builder.Services.AddHostedService<MessageQueueConsumer>();
 
 
 // App pipelines

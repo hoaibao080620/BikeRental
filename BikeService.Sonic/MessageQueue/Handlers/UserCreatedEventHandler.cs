@@ -19,16 +19,18 @@ public class UserCreatedEventHandler : IMessageQueueHandler
     public async Task Handle(string message)
     {
         var userCreatedMessage = JsonConvert.DeserializeObject<UserCreated>(message);
-        if(userCreatedMessage?.Role != UserRole.Manager || userCreatedMessage.Role != UserRole.SuperManager) return;
-        
-        await _unitOfWork.ManagerRepository.Add(new Manager
+
+        if (userCreatedMessage?.Role is UserRole.Manager or UserRole.SuperManager)
         {
-            CreatedOn = DateTime.UtcNow,
-            IsActive = true,
-            Email = userCreatedMessage.Email,
-            ExternalId = userCreatedMessage.Id,
-            IsSuperManager = userCreatedMessage.Role == UserRole.SuperManager
-        });
-        await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.ManagerRepository.Add(new Manager
+            {
+                CreatedOn = DateTime.UtcNow,
+                IsActive = true,
+                Email = userCreatedMessage.Email,
+                ExternalId = userCreatedMessage.Id,
+                IsSuperManager = userCreatedMessage.Role == UserRole.SuperManager
+            });
+            await _unitOfWork.SaveChangesAsync();
+        }
     }
 }
