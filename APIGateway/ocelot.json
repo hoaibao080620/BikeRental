@@ -1,6 +1,21 @@
 ﻿{
   "Routes": [
     {
+      "DownstreamPathTemplate": "/payment/stripePaymentWebhook",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "bike-rental-payment-service.herokuapp.com",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/api/v1/payment-service/payment/stripePaymentWebhook",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "AuthenticationOptions": {
+        "AllowedScopes": []
+      }
+    },
+    {
       "DownstreamPathTemplate": "/validation/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
