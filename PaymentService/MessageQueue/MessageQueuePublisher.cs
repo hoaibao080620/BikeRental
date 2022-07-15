@@ -26,6 +26,6 @@ public class MessageQueuePublisher : IMessageQueuePublisher
     {
         var topic = _configuration["MessageQueue:PaymentTopic"];
         var payload = JsonConvert.SerializeObject(paymentFailed);
-        await _publisher.SendMessage(payload, topic);
+        // await _publisher.SendMessage(payload, topic);
     }
 }

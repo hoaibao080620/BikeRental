@@ -49,6 +49,10 @@ public static class ServiceLifetimeServiceCollectionExtension
         messageQueueSubscriptionManager.RegisterEventHandlerSubscription<BikeCheckedOutEventHandler>(
             serviceProvider.CreateScope().ServiceProvider, 
             MessageType.BikeCheckedOut);
+        
+        messageQueueSubscriptionManager.RegisterEventHandlerSubscription<PaymentPointSucceedEventHandler>(
+            serviceProvider.CreateScope().ServiceProvider, 
+            MessageType.PaymentSucceeded);
     }
     
     public static void AddMongoDb(this IServiceCollection serviceCollection, IConfiguration configuration)

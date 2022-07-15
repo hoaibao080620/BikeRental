@@ -50,5 +50,20 @@ public class BikeCheckedOutEventHandler : IMessageQueueHandler
             AccountEmail = account.Email,
             MessageType = MessageType.AccountPointSubtracted
         });
+        
+        await _mongoService.AddAccountTransaction(new AccountTransaction
+        {
+            AccountEmail = account.Email,
+            Amount = payload.RentingPoint * 1000,
+            CreatedOn = DateTime.UtcNow,
+            TransactionTime = DateTime.UtcNow,
+        });
+        
+        await _mongoService.AddAccountPointHistory(new AccountPointHistory
+        {
+            AccountEmail = account.Email,
+            Point = payload.RentingPoint * -1,
+            CreatedOn = DateTime.UtcNow
+        });
     }
 }

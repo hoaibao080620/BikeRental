@@ -38,5 +38,13 @@ public static class WebApplicationExtension
         messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserRoleUpdatedHandler>(
             serviceProvider.CreateScope().ServiceProvider, 
             MessageType.UserRoleUpdated);
+        
+        messageQueueSubscriptionManager.RegisterEventHandlerSubscription<AccountPointLimitExceededHandler>(
+            serviceProvider.CreateScope().ServiceProvider, 
+            MessageType.AccountPointLimitExceeded);
+        
+        messageQueueSubscriptionManager.RegisterEventHandlerSubscription<AccountPointSubtractedHandler>(
+            serviceProvider.CreateScope().ServiceProvider, 
+            MessageType.AccountPointSubtracted);
     }
 }

@@ -35,6 +35,22 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
+          "Host": "bike-rental-account-service",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/api/v1/account/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "OktaProvider",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
           "Host": "user-service-13062022.herokuapp.com",
           "Port": 443
         }

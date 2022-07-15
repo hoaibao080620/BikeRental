@@ -28,7 +28,7 @@ public class StripeService : IStripeService
         var options = new PaymentIntentCreateOptions
         {
             Amount = paymentDto.Point,
-            Currency = "usd",
+            Currency = "vnd",
             PaymentMethodTypes = new List<string>
             {
                 "card"
