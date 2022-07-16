@@ -19,25 +19,33 @@ public class AccountController : ControllerBase
     {
         _mongoService = mongoService;
     }
-    
+
     [HttpGet]
-    public async Task<IActionResult> GetAccountPaymentHistories()
+    public async Task<IActionResult> GetAllAccounts()
     {
-        var email = HttpContext.User.Claims.FirstOrDefault(x => 
-            x.Type == ClaimTypes.NameIdentifier)!.Value;
+        var accounts = await _mongoService.FindAccounts(_ => true);
+        return Ok(accounts);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAccountPaymentHistories([FromQuery] string? email)
+    {
+        var accountEmail = string.IsNullOrEmpty(email) ? HttpContext.User.Claims.FirstOrDefault(x => 
+            x.Type == ClaimTypes.NameIdentifier)!.Value : email;
         var paymentHistories = await _mongoService
-            .FindAccountTransactions(x => x.AccountEmail == email);
+            .FindAccountTransactions(x => x.AccountEmail == accountEmail);
 
         return Ok(paymentHistories);
     }
     
     [HttpGet]
-    public async Task<IActionResult> GetAccountPointHistories()
+    public async Task<IActionResult> GetAccountPointHistories([FromQuery] string? email)
     {
-        var email = HttpContext.User.Claims.FirstOrDefault(x => 
-            x.Type == ClaimTypes.NameIdentifier)!.Value;
+        var accountEmail = string.IsNullOrEmpty(email) ? HttpContext.User.Claims.FirstOrDefault(x => 
+            x.Type == ClaimTypes.NameIdentifier)!.Value : email;
+        
         var paymentHistories = await _mongoService
-            .FindAccountPointHistories(x => x.AccountEmail == email);
+            .FindAccountPointHistories(x => x.AccountEmail == accountEmail);
 
         return Ok(paymentHistories);
     }
