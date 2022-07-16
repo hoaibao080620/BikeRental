@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using BikeBookingService.BLL;
 using BikeBookingService.Dtos.BikeOperation;
+using BikeBookingService.Validations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,10 +13,12 @@ namespace BikeBookingService.Controllers;
 public class BikeTrackingController : ControllerBase
 {
     private readonly IBikeTrackingBusinessLogic _bikeTrackingBusinessLogic;
+    private readonly IBikeTrackingValidation _bikeTrackingValidation;
 
-    public BikeTrackingController(IBikeTrackingBusinessLogic bikeTrackingBusinessLogic)
+    public BikeTrackingController(IBikeTrackingBusinessLogic bikeTrackingBusinessLogic, IBikeTrackingValidation bikeTrackingValidation)
     {
         _bikeTrackingBusinessLogic = bikeTrackingBusinessLogic;
+        _bikeTrackingValidation = bikeTrackingValidation;
     }
     
     [HttpGet]
@@ -48,6 +51,9 @@ public class BikeTrackingController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Checking(BikeCheckinDto bikeCheckinDto)
     {
+        var isBikeCheckinWrongTime = await _bikeTrackingValidation.IsBikeCheckinWrongTime(bikeCheckinDto.CheckinTime);
+        if (isBikeCheckinWrongTime) return BadRequest("You cannot checkin from 10pm to 6am!");
+        
         var email = HttpContext.User.Claims.FirstOrDefault(x => 
             x.Type == ClaimTypes.NameIdentifier)!.Value;
         

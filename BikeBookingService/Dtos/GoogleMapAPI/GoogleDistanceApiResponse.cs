@@ -1,6 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿#nullable disable
+using Newtonsoft.Json;
 
-namespace BikeService.Sonic.Dtos.GoogleMapAPI;
+namespace BikeBookingService.Dtos.GoogleMapAPI;
 
 public class Distance
 {

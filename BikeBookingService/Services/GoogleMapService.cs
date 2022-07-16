@@ -1,4 +1,5 @@
-﻿using BikeService.Sonic.Dtos.GoogleMapAPI;
+﻿using BikeBookingService.Dtos.GoogleMapAPI;
+using BikeService.Sonic.Dtos.GoogleMapAPI;
 using BikeBookingService.Services;
 using Newtonsoft.Json;
 

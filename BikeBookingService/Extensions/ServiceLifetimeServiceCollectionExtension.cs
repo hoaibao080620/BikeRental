@@ -1,6 +1,7 @@
 ﻿using BikeBookingService.BLL;
 using BikeBookingService.DAL;
 using BikeBookingService.MessageQueue.Publisher;
+using BikeBookingService.Validations;
 using BikeRental.MessageQueue.Consumer;
 using BikeRental.MessageQueue.Publisher;
 using BikeRental.MessageQueue.SubscriptionManager;
@@ -25,6 +26,7 @@ public static class ServiceLifetimeServiceCollectionExtension
         serviceCollection.AddScoped<IConsumer, SqsConsumer>();
         serviceCollection.AddScoped<IBikeTrackingBusinessLogic, BikeTrackingBusinessLogic>();
         serviceCollection.AddScoped<IMessageQueuePublisher, MessageQueuePublisher>();
+        serviceCollection.AddScoped<IBikeTrackingValidation, BikeTrackingValidation>();
     }
     
     public static void AddSingletonServices(this IServiceCollection serviceCollection)
