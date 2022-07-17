@@ -11,4 +11,5 @@ public class Bike : BaseEntity
     [ForeignKey("BikeStationId")]
     public BikeStation? BikeStation { get; set; }
     public string Status { get; set; } = null!;
+    public bool IsLock { get; set; }
 }

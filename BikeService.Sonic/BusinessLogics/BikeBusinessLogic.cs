@@ -158,7 +158,15 @@ public class BikeBusinessLogic : IBikeBusinessLogic
             await _messageQueuePublisher.PublishBikeDeletedEvent(bike.Id);
         }
     }
-    
+
+    public async Task UnlockBike(int bikeId)
+    {
+        var bike = await _unitOfWork.BikeRepository.GetById(bikeId);
+        if (bike is null) return;
+        bike.IsLock = true;
+        await _unitOfWork.SaveChangesAsync();
+    }
+
     private async Task<Bike> GetBikeById(int bikeId)
     {
         var bike = await _unitOfWork.BikeRepository.GetById(bikeId) ?? throw new BikeNotFoundException(bikeId);

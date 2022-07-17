@@ -10,4 +10,5 @@ public interface IBikeBusinessLogic
     Task UpdateBike(BikeUpdateDto bikeInsertDto);
     Task DeleteBike(int id);
     Task DeleteBikes(List<int> bikeIds);
+    Task UnlockBike(int bikeId);
 }

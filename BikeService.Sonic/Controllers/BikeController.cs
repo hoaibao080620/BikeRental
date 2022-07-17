@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using BikeService.Sonic.BusinessLogics;
+using BikeService.Sonic.Dtos;
 using BikeService.Sonic.Dtos.Bike;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -85,5 +86,13 @@ public class BikeController : ControllerBase
         {
             return BadRequest(exception.Message);
         }
+    }
+    
+    [HttpPut]
+    [Route("[action]")]
+    public async Task<IActionResult> UnlockBike([FromBody] BikeUnlockDto bikeUnlockDto)
+    {
+        await _bikeBusinessLogic.UnlockBike(bikeUnlockDto.BikeId);
+        return Ok();
     }
 }

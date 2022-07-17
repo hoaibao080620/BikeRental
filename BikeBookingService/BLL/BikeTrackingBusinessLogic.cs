@@ -139,12 +139,15 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
 
     public async Task BikeCheckout(BikeCheckoutDto bikeCheckout, string accountEmail)
     {
+        var bikeRenting = (await _unitOfWork.BikeRentalTrackingRepository
+            .Find(x => x.Account.Email == accountEmail)).FirstOrDefault()!;
+        
         var managerEmails = (await _bikeServiceGrpc.GetManagerEmailsOfBikeIdAsync(new GetManagerEmailsRequest
         {
-            BikeId = bikeCheckout.BikeId
+            BikeId = bikeRenting.BikeId
         })).ManagerEmails.ToList();
         
-        var bike = await GetBikeById(bikeCheckout.BikeId);
+        var bike = await GetBikeById(bikeRenting.BikeId);
         var address = await _googleMapService.GetAddressOfLocation(
             bikeCheckout.Longitude,
             bikeCheckout.Latitude);
@@ -152,7 +155,14 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
         ArgumentNullException.ThrowIfNull(address);
         var rentingPoint = 20;
         var pushEventToMapTask = _messageQueuePublisher.PublishBikeLocationChangeCommand(managerEmails);
-        var stopTrackingBikeTask = StopTrackingBike(bikeCheckout, accountEmail, address, rentingPoint);
+        var stopTrackingBikeTask = StopTrackingBike(new StopTrackingBikeParam
+        {
+            AccountEmail = accountEmail,
+            Address = address,
+            BikeCheckoutDto = bikeCheckout,
+            BikeId = bikeRenting.BikeId,
+            RentingPoint = rentingPoint
+        });
         // var updateBikeCache = UpdateBikeCache(new BikeCacheParameter
         // {
         //     BikeId = bike.Id,
@@ -309,28 +319,29 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
                ?? throw new InvalidOperationException($"Account with email {email} not found!");
     }
     
-    private async Task StopTrackingBike(BikeCheckoutDto bikeCheckoutDto, string userEmail, string address, double rentingPoint)
+    private async Task StopTrackingBike(StopTrackingBikeParam stopTrackingBikeParam)
     {
-        var finishBikeRentalBooking = await FinishBikeRentalBooking(bikeCheckoutDto, userEmail, rentingPoint); 
+        var finishBikeRentalBooking = await FinishBikeRentalBooking(
+            stopTrackingBikeParam.BikeCheckoutDto, stopTrackingBikeParam.AccountEmail, stopTrackingBikeParam.RentingPoint); 
         var bikeLocationTracking = (await _unitOfWork.BikeLocationTrackingRepository
-                                       .Find(b => b.BikeId == bikeCheckoutDto.BikeId)).FirstOrDefault()
+                                       .Find(b => b.BikeId == stopTrackingBikeParam.BikeId)).FirstOrDefault()
                                    ?? throw new InvalidOperationException();
 
         bikeLocationTracking.IsActive = false;
         bikeLocationTracking.UpdatedOn = DateTime.UtcNow;
-        bikeLocationTracking.Address = address;
-        bikeLocationTracking.Latitude = bikeCheckoutDto.Latitude;
-        bikeLocationTracking.Longitude = bikeCheckoutDto.Longitude;
+        bikeLocationTracking.Address = stopTrackingBikeParam.Address;
+        bikeLocationTracking.Latitude = stopTrackingBikeParam.BikeCheckoutDto.Latitude;
+        bikeLocationTracking.Longitude = stopTrackingBikeParam.BikeCheckoutDto.Longitude;
         
         await _unitOfWork.BikeLocationTrackingHistoryRepository.Add(new BikeLocationTrackingHistory
         {
-            BikeId = bikeCheckoutDto.BikeId,
+            BikeId = stopTrackingBikeParam.BikeId,
             CreatedOn = DateTime.UtcNow,
             UpdatedOn = DateTime.UtcNow,
             IsActive = true,
-            Latitude = bikeCheckoutDto.Latitude,
-            Longitude = bikeCheckoutDto.Longitude,
-            Address = address,
+            Latitude = stopTrackingBikeParam.BikeCheckoutDto.Latitude,
+            Longitude = stopTrackingBikeParam.BikeCheckoutDto.Longitude,
+            Address = stopTrackingBikeParam.Address,
             BikeRentalBooking = finishBikeRentalBooking
         });
     }

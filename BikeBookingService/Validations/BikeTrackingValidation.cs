@@ -47,4 +47,13 @@ public class BikeTrackingValidation : IBikeTrackingValidation
 
         return isAccountHasBikeRentingNotFullyPaid;
     }
+
+    public async ValueTask<bool> IsAccountIsRentingBike(string accountEmail)
+    {
+        var isAccountHasRentingBike = (await _unitOfWork.BikeRentalTrackingRepository
+                .Find(x => x.Account.Email == accountEmail && x.CheckoutOn == null))
+            .Any();
+
+        return isAccountHasRentingBike;
+    }
 }

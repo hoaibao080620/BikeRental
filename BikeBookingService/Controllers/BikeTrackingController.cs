@@ -81,11 +81,12 @@ public class BikeTrackingController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Checkout(BikeCheckoutDto bikeCheckoutDto)
     {
-        if (bikeCheckoutDto.BikeStationId is null)
-            return BadRequest("You have to scan QR code of station before scan bike QR code");
-        
         var email = HttpContext.User.Claims.FirstOrDefault(x => 
             x.Type == ClaimTypes.NameIdentifier)!.Value;
+
+        var isRenting = await _bikeTrackingValidation.IsAccountIsRentingBike(email);
+
+        if (!isRenting) return BadRequest("Tài khoản của bạn đang không thuê xe nên không thể trả xe!");
         
         await _bikeTrackingBusinessLogic.BikeCheckout(bikeCheckoutDto, email);
         
@@ -93,8 +94,8 @@ public class BikeTrackingController : ControllerBase
         if (!isBikeCheckoutWrongTime) return Ok();
         
         await LockAccount(email, Request.Headers[HeaderNames.Authorization]);
-        return BadRequest("Your account has been locked and cannot rent bike in next time due to late checkout after 22pm, " +
-                          "please contact admin to unlock account!");
+        return BadRequest("Tài khoản của bạn đã bị khóa và không thể thuê xe ở lần tới vì đã trả xe muộn (sau 22h), " +
+                          "liên hệ với chúng tôi qua hotline để mở tải khoản. Xin cảm ơn!");
     }
     
     [HttpGet]
