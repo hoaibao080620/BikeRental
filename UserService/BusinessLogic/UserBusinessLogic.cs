@@ -63,7 +63,6 @@ public class UserBusinessLogic : IUserBusinessLogic
 
     public async Task AddUser(UserInsertDto user)
     {
-        user.RoleName ??= UserRole.User;
         var userAdded = new User
         {
             RoleName = user.RoleName,
@@ -79,7 +78,17 @@ public class UserBusinessLogic : IUserBusinessLogic
         
         await _mongoService.AddUser(userAdded);
         await _messageQueuePublisher.PublishUserAddedEventToMessageQueue(userAdded);
-        var oktaUserId = await AddUserToOkta(user);
+        var oktaUserId = await AddUserToOkta(new OktaUserInsertParam
+        {
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Address = user.Address,
+            DateOfBirth = user.DateOfBirth,
+            Email = user.Email,
+            Password = user.Password,
+            PhoneNumber = user.PhoneNumber,
+            RoleName = user.RoleName
+        });
 
         var updateOktaUserBuilder = Builders<User>.Update.Set(x => x.OktaUserId, oktaUserId);
         await _mongoService.UpdateUser(userAdded.Id, updateOktaUserBuilder);
@@ -181,17 +190,61 @@ public class UserBusinessLogic : IUserBusinessLogic
         }
     }
 
-    private async Task<string?> AddUserToOkta(UserInsertDto userInsertDto)
+    public async Task ForgetPassword(ForgetPasswordDto forgetPasswordDto)
     {
-        var group = (await _mongoService.GetRoles()).FirstOrDefault(x => x.Name == userInsertDto.RoleName)!;
+        var user = (await _mongoService
+            .FindUser(x => x.PhoneNumber == forgetPasswordDto.PhoneNumber))
+            .FirstOrDefault();
+
+        if (user is null) return;
+        await _oktaClient.UpdateOktaUserPassword(user.OktaUserId!, forgetPasswordDto.NewPassword);
+    }
+
+    public async Task SignUp(SignUpDto signUpDto)
+    {
+        var userAdded = new User
+        {
+            RoleName = UserRole.User,
+            Address = signUpDto.Address,
+            Email = $"{signUpDto.PhoneNumber.Replace("+", "")}@gmail.com",
+            FirstName = signUpDto.FirstName,
+            LastName = signUpDto.LastName,
+            PhoneNumber = signUpDto.PhoneNumber,
+            DateOfBirth = signUpDto.DateOfBirth,
+            CreatedOn = DateTime.Now,
+            IsActive = true
+        };
+        
+        await _mongoService.AddUser(userAdded);
+        await _messageQueuePublisher.PublishUserAddedEventToMessageQueue(userAdded);
+        var oktaUserId = await AddUserToOkta(new OktaUserInsertParam
+        {
+            FirstName = signUpDto.FirstName,
+            LastName = signUpDto.LastName,
+            Address = signUpDto.Address,
+            DateOfBirth = signUpDto.DateOfBirth,
+            Email = $"{signUpDto.PhoneNumber.Replace("+", "")}@gmail.com",
+            Password = signUpDto.Password,
+            PhoneNumber = signUpDto.PhoneNumber,
+            RoleName = UserRole.User
+        });
+
+        var updateOktaUserBuilder = Builders<User>.Update.Set(x => x.OktaUserId, oktaUserId);
+        await _mongoService.UpdateUser(userAdded.Id, updateOktaUserBuilder);
+    }
+
+    private async Task<string?> AddUserToOkta(OktaUserInsertParam oktaInsertParam)
+    {
+        var group = (await _mongoService.GetRoles()).FirstOrDefault(x => x.Name == oktaInsertParam.RoleName)!;
     
         var oktaUserId =  await _oktaClient.AddUserToOkta(new OktaUserInsertDto
         {
-            FirstName = userInsertDto.FirstName,
-            LastName = userInsertDto.LastName,
-            Email = userInsertDto.Email,
-            PhoneNumber = userInsertDto.PhoneNumber,
-            GroupId = group.OktaRoleId
+            FirstName = oktaInsertParam.FirstName,
+            LastName = oktaInsertParam.LastName,
+            Email = oktaInsertParam.Email,
+            PhoneNumber = oktaInsertParam.PhoneNumber,
+            GroupId = group.OktaRoleId,
+            Password = oktaInsertParam.Password
         });
     
         return oktaUserId;

@@ -12,4 +12,6 @@ public interface IUserBusinessLogic
     Task DeleteUser(string id);
     public Task<UserProfileDto?> GetUserProfile(string email);
     public Task SyncOktaUsers();
+    public Task ForgetPassword(ForgetPasswordDto forgetPasswordDto);
+    public Task SignUp(SignUpDto signUpDto);
 }

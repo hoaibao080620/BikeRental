@@ -1,6 +1,6 @@
-﻿using System.Security.Claims;
+﻿using System.Net.Http.Headers;
+using System.Security.Claims;
 using AccountService.DataAccess;
-using AccountService.Dto;
 using AccountService.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,6 +24,20 @@ public class AccountController : ControllerBase
     public async Task<IActionResult> GetAllAccounts()
     {
         var accounts = await _mongoService.FindAccounts(_ => true);
+        return Ok(accounts);
+    }
+    
+    [HttpGet]
+    public async Task<IActionResult> GetAllAccountTransactions()
+    {
+        var accounts = await _mongoService.FindAccountTransactions(_ => true);
+        return Ok(accounts);
+    }
+    
+    [HttpGet]
+    public async Task<IActionResult> GetAllAccountPointHistories()
+    {
+        var accounts = await _mongoService.FindAccountPointHistories(_ => true);
         return Ok(accounts);
     }
 
@@ -50,23 +64,32 @@ public class AccountController : ControllerBase
         return Ok(paymentHistories);
     }
     
-    [HttpPut]
-    public async Task<IActionResult> TryToMinusPoint([FromBody] AccountPointSubtract accountPointSubtract)
+    [HttpGet]
+    public async Task<IActionResult> IsAccountHasEnoughPoint([FromQuery] string accountEmail)
     {
-        var email = HttpContext.User.Claims.FirstOrDefault(x => 
-            x.Type == ClaimTypes.NameIdentifier)!.Value;
-
-        var account = (await _mongoService.FindAccounts(x => x.Email == email)).FirstOrDefault();
-
-        if (account is null) return NotFound();
-
-        if (account.Point < accountPointSubtract.Point) return BadRequest("You does not have enough point!");
-        
+        var account = (await _mongoService.FindAccounts(x => x.Email == accountEmail)).FirstOrDefault();
+        return Ok(account?.Point >= 50);
+    }
+    
+    [HttpPut]
+    public async Task<IActionResult> LockAccount([FromQuery] string accountId)
+    {
         var builder = Builders<Account>.Update
-            .Set(x => x.Point, account.Point - accountPointSubtract.Point);
+            .Set(x => x.IsActive, false)
+            .Set(x => x.UpdatedOn, DateTime.Now);
 
-        await _mongoService.UpdateAccount(account.Id, builder);
+        await _mongoService.UpdateAccount(accountId, builder);
+        return Ok();
+    }
+    
+    [HttpPut]
+    public async Task<IActionResult> UnlockAccount([FromQuery] string accountId)
+    {
+        var builder = Builders<Account>.Update
+            .Set(x => x.IsActive, true)
+            .Set(x => x.UpdatedOn, DateTime.Now);
 
+        await _mongoService.UpdateAccount(accountId, builder);
         return Ok();
     }
 }

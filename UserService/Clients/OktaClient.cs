@@ -32,6 +32,13 @@ public class OktaClient : IOktaClient
                     login = oktaUserInsertDto.Email,
                     mobilePhone =  oktaUserInsertDto.PhoneNumber
                 },
+                credentials = new
+                {
+                    password = new
+                    {
+                        value = oktaUserInsertDto.Password
+                    }
+                },
                 groupIds = new List<string>
                 {
                     oktaUserInsertDto.GroupId
@@ -79,5 +86,23 @@ public class OktaClient : IOktaClient
         await _httpClient.PutAsJsonAsync(
             $"{_baseUrl}/api/v1/groups/{newGroupId}/users/{oktaUserId}", 
             string.Empty);
+    }
+
+    public async Task UpdateOktaUserPassword(string oktaUserId, string password)
+    {
+        var content = new StringContent(
+            JsonConvert.SerializeObject(new
+            {
+                credentials = new
+                {
+                    password = new
+                    {
+                        value = password
+                    }
+                }
+            }), 
+            Encoding.UTF8, "application/json");
+
+        await _httpClient.PostAsync($"{_baseUrl}/api/v1/users/{oktaUserId}", content);
     }
 }

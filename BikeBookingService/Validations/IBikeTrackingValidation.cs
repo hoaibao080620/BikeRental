@@ -2,6 +2,8 @@
 
 public interface IBikeTrackingValidation
 {
-    ValueTask<bool> IsBikeCheckinWrongTime(DateTime checkinTime);
-    ValueTask<bool> IsAccountHasEnoughPoint(string accountEmail);
+    ValueTask<bool> IsBikeCheckinOrCheckoutWrongTime(DateTime checkinTime);
+    ValueTask<bool> IsAccountHasEnoughPoint(string accountEmail, string token);
+    ValueTask<bool> IsAccountHasBikeRentingNotFullyPaid(string accountEmail);
+    ValueTask<bool> IsAccountHasBikeRentingPending(string accountEmail);
 }

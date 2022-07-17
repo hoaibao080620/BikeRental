@@ -17,7 +17,7 @@ public class UserController : ControllerBase
     {
         _userBusinessLogic = userBusinessLogic;
     }
-    
+
     [HttpGet]
     [Route("[action]")]
     public async Task<IActionResult> GetUserProfile()

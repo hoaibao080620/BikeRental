@@ -31,7 +31,7 @@
       }
     },
     {
-      "DownstreamPathTemplate": "/user",
+      "DownstreamPathTemplate": "/auth/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
@@ -39,8 +39,8 @@
           "Port": 443
         }
       ],
-      "UpstreamPathTemplate": "/api/v1/user-api/user",
-      "UpstreamHttpMethod": [ "POST" ],
+      "UpstreamPathTemplate": "/api/v1/user-api/auth/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "AuthenticationOptions": {
         "AllowedScopes": []
       }
