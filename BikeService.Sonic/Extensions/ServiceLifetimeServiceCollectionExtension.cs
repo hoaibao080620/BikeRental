@@ -62,6 +62,14 @@ public static class ServiceLifetimeServiceCollectionExtension
         messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserRoleUpdatedHandler>(
             serviceProvider.CreateScope().ServiceProvider, 
             MessageType.UserRoleUpdated);
+        
+        messageQueueSubscriptionManager.RegisterEventHandlerSubscription<BikeCheckedInEventHandler>(
+            serviceProvider.CreateScope().ServiceProvider, 
+            MessageType.BikeCheckedIn);
+        
+        messageQueueSubscriptionManager.RegisterEventHandlerSubscription<BikeCheckedOutHandler>(
+            serviceProvider.CreateScope().ServiceProvider, 
+            MessageType.BikeCheckedOut);
     }
     
     public static void AddElasticClient(this IServiceCollection serviceCollection, IConfiguration configuration)

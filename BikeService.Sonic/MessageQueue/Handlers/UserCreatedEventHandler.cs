@@ -19,7 +19,6 @@ public class UserCreatedEventHandler : IMessageQueueHandler
     public async Task Handle(string message)
     {
         var userCreatedMessage = JsonConvert.DeserializeObject<UserCreated>(message);
-
         if (userCreatedMessage?.Role is UserRole.Manager or UserRole.SuperManager)
         {
             await _unitOfWork.ManagerRepository.Add(new Manager

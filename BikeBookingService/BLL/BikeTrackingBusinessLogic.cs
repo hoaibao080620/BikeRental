@@ -153,7 +153,7 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
             bikeCheckout.Latitude);
         
         ArgumentNullException.ThrowIfNull(address);
-        var rentingPoint = 20;
+        var rentingPoint = GetRentingPoint(bikeRenting.CheckinOn, bikeCheckout.CheckoutOn);
         var pushEventToMapTask = _messageQueuePublisher.PublishBikeLocationChangeCommand(managerEmails);
         var stopTrackingBikeTask = StopTrackingBike(new StopTrackingBikeParam
         {
@@ -362,17 +362,12 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
         return bikeRentalBooking;
     }
     
-    // private static double GetRentingPoint(DateTime checkinOn, DateTime checkoutOn)
-    // {
-    //     var duration = checkoutOn.Subtract(checkinOn).TotalHours;
-    //
-    //     return duration switch
-    //     {
-    //         <= TimeDuration.TotalHourOfDay => duration * 2,
-    //         <= TimeDuration.TotalHourOfWeek => duration * 1.0 / TimeDuration.TotalHourOfDay * 20,
-    //         _ => duration * 1.0 / TimeDuration.TotalHourOfWeek * 100
-    //     };
-    // }
+    private static double GetRentingPoint(DateTime checkinOn, DateTime checkoutOn)
+    {
+        var duration = checkoutOn.Subtract(checkinOn).TotalHours;
+
+        return duration * 20;
+    }
     
     private async Task UpdateBikeRentalTracking(BikeLocationDto bikeLocationDto, string address)
     {

@@ -9,5 +9,6 @@ public class AccountPointHistory
     public string Id { get; set; } = null!;
     public double Point { get; set; }
     public string AccountEmail { get; set; } = null!;
+    public string AccountPhoneNumber { get; set; } = null!;
     public DateTime CreatedOn { get; set; }
 }

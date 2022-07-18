@@ -10,5 +10,6 @@ public class AccountTransaction
     public double Amount { get; set; }
     public DateTime TransactionTime { get; set; }
     public string AccountEmail { get; set; } = null!;
+    public string AccountPhoneNumber { get; set; } = null!;
     public DateTime CreatedOn { get; set; }
 }
