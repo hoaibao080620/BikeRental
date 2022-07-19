@@ -2,6 +2,7 @@
 
 service BikeServiceGrpc {
   rpc GetBikeReportStatistics(BikeGetStatisticsRequest) returns (BikeGetStatisticsResponse);
+  rpc GetBikeStationNameById(GetBikeStationNameByIdRequest) returns (GetBikeStationNameByIdResponse);
 }
 
 message BikeGetStatisticsRequest {
@@ -11,4 +12,12 @@ message BikeGetStatisticsRequest {
 message BikeGetStatisticsResponse {
   double total = 1;
   double rateCompare = 2;
+}
+
+message GetBikeStationNameByIdRequest{
+  int32 id = 1;
+}
+
+message GetBikeStationNameByIdResponse{
+  string name = 1;
 }

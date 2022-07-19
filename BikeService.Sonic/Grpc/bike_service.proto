@@ -4,6 +4,7 @@ service BikeServiceGrpc {
   rpc GetBikeIdsOfManager (GetBikeIdsRequest) returns (GetBikeIdsResponse);
   rpc GetManagerEmailsOfBikeId (GetManagerEmailsRequest) returns (GetManagerEmailsResponse);
   rpc GetBikeReportStatistics(GetStatisticsRequest) returns (GetStatisticsResponse);
+  rpc GetBikeStationNameById(GetBikeStationNameByIdRequest) returns (GetBikeStationNameByIdResponse);
 }
 
 message GetBikeIdsRequest {
@@ -29,4 +30,12 @@ message GetStatisticsRequest {
 message GetStatisticsResponse {
   double total = 1;
   double rateCompare = 2;
+}
+
+message GetBikeStationNameByIdRequest{
+  int32 id = 1;
+}
+
+message GetBikeStationNameByIdResponse{
+  string name = 1;
 }
