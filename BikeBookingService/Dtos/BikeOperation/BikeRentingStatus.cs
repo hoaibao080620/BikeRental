@@ -1,4 +1,4 @@
-﻿namespace BikeService.Sonic.Dtos.BikeOperation;
+﻿namespace BikeBookingService.Dtos.BikeOperation;
 
 public class BikeRentingStatus
 {
@@ -6,7 +6,6 @@ public class BikeRentingStatus
     public int? BikeId { get; set; }
     public string? LicensePlate { get; set; } = null!;
     public bool IsRenting { get; set; }
-    public double? LastLongitude { get; set; }
-    public double? LastLatitude { get; set; }
-    public string? LastAddress { get; set; }
+    public int TimeUsing { get; set; }
+    public double? Cost { get; set; }
 }

@@ -236,9 +236,8 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
                 IsRenting = true,
                 BikeId = x.BikeId,
                 LicensePlate = x.Bike.LicensePlate,
-                LastLatitude = x.Bike.BikeLocationTrackings.FirstOrDefault(b => b.IsActive)!.Latitude,
-                LastLongitude = x.Bike.BikeLocationTrackings.FirstOrDefault(b => b.IsActive)!.Longitude,
-                LastAddress = x.Bike.BikeLocationTrackings.FirstOrDefault(b => b.IsActive)!.Address,
+                TimeUsing = DateTime.Now.Subtract(x.CheckinOn).Milliseconds,
+                Cost = Math.Round(GetRentingPoint(x.CheckinOn, DateTime.Now), 2)
             }).FirstOrDefault()!
             : new BikeRentingStatus
             {

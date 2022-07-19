@@ -12,4 +12,5 @@ public class AccountTransaction
     public string AccountEmail { get; set; } = null!;
     public string AccountPhoneNumber { get; set; } = null!;
     public DateTime CreatedOn { get; set; }
+    public string Status { get; set; } = null!;
 }

@@ -1,0 +1,14 @@
+﻿syntax = "proto3";
+
+service BikeBookingServiceGrpc {
+  rpc GetBikeRentingStatistics (GetStatisticsRequest) returns (GetStatisticsResponse);
+}
+
+message GetStatisticsRequest {
+  string filterType = 1;
+}
+
+message GetStatisticsResponse {
+  double total = 1;
+  double rateCompare = 2;
+}

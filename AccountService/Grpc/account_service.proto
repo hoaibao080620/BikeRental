@@ -1,13 +1,15 @@
 ﻿syntax = "proto3";
 
 service AccountServiceGrpc {
-  rpc GetAccountPoint (GetAccountPointRequest) returns (GetAccountPointResponse);
+  rpc GetPaymentStatistics(GetStatisticsRequest) returns (GetStatisticsResponse);
+  rpc GetAccountStatistics(GetStatisticsRequest) returns (GetStatisticsResponse);
 }
 
-message GetAccountPointRequest {
-  string accountEmail = 1;
+message GetStatisticsRequest {
+  string filterType = 1;
 }
 
-message GetAccountPointResponse {
-  double point = 1;
+message GetStatisticsResponse {
+  double total = 1;
+  double rateCompare = 2;
 }

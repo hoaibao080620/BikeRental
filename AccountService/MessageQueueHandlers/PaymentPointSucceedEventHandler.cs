@@ -37,6 +37,7 @@ public class PaymentPointSucceedEventHandler : IMessageQueueHandler
             Amount = payload.Amount,
             CreatedOn = DateTime.Now,
             TransactionTime = DateTime.UtcNow,
+            Status = "Success"
         });
 
         await _mongoService.AddAccountPointHistory(new AccountPointHistory

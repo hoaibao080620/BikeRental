@@ -1,66 +1,29 @@
 ﻿using System.Globalization;
-using BikeService.Sonic.DAL;
+using BikeBookingService.DAL;
 using Grpc.Core;
-using Microsoft.EntityFrameworkCore;
 
-namespace BikeService.Sonic.GrpcServices;
+namespace BikeBookingService.GrpcServices;
 
-public class BikeGrpcService : BikeServiceGrpc.BikeServiceGrpcBase
+public class BikeBookingGrpcService : BikeBookingServiceGrpc.BikeBookingServiceGrpcBase
 {
     private readonly IUnitOfWork _unitOfWork;
 
-    public BikeGrpcService(IUnitOfWork unitOfWork)
+    public BikeBookingGrpcService(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
     }
-    
-    public override async Task<GetBikeIdsResponse> GetBikeIdsOfManager(GetBikeIdsRequest request, ServerCallContext context)
+
+    public override async Task<GetStatisticsResponse> GetBikeRentingStatistics(GetStatisticsRequest request, ServerCallContext context)
     {
-        var manager = (await _unitOfWork.ManagerRepository
-            .Find(x => x.Email == request.ManagerEmail)).FirstOrDefault();
-
-        ArgumentNullException.ThrowIfNull(manager);
-        
-        var bikeIds = (await _unitOfWork.BikeRepository
-            .Find(x =>
-                x.BikeStationId.HasValue &&
-                manager.IsSuperManager || 
-                x.BikeStation!.BikeStationManagers.Any(b => b.Manager.Email == request.ManagerEmail)
-            ))
-            .Select(x => x.Id).ToList();
-
-        return new GetBikeIdsResponse
-        {
-            BikeIds =
-            {
-                bikeIds
-            }
-        };
-    }
-
-    public override async Task<GetManagerEmailsResponse> GetManagerEmailsOfBikeId(GetManagerEmailsRequest request, ServerCallContext context)
-    {
-        var managerEmails = (await _unitOfWork.BikeStationManagerRepository
-                .Find(x => x.BikeStation.Bikes.Any(b => b.Id == request.BikeId)))
-            .AsNoTracking().Select(x => x.Manager.Email).ToList();
-
-        return new GetManagerEmailsResponse
-        {
-            ManagerEmails = {managerEmails}
-        };
-    }
-
-    public override async Task<GetStatisticsResponse> GetBikeReportStatistics(GetStatisticsRequest request, ServerCallContext context)
-    {
-        double totalReports = 0;
-        double previousTotalReports = 0;
+        double totalRenting = 0;
+        double previousTotalRenting = 0;
         var now = DateTime.Now;
         switch (request.FilterType)
         {
             case "week":
                 var dayOfWeek = now.DayOfWeek;
                 var firstDateOfWeek = now.AddDays((int) dayOfWeek * -1);
-                totalReports = (await _unitOfWork.BikeReportRepository
+                totalRenting = (await _unitOfWork.BikeRentalTrackingRepository
                     .Find(x =>
                         x.CreatedOn.Date >= firstDateOfWeek.Date &&
                         x.CreatedOn.Date <= now.Date
@@ -69,7 +32,7 @@ public class BikeGrpcService : BikeServiceGrpc.BikeServiceGrpcBase
                 var previousWeek = ISOWeek.GetWeekOfYear(now) - 1;
                 var firstDateOfPreviousWeek = ISOWeek.ToDateTime(now.Year, previousWeek, DayOfWeek.Monday);
                 var filterDateOfPreviousWeek = ISOWeek.ToDateTime(now.Year, previousWeek, dayOfWeek);
-                previousTotalReports = (await _unitOfWork.BikeReportRepository
+                previousTotalRenting = (await _unitOfWork.BikeRentalTrackingRepository
                     .Find(x =>
                         x.CreatedOn.Date >= firstDateOfPreviousWeek.Date &&
                         x.CreatedOn.Date <= filterDateOfPreviousWeek.Date
@@ -77,7 +40,7 @@ public class BikeGrpcService : BikeServiceGrpc.BikeServiceGrpcBase
                 break;
             case "month":
                 var firstDateOfMonth = new DateTime(now.Year, now.Month, 1);
-                totalReports = (await _unitOfWork.BikeReportRepository
+                totalRenting = (await _unitOfWork.BikeRentalTrackingRepository
                     .Find(x =>
                         x.CreatedOn.Date >= firstDateOfMonth.Date &&
                         x.CreatedOn.Date <= now.Date
@@ -85,7 +48,7 @@ public class BikeGrpcService : BikeServiceGrpc.BikeServiceGrpcBase
 
                 var previousMonth = now.AddMonths(-1);
                 var firstDateOfPreviousMonth= new DateTime(previousMonth.Year, previousMonth.Month, 1);
-                previousTotalReports = (await _unitOfWork.BikeReportRepository
+                previousTotalRenting = (await _unitOfWork.BikeRentalTrackingRepository
                     .Find(x =>
                         x.CreatedOn.Date >= firstDateOfPreviousMonth.Date &&
                         x.CreatedOn.Date <= previousMonth.Date
@@ -93,7 +56,7 @@ public class BikeGrpcService : BikeServiceGrpc.BikeServiceGrpcBase
                 break;
             case "year":
                 var firstDateOfYear = new DateTime(now.Year, 1, 1);
-                totalReports = (await _unitOfWork.BikeReportRepository
+                totalRenting = (await _unitOfWork.BikeRentalTrackingRepository
                     .Find(x =>
                         x.CreatedOn.Date >= firstDateOfYear.Date &&
                         x.CreatedOn.Date <= now.Date
@@ -101,7 +64,7 @@ public class BikeGrpcService : BikeServiceGrpc.BikeServiceGrpcBase
 
                 var previousYear = now.AddYears(-1);
                 var firstDateOfPreviousYear= new DateTime(previousYear.Year, 1, 1);
-                previousTotalReports = (await _unitOfWork.BikeReportRepository
+                previousTotalRenting = (await _unitOfWork.BikeRentalTrackingRepository
                     .Find(x =>
                         x.CreatedOn.Date >= firstDateOfPreviousYear.Date &&
                         x.CreatedOn.Date <= previousYear.Date
@@ -111,8 +74,8 @@ public class BikeGrpcService : BikeServiceGrpc.BikeServiceGrpcBase
 
         return new GetStatisticsResponse
         {
-            RateCompare = previousTotalReports == 0 ? 100 : totalReports / previousTotalReports * 100 - 100,
-            Total = totalReports
+            RateCompare = previousTotalRenting == 0 ? 100 : totalRenting / previousTotalRenting * 100 - 100,
+            Total = totalRenting
         };
     }
 }
