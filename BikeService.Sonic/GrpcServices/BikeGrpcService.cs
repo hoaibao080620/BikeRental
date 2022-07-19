@@ -127,4 +127,13 @@ public class BikeGrpcService : BikeServiceGrpc.BikeServiceGrpcBase
             Total = totalReports
         };
     }
+
+    public override async Task<GetBikeStationNameByIdResponse> GetBikeStationNameById(GetBikeStationNameByIdRequest request, ServerCallContext context)
+    {
+        var bikeStation = await _unitOfWork.BikeStationRepository.GetById(request.Id);
+        return new GetBikeStationNameByIdResponse
+        {
+            Name = bikeStation!.Name
+        };
+    }
 }

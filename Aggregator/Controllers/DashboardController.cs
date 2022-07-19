@@ -1,7 +1,6 @@
 using Aggregator.Dto;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Net.ClientFactory;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Aggregator.Controllers;
@@ -72,5 +71,35 @@ public class DashboardController : ControllerBase
     {
         var rentingChartData = await _bikeBookingServiceGrpc.GetBikeRentingChartDataAsync(new Empty());
         return Ok(rentingChartData.ChartData.ToList());
+    }
+    
+    [HttpGet]
+    public async Task<IActionResult> GetRecentTransactions()
+    {
+        var data = await _accountServiceGrpc.GetRecentTransactionsAsync(new GetRecentTransactionsRequest
+        {
+            NumberOfItem = 4
+        });
+        return Ok(data.Transactions.ToList());
+    }
+    
+    [HttpGet]
+    public async Task<IActionResult> GetTotalRentByBikeStation()
+    {
+        var data = await _bikeBookingServiceGrpc.GetTotalTimesRentingByBikeStationAsync(new Empty());
+        var response = new List<TimeRentingByBikeStationDto>();
+        foreach (var result in data.Result)
+        {
+            response.Add(new TimeRentingByBikeStationDto
+            {
+                BikeStationId = result.BikeStationId,
+                Percentage = result.Percentage,
+                BikeStationName = (await _bikeServiceGrpc.GetBikeStationNameByIdAsync(new GetBikeStationNameByIdRequest
+                {
+                    Id = result.BikeStationId
+                })).Name
+            });
+        }
+        return Ok(response);
     }
 }

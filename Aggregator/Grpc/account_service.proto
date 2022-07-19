@@ -3,6 +3,7 @@
 service AccountServiceGrpc {
   rpc GetPaymentStatistics(AccountGetStatisticsRequest) returns (AccountGetStatisticsResponse);
   rpc GetAccountStatistics(AccountGetStatisticsRequest) returns (AccountGetStatisticsResponse);
+  rpc GetRecentTransactions(GetRecentTransactionsRequest) returns (GetRecentTransactionsResponse);
 }
 
 message AccountGetStatisticsRequest {
@@ -12,4 +13,17 @@ message AccountGetStatisticsRequest {
 message AccountGetStatisticsResponse {
   double total = 1;
   double rateCompare = 2;
+}
+
+message GetRecentTransactionsRequest {
+  int32 numberOfItem = 1;
+}
+
+message GetRecentTransactionsResponse {
+  repeated RecentTransaction transactions = 1;
+}
+
+message RecentTransaction {
+  string status = 1;
+  string content = 2;
 }

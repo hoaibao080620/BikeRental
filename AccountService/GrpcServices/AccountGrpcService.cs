@@ -175,7 +175,7 @@ public class AccountGrpcService : AccountServiceGrpc.AccountServiceGrpcBase
             {
                 Content = $"Tài khoản với số điện thoại {x.AccountPhoneNumber} nạp {x.Amount} vnd!",
                 Status = x.Status
-            });
+            }).ToList();
 
         return new GetRecentTransactionsResponse
         {
