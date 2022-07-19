@@ -23,7 +23,7 @@ public class UserCreatedEventHandler : IMessageQueueHandler
         
         await _mongoService.AddAccount(new Account
         {
-            CreatedOn = DateTime.UtcNow,
+            CreatedOn = DateTime.Now,
             IsActive = true,
             FirstName = userCreatedMessage.FirstName,
             LastName = userCreatedMessage.LastName,

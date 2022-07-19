@@ -46,7 +46,7 @@ public class MongoService : IMongoService
     {
         var builder = Builders<User>.Update
             .Set(x => x.IsActive, false)
-            .Set(x => x.UpdatedOn, DateTime.UtcNow);
+            .Set(x => x.UpdatedOn, DateTime.Now);
         await _userCollection.UpdateOneAsync(id, builder);
     }
 }

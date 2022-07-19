@@ -1,7 +1,7 @@
 ﻿using BikeBookingService.Models;
 using Shared.Repositories;
 
-namespace BikeService.Sonic.DAL;
+namespace BikeBookingService.DAL;
 
 public interface IBikeRentalTrackingRepository : IRepositoryGeneric<BikeRentalBooking>
 {

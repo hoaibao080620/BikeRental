@@ -26,55 +26,70 @@ public class AccountGrpcService : AccountServiceGrpc.AccountServiceGrpcBase
                 totalPayment = (await _mongoService
                     .FindAccountTransactions(x =>
                         x.Status == "Success" &&
-                        x.CreatedOn.Date >= firstDateOfWeek.Date &&
-                        x.CreatedOn.Date <= now.Date)).Sum(x => x.Amount);
+                        x.CreatedOn >= firstDateOfWeek.Date &&
+                        x.CreatedOn <= now)
+                    ).Sum(x => x.Amount);
 
                 var previousWeek = ISOWeek.GetWeekOfYear(now) - 1;
                 var firstDateOfPreviousWeek = ISOWeek.ToDateTime(now.Year, previousWeek, DayOfWeek.Monday);
-                var filterDateOfPreviousWeek = ISOWeek.ToDateTime(now.Year, previousWeek, dayOfWeek);
+                var filterDateOfPreviousWeek = ISOWeek.ToDateTime(now.Year, previousWeek, dayOfWeek).AddDays(1).AddTicks(-1);
                 previousTotalPayment = (await _mongoService
                     .FindAccountTransactions(x =>
                         x.Status == "Success" &&
-                        x.CreatedOn.Date >= firstDateOfPreviousWeek.Date &&
-                        x.CreatedOn.Date <= filterDateOfPreviousWeek.Date)).Sum(x => x.Amount);
+                        x.CreatedOn >= firstDateOfPreviousWeek.Date &&
+                        x.CreatedOn <= filterDateOfPreviousWeek)
+                    ).Sum(x => x.Amount);
                 break;
             case "month":
                 var firstDateOfMonth = new DateTime(now.Year, now.Month, 1);
                 totalPayment = (await _mongoService
                     .FindAccountTransactions(x =>
                         x.Status == "Success" &&
-                        x.CreatedOn.Date >= firstDateOfMonth.Date &&
-                        x.CreatedOn.Date <= now.Date)).Sum(x => x.Amount);
+                        x.CreatedOn >= firstDateOfMonth.Date &&
+                        x.CreatedOn <= now)
+                    ).Sum(x => x.Amount);
 
-                var previousMonth = now.AddMonths(-1);
+                var previousMonth = now.AddMonths(-1).AddDays(1).AddTicks(-1);
                 var firstDateOfPreviousMonth= new DateTime(previousMonth.Year, previousMonth.Month, 1);
                 previousTotalPayment = (await _mongoService
                     .FindAccountTransactions(x =>
                         x.Status == "Success" &&
-                        x.CreatedOn.Date >= firstDateOfPreviousMonth.Date &&
-                        x.CreatedOn.Date <= previousMonth.Date)).Sum(x => x.Amount);
+                        x.CreatedOn >= firstDateOfPreviousMonth.Date &&
+                        x.CreatedOn <= previousMonth)
+                    ).Sum(x => x.Amount);
                 break;
             case "year":
                 var firstDateOfYear = new DateTime(now.Year, 1, 1);
                 totalPayment = (await _mongoService
                     .FindAccountTransactions(x =>
                         x.Status == "Success" &&
-                        x.CreatedOn.Date >= firstDateOfYear.Date &&
-                        x.CreatedOn.Date <= now.Date)).Sum(x => x.Amount);
+                        x.CreatedOn >= firstDateOfYear.Date &&
+                        x.CreatedOn <= now)).Sum(x => x.Amount);
 
-                var previousYear = now.AddYears(-1);
+                var previousYear = now.AddYears(-1).AddDays(1).AddTicks(-1);
                 var firstDateOfPreviousYear= new DateTime(previousYear.Year, 1, 1);
                 previousTotalPayment = (await _mongoService
                     .FindAccountTransactions(x =>
                         x.Status == "Success" &&
-                        x.CreatedOn.Date >= firstDateOfPreviousYear.Date &&
-                        x.CreatedOn.Date <= previousYear.Date)).Sum(x => x.Amount);
+                        x.CreatedOn >= firstDateOfPreviousYear.Date &&
+                        x.CreatedOn <= previousYear))
+                    .Sum(x => x.Amount);
                 break;
+        }
+        
+        double rateCompare;
+        if (previousTotalPayment == 0)
+        {
+            rateCompare = totalPayment == 0 ? 0 : 100;
+        }
+        else
+        {
+            rateCompare = totalPayment / previousTotalPayment * 100 - 100;
         }
 
         return new GetStatisticsResponse
         {
-            RateCompare = previousTotalPayment == 0 ? 100 : totalPayment / previousTotalPayment * 100 - 100,
+            RateCompare = rateCompare,
             Total = totalPayment
         };
     }
@@ -87,54 +102,65 @@ public class AccountGrpcService : AccountServiceGrpc.AccountServiceGrpcBase
         switch (request.FilterType)
         {
             case "week":
-                var dayOfWeek = now.DayOfWeek;
-                var firstDateOfWeek = now.AddDays((int) dayOfWeek * -1);
+                var dayOfWeek = now.DayOfWeek == DayOfWeek.Sunday ? 7 : (int) now.DayOfWeek;
+                var firstDateOfWeek = now.Subtract(TimeSpan.FromDays(dayOfWeek - 1));
                 totalAccounts = (await _mongoService
                     .FindAccounts(x =>
-                        x.CreatedOn.Date >= firstDateOfWeek.Date &&
-                        x.CreatedOn.Date <= now.Date)).Count;
+                        x.CreatedOn >= firstDateOfWeek.Date &&
+                        x.CreatedOn <= now)).Count;
 
                 var previousWeek = ISOWeek.GetWeekOfYear(now) - 1;
                 var firstDateOfPreviousWeek = ISOWeek.ToDateTime(now.Year, previousWeek, DayOfWeek.Monday);
-                var filterDateOfPreviousWeek = ISOWeek.ToDateTime(now.Year, previousWeek, dayOfWeek);
+                var filterDateOfPreviousWeek = ISOWeek.ToDateTime(now.Year, previousWeek, dayOfWeek == 7 ? DayOfWeek.Sunday : (DayOfWeek) dayOfWeek)
+                    .AddDays(1).AddTicks(-1);
                 previousTotalAccount = (await _mongoService
                     .FindAccounts(x =>
-                        x.CreatedOn.Date >= firstDateOfPreviousWeek.Date &&
-                        x.CreatedOn.Date <= filterDateOfPreviousWeek.Date)).Count;
+                        x.CreatedOn >= firstDateOfPreviousWeek.Date &&
+                        x.CreatedOn <= filterDateOfPreviousWeek)).Count;
                 break;
             case "month":
                 var firstDateOfMonth = new DateTime(now.Year, now.Month, 1);
                 totalAccounts = (await _mongoService
                     .FindAccounts(x =>
-                        x.CreatedOn.Date >= firstDateOfMonth.Date &&
-                        x.CreatedOn.Date <= now.Date)).Count;
+                        x.CreatedOn >= firstDateOfMonth.Date &&
+                        x.CreatedOn <= now)).Count;
 
-                var previousMonth = now.AddMonths(-1);
+                var previousMonth = now.AddMonths(-1).AddDays(1).AddTicks(-1);
                 var firstDateOfPreviousMonth= new DateTime(previousMonth.Year, previousMonth.Month, 1);
                 previousTotalAccount = (await _mongoService
                     .FindAccounts(x =>
-                        x.CreatedOn.Date >= firstDateOfPreviousMonth.Date &&
-                        x.CreatedOn.Date <= previousMonth.Date)).Count;
+                        x.CreatedOn >= firstDateOfPreviousMonth.Date &&
+                        x.CreatedOn <= previousMonth)).Count;
                 break;
             case "year":
                 var firstDateOfYear = new DateTime(now.Year, 1, 1);
                 totalAccounts = (await _mongoService
                     .FindAccounts(x =>
-                        x.CreatedOn.Date >= firstDateOfYear.Date &&
-                        x.CreatedOn.Date <= now.Date)).Count;
+                        x.CreatedOn >= firstDateOfYear.Date &&
+                        x.CreatedOn <= now)).Count;
 
-                var previousYear = now.AddYears(-1);
+                var previousYear = now.AddYears(-1).AddDays(1).AddTicks(-1);
                 var firstDateOfPreviousYear= new DateTime(previousYear.Year, 1, 1);
                 previousTotalAccount = (await _mongoService
                     .FindAccounts(x =>
-                        x.CreatedOn.Date >= firstDateOfPreviousYear.Date &&
-                        x.CreatedOn.Date <= previousYear.Date)).Count;
+                        x.CreatedOn >= firstDateOfPreviousYear.Date &&
+                        x.CreatedOn <= previousYear)).Count;
                 break;
+        }
+
+        double rateCompare;
+        if (previousTotalAccount == 0)
+        {
+            rateCompare = totalAccounts == 0 ? 0 : 100;
+        }
+        else
+        {
+            rateCompare = totalAccounts / previousTotalAccount * 100 - 100;
         }
 
         return new GetStatisticsResponse
         {
-            RateCompare = previousTotalAccount == 0 ? 100 : totalAccounts / previousTotalAccount * 100 - 100,
+            RateCompare = rateCompare,
             Total = totalAccounts
         };
     }

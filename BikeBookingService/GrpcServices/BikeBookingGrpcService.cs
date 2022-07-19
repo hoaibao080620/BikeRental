@@ -26,56 +26,66 @@ public class BikeBookingGrpcService : BikeBookingServiceGrpc.BikeBookingServiceG
                 var firstDateOfWeek = now.AddDays((int) dayOfWeek * -1);
                 totalRenting = (await _unitOfWork.BikeRentalTrackingRepository
                     .Find(x =>
-                        x.CreatedOn.Date >= firstDateOfWeek.Date &&
-                        x.CreatedOn.Date <= now.Date
+                        x.CreatedOn >= firstDateOfWeek.Date &&
+                        x.CreatedOn <= now
                     )).Count();
 
                 var previousWeek = ISOWeek.GetWeekOfYear(now) - 1;
                 var firstDateOfPreviousWeek = ISOWeek.ToDateTime(now.Year, previousWeek, DayOfWeek.Monday);
-                var filterDateOfPreviousWeek = ISOWeek.ToDateTime(now.Year, previousWeek, dayOfWeek);
+                var filterDateOfPreviousWeek = ISOWeek.ToDateTime(now.Year, previousWeek, dayOfWeek).AddDays(1).AddTicks(-1);
                 previousTotalRenting = (await _unitOfWork.BikeRentalTrackingRepository
                     .Find(x =>
-                        x.CreatedOn.Date >= firstDateOfPreviousWeek.Date &&
-                        x.CreatedOn.Date <= filterDateOfPreviousWeek.Date
+                        x.CreatedOn >= firstDateOfPreviousWeek.Date &&
+                        x.CreatedOn <= filterDateOfPreviousWeek
                     )).Count();
                 break;
             case "month":
                 var firstDateOfMonth = new DateTime(now.Year, now.Month, 1);
                 totalRenting = (await _unitOfWork.BikeRentalTrackingRepository
                     .Find(x =>
-                        x.CreatedOn.Date >= firstDateOfMonth.Date &&
-                        x.CreatedOn.Date <= now.Date
+                        x.CreatedOn >= firstDateOfMonth.Date &&
+                        x.CreatedOn <= now
                     )).Count();
 
-                var previousMonth = now.AddMonths(-1);
+                var previousMonth = now.AddMonths(-1).AddDays(1).AddTicks(-1);
                 var firstDateOfPreviousMonth= new DateTime(previousMonth.Year, previousMonth.Month, 1);
                 previousTotalRenting = (await _unitOfWork.BikeRentalTrackingRepository
                     .Find(x =>
-                        x.CreatedOn.Date >= firstDateOfPreviousMonth.Date &&
-                        x.CreatedOn.Date <= previousMonth.Date
+                        x.CreatedOn >= firstDateOfPreviousMonth.Date &&
+                        x.CreatedOn <= previousMonth
                     )).Count();
                 break;
             case "year":
                 var firstDateOfYear = new DateTime(now.Year, 1, 1);
                 totalRenting = (await _unitOfWork.BikeRentalTrackingRepository
                     .Find(x =>
-                        x.CreatedOn.Date >= firstDateOfYear.Date &&
-                        x.CreatedOn.Date <= now.Date
+                        x.CreatedOn >= firstDateOfYear.Date &&
+                        x.CreatedOn <= now
                     )).Count();
 
-                var previousYear = now.AddYears(-1);
+                var previousYear = now.AddYears(-1).AddDays(1).AddTicks(-1);
                 var firstDateOfPreviousYear= new DateTime(previousYear.Year, 1, 1);
                 previousTotalRenting = (await _unitOfWork.BikeRentalTrackingRepository
                     .Find(x =>
-                        x.CreatedOn.Date >= firstDateOfPreviousYear.Date &&
-                        x.CreatedOn.Date <= previousYear.Date
+                        x.CreatedOn >= firstDateOfPreviousYear.Date &&
+                        x.CreatedOn <= previousYear
                     )).Count();
                 break;
+        }
+        
+        double rateCompare;
+        if (previousTotalRenting == 0)
+        {
+            rateCompare = totalRenting == 0 ? 0 : 100;
+        }
+        else
+        {
+            rateCompare = totalRenting / previousTotalRenting * 100 - 100;
         }
 
         return new GetStatisticsResponse
         {
-            RateCompare = previousTotalRenting == 0 ? 100 : totalRenting / previousTotalRenting * 100 - 100,
+            RateCompare = rateCompare,
             Total = totalRenting
         };
     }

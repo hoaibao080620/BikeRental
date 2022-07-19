@@ -39,7 +39,7 @@ public class BikeCheckinCommandHandler : IMessageQueueHandler
                     notificationCommand.LicensePlate,
                     notificationCommand.BikeStationName,
                     notificationCommand.CheckinOn),
-                CreatedOn = DateTime.UtcNow,
+                CreatedOn = DateTime.Now,
                 NotificationType = NotificationType.Checkin
             };
             

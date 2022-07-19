@@ -94,7 +94,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
     public async Task UpdateBike(BikeUpdateDto bikeInsertDto)
     {
         var bike = _mapper.Map<Bike>(bikeInsertDto);
-        bike.UpdatedOn = DateTime.UtcNow;
+        bike.UpdatedOn = DateTime.Now;
         var bikeStation = bike.BikeStationId.HasValue ?
             await _unitOfWork.BikeStationRepository.GetById(bike.BikeStationId.Value) : null;
         await _cacheService.Remove(string.Format(RedisCacheKey.SingleBike, bike.Id));

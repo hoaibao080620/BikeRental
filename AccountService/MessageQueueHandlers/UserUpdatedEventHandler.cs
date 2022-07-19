@@ -30,7 +30,7 @@ public class UserUpdatedEventHandler : IMessageQueueHandler
             .Set(x => x.FirstName, userUpdatedMessage.FirstName)
             .Set(x => x.LastName, userUpdatedMessage.LastName)
             .Set(x => x.PhoneNumber, userUpdatedMessage.PhoneNumber)
-            .Set(x => x.UpdatedOn, DateTime.UtcNow);
+            .Set(x => x.UpdatedOn, DateTime.Now);
 
         await _mongoService.UpdateAccount(account.Id, builder);
     }

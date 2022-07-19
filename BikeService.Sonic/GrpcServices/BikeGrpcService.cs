@@ -108,10 +108,20 @@ public class BikeGrpcService : BikeServiceGrpc.BikeServiceGrpcBase
                     )).Count();
                 break;
         }
+        
+        double rateCompare;
+        if (previousTotalReports == 0)
+        {
+            rateCompare = totalReports == 0 ? 0 : 100;
+        }
+        else
+        {
+            rateCompare = totalReports / previousTotalReports * 100 - 100;
+        }
 
         return new GetStatisticsResponse
         {
-            RateCompare = previousTotalReports == 0 ? 100 : totalReports / previousTotalReports * 100 - 100,
+            RateCompare = rateCompare,
             Total = totalReports
         };
     }

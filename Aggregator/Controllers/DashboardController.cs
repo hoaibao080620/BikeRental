@@ -30,11 +30,11 @@ public class DashboardController : ControllerBase
         // {
         //     FilterType = filterType
         // });
-        
-        var getAccountStatistic = await _accountServiceGrpc.GetAccountStatisticsAsync(new AccountGetStatisticsRequest
-        {
-            FilterType = filterType
-        });
+        //
+        // var getAccountStatistic = await _accountServiceGrpc.GetAccountStatisticsAsync(new AccountGetStatisticsRequest
+        // {
+        //     FilterType = filterType
+        // });
 
         var getBikeBookingStatistics = await _bikeBookingServiceGrpc.GetBikeRentingStatisticsAsync(
             new BikeBookingGetStatisticsRequest

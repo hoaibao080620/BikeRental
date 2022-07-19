@@ -32,7 +32,7 @@ public class UserRoleUpdatedHandler : IMessageQueueHandler
             {
                 await _unitOfWork.ManagerRepository.Add(new Manager
                 {
-                    CreatedOn = DateTime.UtcNow,
+                    CreatedOn = DateTime.Now,
                     IsActive = true,
                     Email = payload.Email,
                     ExternalId = payload.UserId,
