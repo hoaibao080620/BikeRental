@@ -1,4 +1,5 @@
 using BikeBookingService.Extensions;
+using BikeBookingService.GrpcServices;
 using BikeBookingService.MessageQueue.Consumer;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddGrpc();
 builder.Services.AddRedisCache(builder.Configuration);
 builder.Services.AddScopedServices();
 builder.Services.AddSingletonServices();
@@ -25,6 +27,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapGrpcService<BikeBookingGrpcService>().EnableGrpcWeb();
 
 app.RegisterMessageHandler();
 app.Run();

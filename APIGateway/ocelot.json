@@ -16,6 +16,21 @@
       }
     },
     {
+      "DownstreamPathTemplate": "{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "api-gateway-agg.herokuapp.com",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/aggregator/{everything}",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "AuthenticationOptions": {
+        "AllowedScopes": []
+      }
+    },
+    {
       "DownstreamPathTemplate": "/validation/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [

@@ -42,9 +42,12 @@ public class MongoService : IMongoService
         await _transactionCollection.InsertOneAsync(accountTransaction);
     }
 
-    public async Task<List<AccountTransaction>> FindAccountTransactions(Expression<Func<AccountTransaction, bool>> expression)
+    public async Task<List<AccountTransaction>> FindAccountTransactions(Expression<Func<AccountTransaction, bool>> expression, int limit = 1000)
     {
-        return await _transactionCollection.Find(expression).ToListAsync();
+        return await _transactionCollection.Find(expression)
+            .SortByDescending(x => x.CreatedOn)
+            .Limit(limit)
+            .ToListAsync();
     }
 
     public async Task AddAccountPointHistory(AccountPointHistory accountPointHistory)

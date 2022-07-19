@@ -1,0 +1,15 @@
+﻿syntax = "proto3";
+
+service AccountServiceGrpc {
+  rpc GetPaymentStatistics(AccountGetStatisticsRequest) returns (AccountGetStatisticsResponse);
+  rpc GetAccountStatistics(AccountGetStatisticsRequest) returns (AccountGetStatisticsResponse);
+}
+
+message AccountGetStatisticsRequest {
+  string filterType = 1;
+}
+
+message AccountGetStatisticsResponse {
+  double total = 1;
+  double rateCompare = 2;
+}

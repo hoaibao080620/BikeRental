@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddOktaAuthenticationService(builder.Configuration);
+builder.Services.RegisterGrpcClient();
 
 var app = builder.Build();
 
