@@ -16,7 +16,7 @@
       }
     },
     {
-      "DownstreamPathTemplate": "{everything}",
+      "DownstreamPathTemplate": "/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
