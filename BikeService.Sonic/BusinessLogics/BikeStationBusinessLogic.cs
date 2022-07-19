@@ -61,7 +61,7 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
     public async Task AddStationBike(BikeStationInsertDto bikeInsertDto)
     {
         var bikeStation = _mapper.Map<BikeStation>(bikeInsertDto);
-        bikeStation.CreatedOn = DateTime.Now;
+        bikeStation.CreatedOn = DateTime.UtcNow;
         bikeStation.IsActive = true;
         var (latitude, longitude) = await _googleMapService.GetLocationOfAddress(bikeInsertDto.PlaceId);
         bikeStation.Latitude = latitude;
@@ -122,14 +122,14 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
                     BikeStationId = bikeStationColorDto.BikeStationId,
                     Manager = manager!,
                     Color = bikeStationColorDto.Color,
-                    CreatedOn = DateTime.Now,
+                    CreatedOn = DateTime.UtcNow,
                     IsActive = true
                 });
             }
             else
             {
                 bikeStationColor.Color = bikeStationColorDto.Color;
-                bikeStationColor.UpdatedOn = DateTime.Now;
+                bikeStationColor.UpdatedOn = DateTime.UtcNow;
             }
         }
 
@@ -284,9 +284,9 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
                 {
                     BikeStationId = bikeStationId,
                     ManagerId = bikeStationManagerAssign.ManagerId,
-                    CreatedOn = DateTime.Now,
+                    CreatedOn = DateTime.UtcNow,
                     IsActive = true,
-                    UpdatedOn = DateTime.Now
+                    UpdatedOn = DateTime.UtcNow
                 });
             }
             else

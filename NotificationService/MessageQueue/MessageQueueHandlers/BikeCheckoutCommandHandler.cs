@@ -40,7 +40,7 @@ public class BikeCheckoutCommandHandler : IMessageQueueHandler
                     notificationCommand.LicensePlate,
                     notificationCommand.BikeStationName,
                     notificationCommand.CheckoutOn),
-                CreatedOn = DateTime.Now,
+                CreatedOn = DateTime.UtcNow,
                 NotificationType = NotificationType.Checkout
             };
 

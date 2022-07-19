@@ -13,7 +13,7 @@ public class Account
     public string Email { get; set; } = null!;
     public string PhoneNumber { get; set; } = null!;
     public string ExternalUserId { get; set; } = null!;
-    public DateTime CreatedOn { get; set; } = DateTime.Now;
-    public DateTime? UpdatedOn { get; set; } = DateTime.Now;
+    public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
+    public DateTime? UpdatedOn { get; set; } = DateTime.UtcNow;
     public bool IsActive { get; set; }
 }

@@ -68,7 +68,7 @@ public class StripeService : IStripeService
                 {
                     Amount = paymentIntent.Amount,
                     Email = paymentIntent.Customer?.Email ?? paymentCharge!.ReceiptEmail,
-                    PaymentOn = DateTime.Now,
+                    PaymentOn = DateTime.UtcNow,
                     MessageType = MessageType.PaymentSucceeded
                 });
                 break;
@@ -81,7 +81,7 @@ public class StripeService : IStripeService
             //     {
             //         Amount = paymentIntent.Amount,
             //         Email = paymentIntent.Customer?.Email ?? paymentCharge.ReceiptEmail,
-            //         FailedOn = DateTime.Now,
+            //         FailedOn = DateTime.UtcNow,
             //         FailureMessage = paymentCharge.FailureMessage,
             //         MessageType = MessageType.PaymentFailed
             //     });
@@ -95,7 +95,7 @@ public class StripeService : IStripeService
             //     {
             //         Amount = paymentIntent.Amount,
             //         Email = paymentIntent.Customer?.Email ?? paymentCharge.ReceiptEmail,
-            //         FailedOn = DateTime.Now,
+            //         FailedOn = DateTime.UtcNow,
             //         FailureMessage = paymentCharge.FailureMessage,
             //         MessageType = MessageType.PaymentFailed
             //     });

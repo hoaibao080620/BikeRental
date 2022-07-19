@@ -23,7 +23,7 @@ public class UserCreatedEventHandler : IMessageQueueHandler
         {
             await _unitOfWork.ManagerRepository.Add(new Manager
             {
-                CreatedOn = DateTime.Now,
+                CreatedOn = DateTime.UtcNow,
                 IsActive = true,
                 Email = userCreatedMessage.Email,
                 ExternalId = userCreatedMessage.Id,

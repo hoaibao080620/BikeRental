@@ -17,7 +17,7 @@ public class AccountGrpcService : AccountServiceGrpc.AccountServiceGrpcBase
     {
         double totalPayment = 0;
         double previousTotalPayment = 0;
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
         switch (request.FilterType)
         {
             case "week":
@@ -98,7 +98,7 @@ public class AccountGrpcService : AccountServiceGrpc.AccountServiceGrpcBase
     {
         double totalAccounts = 0;
         double previousTotalAccount = 0;
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
         switch (request.FilterType)
         {
             case "week":

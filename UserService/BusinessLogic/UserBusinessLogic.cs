@@ -72,7 +72,7 @@ public class UserBusinessLogic : IUserBusinessLogic
             LastName = user.LastName,
             PhoneNumber = user.PhoneNumber,
             DateOfBirth = user.DateOfBirth,
-            CreatedOn = DateTime.Now,
+            CreatedOn = DateTime.UtcNow,
             IsActive = true
         };
         
@@ -105,7 +105,7 @@ public class UserBusinessLogic : IUserBusinessLogic
             .Set(x => x.Address, user.Address)
             .Set(x => x.PhoneNumber, user.PhoneNumber)
             .Set(x => x.DateOfBirth, user.DateOfBirth)
-            .Set(x => x.UpdatedOn, DateTime.Now);
+            .Set(x => x.UpdatedOn, DateTime.UtcNow);
         
         await _mongoService.UpdateUser(userId, builder);
         
@@ -211,7 +211,7 @@ public class UserBusinessLogic : IUserBusinessLogic
             LastName = signUpDto.LastName,
             PhoneNumber = signUpDto.PhoneNumber,
             DateOfBirth = signUpDto.DateOfBirth,
-            CreatedOn = DateTime.Now,
+            CreatedOn = DateTime.UtcNow,
             IsActive = true
         };
         

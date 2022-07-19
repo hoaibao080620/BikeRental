@@ -15,7 +15,8 @@ public class BikeTrackingValidation : IBikeTrackingValidation
     
     public ValueTask<bool> IsBikeCheckinOrCheckoutWrongTime(DateTime checkinTime)
     {
-        return new ValueTask<bool>(checkinTime.Hour is >= 22 or < 6);
+        var localTime = TimeZoneInfo.ConvertTimeFromUtc(checkinTime, TimeZoneInfo.FindSystemTimeZoneById("Asia/Bangkok"));
+        return new ValueTask<bool>(localTime.Hour is >= 22 or < 6);
     }
 
     public async ValueTask<bool> IsAccountHasEnoughPoint(string accountEmail, string token)

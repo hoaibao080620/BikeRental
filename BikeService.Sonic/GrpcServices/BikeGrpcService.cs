@@ -54,7 +54,7 @@ public class BikeGrpcService : BikeServiceGrpc.BikeServiceGrpcBase
     {
         double totalReports = 0;
         double previousTotalReports = 0;
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
         switch (request.FilterType)
         {
             case "week":

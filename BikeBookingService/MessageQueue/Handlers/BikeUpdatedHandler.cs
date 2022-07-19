@@ -22,7 +22,7 @@ public class BikeUpdatedHandler : IMessageQueueHandler
 
         bike.BikeStationId = payload.BikeStationId ?? bike.BikeStationId;
         bike.BikeStationName = payload.BikeStationName ?? bike.BikeStationName;
-        bike.UpdatedOn = DateTime.Now;
+        bike.UpdatedOn = DateTime.UtcNow;
         bike.Description = payload.Description ?? bike.Description;
         bike.LicensePlate = payload.LicensePlate ?? bike.LicensePlate;
         bike.Color = payload.Color ?? bike.Color;

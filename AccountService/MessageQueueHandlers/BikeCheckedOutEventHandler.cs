@@ -55,8 +55,8 @@ public class BikeCheckedOutEventHandler : IMessageQueueHandler
         {
             AccountEmail = account.Email,
             Amount = payload.RentingPoint * 1000,
-            CreatedOn = DateTime.Now,
-            TransactionTime = DateTime.Now,
+            CreatedOn = DateTime.UtcNow,
+            TransactionTime = DateTime.UtcNow,
             AccountPhoneNumber = account.Email.Split("@").First()
         });
         
@@ -64,7 +64,7 @@ public class BikeCheckedOutEventHandler : IMessageQueueHandler
         {
             AccountEmail = account.Email,
             Point = payload.RentingPoint * -1,
-            CreatedOn = DateTime.Now,
+            CreatedOn = DateTime.UtcNow,
             AccountPhoneNumber = account.Email.Split("@").First()
         });
     }

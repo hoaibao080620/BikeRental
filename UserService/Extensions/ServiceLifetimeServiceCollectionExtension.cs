@@ -21,7 +21,6 @@ public static class ServiceLifetimeServiceCollectionExtension
     
     public static void AddMongoDb(this IServiceCollection serviceCollection, IConfiguration configuration)
     {
-        BsonSerializer.RegisterSerializer(DateTimeSerializer.LocalInstance);
         var connectionString = configuration["MongoDB:ConnectionString"];
         var databaseName = configuration["MongoDB:Database"];
         var client = new MongoClient(connectionString);

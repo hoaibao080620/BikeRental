@@ -18,10 +18,8 @@ builder.Services.RunMigrations();
 builder.Services.RegisterMessageHandlers();
 builder.Services.AddHostedService<MessageQueueConsumer>();
 
-
 // App pipelines
 var app = builder.Build();
-
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();

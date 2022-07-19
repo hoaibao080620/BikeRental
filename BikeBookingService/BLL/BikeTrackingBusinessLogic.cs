@@ -236,8 +236,8 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
                 IsRenting = true,
                 BikeId = x.BikeId,
                 LicensePlate = x.Bike.LicensePlate,
-                TimeUsing = DateTime.Now.Subtract(x.CheckinOn).Milliseconds,
-                Cost = Math.Round(GetRentingPoint(x.CheckinOn, DateTime.Now), 2)
+                TimeUsing = DateTime.UtcNow.Subtract(x.CheckinOn).Milliseconds,
+                Cost = Math.Round(GetRentingPoint(x.CheckinOn, DateTime.UtcNow), 2)
             }).FirstOrDefault()!
             : new BikeRentingStatus
             {
@@ -266,8 +266,8 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
             await _unitOfWork.BikeLocationTrackingRepository.Add(new BikeLocationTracking
             {
                 BikeId = bikeCheckinDto.BikeId,
-                CreatedOn = DateTime.Now,
-                UpdatedOn = DateTime.Now,
+                CreatedOn = DateTime.UtcNow,
+                UpdatedOn = DateTime.UtcNow,
                 IsActive = true,
                 Longitude = bikeCheckinDto.Longitude,
                 Latitude = bikeCheckinDto.Latitude,
@@ -276,7 +276,7 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
         }
         else
         {
-            bikeTracking.UpdatedOn = DateTime.Now;
+            bikeTracking.UpdatedOn = DateTime.UtcNow;
             bikeTracking.IsActive = true;
             bikeTracking.Longitude = bikeCheckinDto.Longitude;
             bikeTracking.Latitude = bikeCheckinDto.Latitude;
@@ -286,8 +286,8 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
         await _unitOfWork.BikeLocationTrackingHistoryRepository.Add(new BikeLocationTrackingHistory
         {
             BikeId = bikeCheckinDto.BikeId,
-            CreatedOn = DateTime.Now,
-            UpdatedOn = DateTime.Now,
+            CreatedOn = DateTime.UtcNow,
+            UpdatedOn = DateTime.UtcNow,
             IsActive = true,
             Latitude = bikeCheckinDto.Latitude,
             Longitude = bikeCheckinDto.Longitude,
@@ -305,7 +305,7 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
             AccountId = account.Id,
             BikeId = bikeCheckinDto.BikeId,
             IsActive = true,
-            CreatedOn = DateTime.Now
+            CreatedOn = DateTime.UtcNow
         };
         
         await _unitOfWork.BikeRentalTrackingRepository.Add(bikeRentalTracking);
@@ -327,7 +327,7 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
                                    ?? throw new InvalidOperationException();
 
         bikeLocationTracking.IsActive = false;
-        bikeLocationTracking.UpdatedOn = DateTime.Now;
+        bikeLocationTracking.UpdatedOn = DateTime.UtcNow;
         bikeLocationTracking.Address = stopTrackingBikeParam.Address;
         bikeLocationTracking.Latitude = stopTrackingBikeParam.BikeCheckoutDto.Latitude;
         bikeLocationTracking.Longitude = stopTrackingBikeParam.BikeCheckoutDto.Longitude;
@@ -335,8 +335,8 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
         await _unitOfWork.BikeLocationTrackingHistoryRepository.Add(new BikeLocationTrackingHistory
         {
             BikeId = stopTrackingBikeParam.BikeId,
-            CreatedOn = DateTime.Now,
-            UpdatedOn = DateTime.Now,
+            CreatedOn = DateTime.UtcNow,
+            UpdatedOn = DateTime.UtcNow,
             IsActive = true,
             Latitude = stopTrackingBikeParam.BikeCheckoutDto.Latitude,
             Longitude = stopTrackingBikeParam.BikeCheckoutDto.Longitude,
@@ -354,7 +354,7 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
         
         ArgumentNullException.ThrowIfNull(bikeRentalBooking);
         bikeRentalBooking.CheckoutOn = bikeCheckoutDto.CheckoutOn;
-        bikeRentalBooking.UpdatedOn = DateTime.Now;
+        bikeRentalBooking.UpdatedOn = DateTime.UtcNow;
         bikeRentalBooking.TotalPoint = rentingPoint;
         bikeRentalBooking.PaymentStatus = PaymentStatus.PENDING;
 
@@ -375,7 +375,7 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
         
         bikeRentalTracking!.Latitude = bikeLocationDto.Latitude;
         bikeRentalTracking.Longitude = bikeLocationDto.Longitude;
-        bikeRentalTracking.UpdatedOn = DateTime.Now;
+        bikeRentalTracking.UpdatedOn = DateTime.UtcNow;
         bikeRentalTracking.Address = address;
 
         var latestBikeRentalHistory = (await _unitOfWork.BikeLocationTrackingHistoryRepository.Find(
@@ -384,8 +384,8 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
         await _unitOfWork.BikeLocationTrackingHistoryRepository.Add(new BikeLocationTrackingHistory
         {
             BikeId = bikeLocationDto.BikeId,
-            CreatedOn = DateTime.Now,
-            UpdatedOn = DateTime.Now,
+            CreatedOn = DateTime.UtcNow,
+            UpdatedOn = DateTime.UtcNow,
             IsActive = true,
             Latitude = bikeLocationDto.Latitude,
             Longitude = bikeLocationDto.Longitude,

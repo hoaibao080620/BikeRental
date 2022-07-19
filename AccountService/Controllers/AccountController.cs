@@ -76,7 +76,7 @@ public class AccountController : ControllerBase
     {
         var builder = Builders<Account>.Update
             .Set(x => x.IsActive, false)
-            .Set(x => x.UpdatedOn, DateTime.Now);
+            .Set(x => x.UpdatedOn, DateTime.UtcNow);
 
         await _mongoService.UpdateAccount(accountId, builder);
         return Ok();
@@ -87,7 +87,7 @@ public class AccountController : ControllerBase
     {
         var builder = Builders<Account>.Update
             .Set(x => x.IsActive, true)
-            .Set(x => x.UpdatedOn, DateTime.Now);
+            .Set(x => x.UpdatedOn, DateTime.UtcNow);
 
         await _mongoService.UpdateAccount(accountId, builder);
         return Ok();

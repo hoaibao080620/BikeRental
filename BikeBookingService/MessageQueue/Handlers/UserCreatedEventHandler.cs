@@ -23,7 +23,7 @@ public class UserCreatedEventHandler : IMessageQueueHandler
         
         await _unitOfWork.AccountRepository.Add(new Account
         {
-            CreatedOn = DateTime.Now,
+            CreatedOn = DateTime.UtcNow,
             IsActive = true,
             Email = userCreatedMessage.Email,
             PhoneNumber = userCreatedMessage.PhoneNumber!,

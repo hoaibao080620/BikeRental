@@ -35,8 +35,8 @@ public class PaymentPointSucceedEventHandler : IMessageQueueHandler
         {
             AccountEmail = account.Email,
             Amount = payload.Amount,
-            CreatedOn = DateTime.Now,
-            TransactionTime = DateTime.Now,
+            CreatedOn = DateTime.UtcNow,
+            TransactionTime = DateTime.UtcNow,
             Status = "Success"
         });
 
@@ -44,7 +44,7 @@ public class PaymentPointSucceedEventHandler : IMessageQueueHandler
         {
             AccountEmail = account.Email,
             Point = payload.Amount/ 1000,
-            CreatedOn = DateTime.Now,
+            CreatedOn = DateTime.UtcNow,
             AccountPhoneNumber = account.PhoneNumber
         });
     }

@@ -58,7 +58,7 @@ public class BikeCsvImportService : IImportService
                 Description = string.IsNullOrEmpty(description) ? null : description,
                 BikeStationId = bikeStationDict[bikeStationName]?.Id,
                 IsActive = true,
-                CreatedOn = DateTime.Now,
+                CreatedOn = DateTime.UtcNow,
                 Status = BikeStatus.Available
             });
         }

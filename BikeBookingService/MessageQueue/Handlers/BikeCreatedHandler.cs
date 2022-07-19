@@ -24,7 +24,7 @@ public class BikeCreatedHandler : IMessageQueueHandler
             Id = payload.Id,
             BikeStationId = payload.BikeStationId,
             BikeStationName = payload.BikeStationName,
-            CreatedOn = DateTime.Now,
+            CreatedOn = DateTime.UtcNow,
             Description = payload.Description,
             IsActive = true,
             LicensePlate = payload.LicensePlate,

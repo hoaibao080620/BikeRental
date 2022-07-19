@@ -18,7 +18,7 @@ public class BikeBookingGrpcService : BikeBookingServiceGrpc.BikeBookingServiceG
     {
         double totalRenting = 0;
         double previousTotalRenting = 0;
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
         switch (request.FilterType)
         {
             case "week":
@@ -92,7 +92,7 @@ public class BikeBookingGrpcService : BikeBookingServiceGrpc.BikeBookingServiceG
 
     public override async Task<GetRentingChartDataResponse> GetBikeRentingChartData(Empty request, ServerCallContext context)
     {
-        var today = DateTime.Now;
+        var today = DateTime.UtcNow;
         var dayOfWeek = today.DayOfWeek == DayOfWeek.Sunday ? 7 : (int) today.DayOfWeek;
         var chartData = new List<int>();
 

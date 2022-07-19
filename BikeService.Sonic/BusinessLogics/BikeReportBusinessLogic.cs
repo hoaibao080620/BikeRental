@@ -24,7 +24,7 @@ public class BikeReportBusinessLogic : IBikeReportBusinessLogic
 
         await _unitOfWork.BikeReportRepository.Add(new BikeReport
         {
-            CreatedOn = DateTime.Now,
+            CreatedOn = DateTime.UtcNow,
             IsActive = true,
             BikeId = bikeReportInsertDto.BikeId,
             Status = BikeReportStatus.NoFix,
@@ -72,9 +72,9 @@ public class BikeReportBusinessLogic : IBikeReportBusinessLogic
         var bikeReport = await _unitOfWork.BikeReportRepository.GetById(markReportAsResolveDto.BikeReportId);
         if (bikeReport is null) return;
         
-        bikeReport.CompletedOn = DateTime.Now;
+        bikeReport.CompletedOn = DateTime.UtcNow;
         bikeReport.Status = markReportAsResolveDto.Status;
-        bikeReport.UpdatedOn = DateTime.Now;
+        bikeReport.UpdatedOn = DateTime.UtcNow;
         bikeReport.ManagerFeedback = markReportAsResolveDto.ManagerFeedback;
         await _unitOfWork.SaveChangesAsync();
     }
