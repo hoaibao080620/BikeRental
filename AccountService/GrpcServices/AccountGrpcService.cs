@@ -1,6 +1,8 @@
 ﻿using System.Globalization;
 using AccountService.DataAccess;
 using Grpc.Core;
+using Shared.Service;
+using TimeZone = Shared.Consts.TimeZone;
 
 namespace AccountService.GrpcServices;
 

@@ -26,47 +26,45 @@ public class DashboardController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetNumberStatistics([FromQuery] string? filterType = "week")
     {
-        // var getRevenueStatistic = await _accountServiceGrpc.GetPaymentStatisticsAsync(new AccountGetStatisticsRequest
-        // {
-        //     FilterType = filterType
-        // });
-        //
-        // var getAccountStatistic = await _accountServiceGrpc.GetAccountStatisticsAsync(new AccountGetStatisticsRequest
-        // {
-        //     FilterType = filterType
-        // });
+        var getRevenueStatistic = _accountServiceGrpc.GetPaymentStatisticsAsync(new AccountGetStatisticsRequest
+        {
+            FilterType = filterType
+        });
+        
+        var getAccountStatistic = _accountServiceGrpc.GetAccountStatisticsAsync(new AccountGetStatisticsRequest
+        {
+            FilterType = filterType
+        });
 
-        var getBikeBookingStatistics = await _bikeBookingServiceGrpc.GetBikeRentingStatisticsAsync(
+        var getBikeBookingStatistics = _bikeBookingServiceGrpc.GetBikeRentingStatisticsAsync(
             new BikeBookingGetStatisticsRequest
             {
                 FilterType = filterType
             });
 
-        var getBikeReportStatistics = await _bikeServiceGrpc.GetBikeReportStatisticsAsync(new BikeGetStatisticsRequest
+        var getBikeReportStatistics = _bikeServiceGrpc.GetBikeReportStatisticsAsync(new BikeGetStatisticsRequest
         {
             FilterType = filterType
         });
 
-        // await Task.WhenAll(
-        //     getRevenueStatistic.ResponseAsync, 
-        //     getAccountStatistic.ResponseAsync,
-        //     getBikeBookingStatistics.ResponseAsync,
-        //     getBikeReportStatistics.ResponseAsync
-        // );
-        //
-        // return Ok(new NumberStatisticDto
-        // {
-        //     TotalRevenue = getRevenueStatistic.ResponseAsync.Result.Total,
-        //     RevenueRateCompare = getRevenueStatistic.ResponseAsync.Result.RateCompare,
-        //     TotalAccount = getAccountStatistic.ResponseAsync.Result.Total,
-        //     AccountRateCompare = getAccountStatistic.ResponseAsync.Result.RateCompare,
-        //     TotalBikeRental = getBikeBookingStatistics.ResponseAsync.Result.Total,
-        //     BikeRentalRateCompare = getBikeBookingStatistics.ResponseAsync.Result.RateCompare,
-        //     TotalBikeReport = getBikeReportStatistics.ResponseAsync.Result.Total,
-        //     BikeReportRateCompare = getBikeReportStatistics.ResponseAsync.Result.RateCompare
-        // });
-
-        return Ok();
+        await Task.WhenAll(
+            getRevenueStatistic.ResponseAsync, 
+            getAccountStatistic.ResponseAsync,
+            getBikeBookingStatistics.ResponseAsync,
+            getBikeReportStatistics.ResponseAsync
+        );
+        
+        return Ok(new NumberStatisticDto
+        {
+            TotalRevenue = getRevenueStatistic.ResponseAsync.Result.Total,
+            RevenueRateCompare = getRevenueStatistic.ResponseAsync.Result.RateCompare,
+            TotalAccount = getAccountStatistic.ResponseAsync.Result.Total,
+            AccountRateCompare = getAccountStatistic.ResponseAsync.Result.RateCompare,
+            TotalBikeRental = getBikeBookingStatistics.ResponseAsync.Result.Total,
+            BikeRentalRateCompare = getBikeBookingStatistics.ResponseAsync.Result.RateCompare,
+            TotalBikeReport = getBikeReportStatistics.ResponseAsync.Result.Total,
+            BikeReportRateCompare = getBikeReportStatistics.ResponseAsync.Result.RateCompare
+        });
     }
 
     [HttpGet]

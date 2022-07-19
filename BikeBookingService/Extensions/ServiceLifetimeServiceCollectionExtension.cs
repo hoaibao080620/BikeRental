@@ -27,6 +27,7 @@ public static class ServiceLifetimeServiceCollectionExtension
         serviceCollection.AddScoped<IBikeTrackingBusinessLogic, BikeTrackingBusinessLogic>();
         serviceCollection.AddScoped<IMessageQueuePublisher, MessageQueuePublisher>();
         serviceCollection.AddScoped<IBikeTrackingValidation, BikeTrackingValidation>();
+
     }
     
     public static void AddSingletonServices(this IServiceCollection serviceCollection)

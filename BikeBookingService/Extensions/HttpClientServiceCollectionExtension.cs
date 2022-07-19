@@ -1,6 +1,5 @@
 ﻿using BikeBookingService.Controllers;
 using BikeBookingService.Services;
-using BikeBookingService.Validations;
 using BikeService.Sonic.Services.Implementation;
 
 namespace BikeBookingService.Extensions;
@@ -11,6 +10,5 @@ public static class HttpClientServiceCollectionExtension
     {
         serviceCollection.AddHttpClient<IGoogleMapService, GoogleMapService>();
         serviceCollection.AddHttpClient<BikeTrackingController>();
-        serviceCollection.AddHttpClient<IBikeTrackingValidation, BikeTrackingValidation>();
     }
 }

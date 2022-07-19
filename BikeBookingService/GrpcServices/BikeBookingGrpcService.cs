@@ -2,6 +2,8 @@
 using BikeBookingService.DAL;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using Shared.Service;
+using TimeZone = Shared.Consts.TimeZone;
 
 namespace BikeBookingService.GrpcServices;
 
@@ -24,10 +26,12 @@ public class BikeBookingGrpcService : BikeBookingServiceGrpc.BikeBookingServiceG
             case "week":
                 var dayOfWeek = now.DayOfWeek;
                 var firstDateOfWeek = now.AddDays((int) dayOfWeek * -1);
+                var test = (await _unitOfWork.BikeRentalTrackingRepository
+                    .Find(x => true)).FirstOrDefault();
                 totalRenting = (await _unitOfWork.BikeRentalTrackingRepository
                     .Find(x =>
                         x.CreatedOn >= firstDateOfWeek.Date &&
-                        x.CreatedOn <= now
+                        x.CreatedOn.Date <= now
                     )).Count();
 
                 var previousWeek = ISOWeek.GetWeekOfYear(now) - 1;

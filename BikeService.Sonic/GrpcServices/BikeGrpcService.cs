@@ -2,6 +2,8 @@
 using BikeService.Sonic.DAL;
 using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
+using Shared.Service;
+using TimeZone = Shared.Consts.TimeZone;
 
 namespace BikeService.Sonic.GrpcServices;
 
@@ -62,7 +64,7 @@ public class BikeGrpcService : BikeServiceGrpc.BikeServiceGrpcBase
                 var firstDateOfWeek = now.AddDays((int) dayOfWeek * -1);
                 totalReports = (await _unitOfWork.BikeReportRepository
                     .Find(x =>
-                        x.CreatedOn.Date >= firstDateOfWeek.Date &&
+                        x.CreatedOn >= firstDateOfWeek.Date &&
                         x.CreatedOn.Date <= now.Date
                     )).Count();
 

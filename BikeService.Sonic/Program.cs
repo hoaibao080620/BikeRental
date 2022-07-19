@@ -3,6 +3,7 @@ using BikeService.Sonic.Extensions;
 using BikeService.Sonic.GrpcServices;
 
 var builder = WebApplication.CreateBuilder(args);
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 builder.Services.AddGrpc();
 builder.Services.AddControllers();
