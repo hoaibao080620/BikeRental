@@ -19,6 +19,13 @@ public class AccountController : ControllerBase
     {
         _mongoService = mongoService;
     }
+    
+    [HttpGet]
+    [AllowAnonymous]
+    public async Task<IActionResult> TestSentry()
+    {
+        throw new InvalidOperationException();
+    }
 
     [HttpGet]
     public async Task<IActionResult> GetAllAccounts()

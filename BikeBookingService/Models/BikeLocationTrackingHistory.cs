@@ -12,6 +12,7 @@ public class BikeLocationTrackingHistory : BaseEntity
     [ForeignKey("BikeId")]
     public Bike Bike { get; set; } = null!;
     public int BikeRentalTrackingId { get; set; }
+    public double DistanceFromPreviousLocation { get; set; }
     [ForeignKey("BikeRentalTrackingId")]
     public BikeRentalBooking BikeRentalBooking { get; set; } = null!;
 }

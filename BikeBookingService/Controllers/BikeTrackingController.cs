@@ -6,6 +6,7 @@ using BikeBookingService.Validations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
+using Sentry;
 
 namespace BikeBookingService.Controllers;
 
@@ -21,6 +22,14 @@ public class BikeTrackingController : ControllerBase
     {
         _bikeTrackingBusinessLogic = bikeTrackingBusinessLogic;
         _bikeTrackingValidation = bikeTrackingValidation;
+    }
+    
+    [AllowAnonymous]
+    [HttpGet]
+    public async Task<IActionResult> TestSentry()
+    {
+        SentrySdk.CaptureMessage("Bad request in TestSentry", SentryLevel.Fatal);
+        return BadRequest();
     }
     
     [HttpGet]

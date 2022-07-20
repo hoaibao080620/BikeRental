@@ -390,7 +390,8 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
             Latitude = bikeLocationDto.Latitude,
             Longitude = bikeLocationDto.Longitude,
             Address = address,
-            BikeRentalTrackingId = latestBikeRentalHistory!.BikeRentalTrackingId
+            BikeRentalTrackingId = latestBikeRentalHistory!.BikeRentalTrackingId,
+            DistanceFromPreviousLocation = bikeLocationDto.Distance
         });
     }
 }
