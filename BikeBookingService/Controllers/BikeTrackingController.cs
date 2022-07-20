@@ -5,7 +5,6 @@ using BikeBookingService.Dtos.BikeOperation;
 using BikeBookingService.Validations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Net.Http.Headers;
 using Sentry;
 
 namespace BikeBookingService.Controllers;
@@ -62,26 +61,27 @@ public class BikeTrackingController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Checking(BikeCheckinDto bikeCheckinDto)
     {
-        var isBikeCheckinWrongTime = await _bikeTrackingValidation.IsBikeCheckinOrCheckoutWrongTime(bikeCheckinDto.CheckinTime);
-        if (isBikeCheckinWrongTime) return BadRequest("You cannot checkin from 10pm to 6am!");
+        // var isBikeCheckinWrongTime = await _bikeTrackingValidation.IsBikeCheckinOrCheckoutWrongTime(bikeCheckinDto.CheckinTime);
+        // if (isBikeCheckinWrongTime) return BadRequest("Bạn không thể checkin trong khoảng thời gian sau 10h tối và trước 6h sáng!");
         var email = HttpContext.User.Claims.FirstOrDefault(x => 
             x.Type == ClaimTypes.NameIdentifier)!.Value;
 
-        var isBikeHasEnoughPoint = await _bikeTrackingValidation.IsAccountHasEnoughPoint(
-            email,
-            Request.Headers[HeaderNames.Authorization]);
-
-        if (!isBikeHasEnoughPoint) return BadRequest("You have to have at least 50 point!");
+        // var isBikeHasEnoughPoint = await _bikeTrackingValidation.IsAccountHasEnoughPoint(
+        //     email,
+        //     Request.Headers[HeaderNames.Authorization]);
+        //
+        // if (!isBikeHasEnoughPoint) return BadRequest("Bạn phải có ít nhất 50đ trong tài khoản!");
 
         var isAccountHasBikeRentingPending = await _bikeTrackingValidation
             .IsAccountHasBikeRentingPending(email);
         
-        if(isAccountHasBikeRentingPending) return BadRequest("You have a bike renting which still processing, please wait a minutes!");
+        if(isAccountHasBikeRentingPending) return BadRequest("Bạn có 1 lần thuê xe đang được xử lí, xin chờ trong giây lát và thử lại!");
         
         var isAccountHasBikeRentingNotFullyPaid = await _bikeTrackingValidation
             .IsAccountHasBikeRentingNotFullyPaid(email);
         
-        if(isAccountHasBikeRentingNotFullyPaid) return BadRequest("You have a bike renting which not filly paid, please add points to continue checking!");
+        if(isAccountHasBikeRentingNotFullyPaid) return BadRequest("Bạn hiện đang có 1 lần thuê xe chưa hoàn thành thanh toán, " +
+                                                                  "xin vui lòng nạp điểm và thử lại!");
         
         await _bikeTrackingBusinessLogic.BikeChecking(bikeCheckinDto, email);
         return Ok();
@@ -99,12 +99,14 @@ public class BikeTrackingController : ControllerBase
         
         await _bikeTrackingBusinessLogic.BikeCheckout(bikeCheckoutDto, email);
         
-        var isBikeCheckoutWrongTime = await _bikeTrackingValidation.IsBikeCheckinOrCheckoutWrongTime(bikeCheckoutDto.CheckoutOn);
-        if (!isBikeCheckoutWrongTime) return Ok();
-        
-        await LockAccount(email, Request.Headers[HeaderNames.Authorization]);
-        return BadRequest("Tài khoản của bạn đã bị khóa và không thể thuê xe ở lần tới vì đã trả xe muộn (sau 22h), " +
-                          "liên hệ với chúng tôi qua hotline để mở tải khoản. Xin cảm ơn!");
+        // var isBikeCheckoutWrongTime = await _bikeTrackingValidation.IsBikeCheckinOrCheckoutWrongTime(bikeCheckoutDto.CheckoutOn);
+        // if (!isBikeCheckoutWrongTime) return Ok();
+        //
+        // await LockAccount(email, Request.Headers[HeaderNames.Authorization]);
+        // return BadRequest("Tài khoản của bạn đã bị khóa và không thể thuê xe ở lần tới vì đã trả xe muộn (sau 22h), " +
+        //                   "liên hệ với chúng tôi qua hotline để mở tải khoản. Xin cảm ơn!");
+
+        return Ok();
     }
     
     [HttpGet]

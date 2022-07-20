@@ -42,4 +42,11 @@ public class MessageQueuePublisher : IMessageQueuePublisher
         var payload = JsonConvert.SerializeObject(accountPointLimitExceeded);
         var topic = _configuration["MessageQueue:BikeTrackingTopic"];
         await _publisher.SendMessage(payload, topic);    }
+
+    public async Task PublishAccountDebtHasBeenPaidEvent(AccountDebtHasBeenPaid accountDebtHasBeenPaid)
+    {
+        var payload = JsonConvert.SerializeObject(accountDebtHasBeenPaid);
+        var topic = _configuration["MessageQueue:BikeTrackingTopic"];
+        await _publisher.SendMessage(payload, topic);    
+    }    
 }

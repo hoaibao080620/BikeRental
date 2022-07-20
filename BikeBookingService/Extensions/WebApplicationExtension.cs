@@ -46,5 +46,9 @@ public static class WebApplicationExtension
         messageQueueSubscriptionManager.RegisterEventHandlerSubscription<AccountPointSubtractedHandler>(
             serviceProvider.CreateScope().ServiceProvider, 
             MessageType.AccountPointSubtracted);
+        
+        messageQueueSubscriptionManager.RegisterEventHandlerSubscription<AccountDebtHasBeenPaidHandler>(
+            serviceProvider.CreateScope().ServiceProvider, 
+            MessageType.AccountDebtHasBeenPaid);
     }
 }

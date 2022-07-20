@@ -29,7 +29,12 @@ public class BikeCheckedOutEventHandler : IMessageQueueHandler
             .FindAccounts(x => x.Email == payload.AccountEmail))
             .First();
 
-        if (account.Point < payload.RentingPoint)
+        var pointAfterMinus = account.Point - payload.RentingPoint;
+        var updateBuilder = Builders<Account>.Update
+            .Set(x => x.Point, pointAfterMinus);
+        await _mongoService.UpdateAccount(account.Id, updateBuilder);
+        
+        if (pointAfterMinus < 0)
         {
             await _messageQueuePublisher.PublishAccountPointLimitExceededEvent(new AccountPointLimitExceeded
             {
@@ -39,11 +44,7 @@ public class BikeCheckedOutEventHandler : IMessageQueueHandler
             });
             return;
         }
-
-        var updateBuilder = Builders<Account>.Update
-            .Set(x => x.Point, account.Point - payload.RentingPoint);
-
-        await _mongoService.UpdateAccount(account.Id, updateBuilder);
+        
         await _messageQueuePublisher.PublishAccountPointSubtractedEvent(new AccountPointSubtracted
         {
             AccountId = account.Id,
