@@ -70,12 +70,12 @@ public class BikeTrackingController : ControllerBase
         //     email,
         //     Request.Headers[HeaderNames.Authorization]);
         //
-        // if (!isBikeHasEnoughPoint) return BadRequest("Bạn phải có ít nhất 50đ trong tài khoản!");
+        // if (!isBikeHasEnoughPoint) return BadRequest("Bạn phải có ít nhất 50 điểm trong tài khoản!");
 
         var isAccountHasBikeRentingPending = await _bikeTrackingValidation
             .IsAccountHasBikeRentingPending(email);
         
-        if(isAccountHasBikeRentingPending) return BadRequest("Bạn có 1 lần thuê xe đang được xử lí, xin chờ trong giây lát và thử lại!");
+        if(isAccountHasBikeRentingPending) return BadRequest("Bạn hiện tại đang thuê xe và không thể checkin, xin cảm ơn!");
         
         var isAccountHasBikeRentingNotFullyPaid = await _bikeTrackingValidation
             .IsAccountHasBikeRentingNotFullyPaid(email);

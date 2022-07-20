@@ -104,7 +104,8 @@ public class BikeBookingGrpcService : BikeBookingServiceGrpc.BikeBookingServiceG
         {
             var dateByDateOfWeek = today.Subtract(TimeSpan.FromDays(dayOfWeek - i)).Date;
             var totalByDate = (await _unitOfWork.BikeRentalTrackingRepository
-                .Find(x => x.CheckoutOn == null && x.CreatedOn.Date == dateByDateOfWeek)).Count();
+                .Find(x => x.CheckoutOn != null && x.UpdatedOn.HasValue
+                                                && x.UpdatedOn.Value.Date == dateByDateOfWeek)).Count();
             
             chartData.Add(totalByDate);
         }
@@ -118,7 +119,7 @@ public class BikeBookingGrpcService : BikeBookingServiceGrpc.BikeBookingServiceG
     public override async Task<GetTopThreeBikeHasBeenRentResponse> GetTopThreeBikeHasBeenRent(Empty request, ServerCallContext context)
     {
         var topThreeBikeRent = (await _unitOfWork.BikeRentalTrackingRepository
-                .Find(x => x.CheckoutOn == null && x.Bike.IsActive))
+                .Find(x => x.CheckoutOn != null && x.Bike.IsActive))
             .GroupBy(x => new
             {
                 x.BikeId,

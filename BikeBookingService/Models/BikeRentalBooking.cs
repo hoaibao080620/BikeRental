@@ -8,6 +8,8 @@ public class BikeRentalBooking : BaseEntity
     public DateTime CheckinOn { get; set; }
     public DateTime? CheckoutOn { get; set; }
     public double TotalPoint { get; set; }
+    public int CheckinBikeStationId { get; set; }
+    public int? CheckoutBikeStationId { get; set; }
     public int AccountId { get; set; }
     [ForeignKey(nameof(AccountId))]
     public Account Account { get; set; } = null!;

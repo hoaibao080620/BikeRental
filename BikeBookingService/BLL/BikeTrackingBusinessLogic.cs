@@ -178,8 +178,7 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
             {
                 ManagerEmails = managerEmails,
                 BikeId = bike.Id,
-                BikeStationId = bike.BikeStationId!.Value,
-                BikeStationName = bike.BikeStationName!,
+                BikeStationId = bikeCheckout.BikeStationId.GetValueOrDefault(),
                 AccountEmail = accountEmail,
                 LicensePlate = bike.LicensePlate,
                 CheckoutOn = bikeCheckout.CheckoutOn,
@@ -298,6 +297,7 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
     
     private async Task<BikeRentalBooking> CreateBikeRentalBooking(BikeCheckinDto bikeCheckinDto, string accountEmail)
     {
+        var bike = await GetBikeById(bikeCheckinDto.BikeId);
         var account = await GetAccountByEmail(accountEmail);
         var bikeRentalTracking = new BikeRentalBooking
         {
@@ -305,7 +305,8 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
             AccountId = account.Id,
             BikeId = bikeCheckinDto.BikeId,
             IsActive = true,
-            CreatedOn = DateTime.UtcNow
+            CreatedOn = DateTime.UtcNow,
+            CheckinBikeStationId = bike.BikeStationId!.Value
         };
         
         await _unitOfWork.BikeRentalTrackingRepository.Add(bikeRentalTracking);
@@ -357,6 +358,7 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
         bikeRentalBooking.UpdatedOn = DateTime.UtcNow;
         bikeRentalBooking.TotalPoint = rentingPoint;
         bikeRentalBooking.PaymentStatus = PaymentStatus.PENDING;
+        bikeRentalBooking.CheckoutBikeStationId = bikeCheckoutDto.BikeStationId;
 
         return bikeRentalBooking;
     }
