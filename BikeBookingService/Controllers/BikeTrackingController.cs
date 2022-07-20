@@ -61,6 +61,10 @@ public class BikeTrackingController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Checking(BikeCheckinDto bikeCheckinDto)
     {
+        var isRenting = await _bikeTrackingValidation.IsAccountIsRentingBike(email);
+        if (isRenting)
+            return BadRequest("Bạn hiện tại đang thuê xe, xin vui lòng hoàn thành trả xe trước khi thuê xe mới!");
+        
         // var isBikeCheckinWrongTime = await _bikeTrackingValidation.IsBikeCheckinOrCheckoutWrongTime(bikeCheckinDto.CheckinTime);
         // if (isBikeCheckinWrongTime) return BadRequest("Bạn không thể checkin trong khoảng thời gian sau 10h tối và trước 6h sáng!");
         var email = HttpContext.User.Claims.FirstOrDefault(x => 
@@ -75,7 +79,8 @@ public class BikeTrackingController : ControllerBase
         var isAccountHasBikeRentingPending = await _bikeTrackingValidation
             .IsAccountHasBikeRentingPending(email);
         
-        if(isAccountHasBikeRentingPending) return BadRequest("Bạn hiện tại đang thuê xe và không thể checkin, xin cảm ơn!");
+        if(isAccountHasBikeRentingPending) return BadRequest("Bạn hiện tại đang có 1 thanh toán đang trong quá trình xử lí" +
+                                                             ", xin chờ trong giây lát và thử lại, xin cảm ơn!");
         
         var isAccountHasBikeRentingNotFullyPaid = await _bikeTrackingValidation
             .IsAccountHasBikeRentingNotFullyPaid(email);

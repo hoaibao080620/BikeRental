@@ -163,18 +163,26 @@ public class BikeBookingGrpcService : BikeBookingServiceGrpc.BikeBookingServiceG
             .Find(x => x.CheckoutOn == null && x.Bike.IsActive && x.Bike.BikeStationId.HasValue);
 
         var totalBikeRental = bikeRentals.Count();
-            
-        var result = bikeRentals
-            .GroupBy(x => x.Bike.BikeStationId)
-            .Select(x => new TotalTimesRentingByBikeStation
-            {
-                BikeStationId = x.Key!.Value,
-                Percentage = x.Count() * 1.0 / totalBikeRental 
-            });
 
+        if (totalBikeRental > 0)
+        {
+            var result = bikeRentals
+                .GroupBy(x => x.Bike.BikeStationId)
+                .Select(x => new TotalTimesRentingByBikeStation
+                {
+                    BikeStationId = x.Key!.Value,
+                    Percentage = x.Count() * 1.0 / totalBikeRental * 100
+                });
+
+            return new GetTotalTimesRentingByBikeStationResponse
+            {
+                Result = { result }
+            };
+        }
+        
         return new GetTotalTimesRentingByBikeStationResponse
         {
-            Result = { result }
+            Result = { Array.Empty<TotalTimesRentingByBikeStation>() }
         };
     }
 }
