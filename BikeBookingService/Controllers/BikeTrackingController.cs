@@ -61,14 +61,15 @@ public class BikeTrackingController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Checking(BikeCheckinDto bikeCheckinDto)
     {
+        var email = HttpContext.User.Claims.FirstOrDefault(x => 
+            x.Type == ClaimTypes.NameIdentifier)!.Value;
+        
         var isRenting = await _bikeTrackingValidation.IsAccountIsRentingBike(email);
         if (isRenting)
             return BadRequest("Bạn hiện tại đang thuê xe, xin vui lòng hoàn thành trả xe trước khi thuê xe mới!");
         
         // var isBikeCheckinWrongTime = await _bikeTrackingValidation.IsBikeCheckinOrCheckoutWrongTime(bikeCheckinDto.CheckinTime);
         // if (isBikeCheckinWrongTime) return BadRequest("Bạn không thể checkin trong khoảng thời gian sau 10h tối và trước 6h sáng!");
-        var email = HttpContext.User.Claims.FirstOrDefault(x => 
-            x.Type == ClaimTypes.NameIdentifier)!.Value;
 
         // var isBikeHasEnoughPoint = await _bikeTrackingValidation.IsAccountHasEnoughPoint(
         //     email,
