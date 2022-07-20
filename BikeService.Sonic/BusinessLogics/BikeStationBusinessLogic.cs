@@ -40,9 +40,12 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
         return _mapper.Map<BikeStationRetrieveDto>(stationBike);
     }
 
-    public async Task<List<BikeStationRetrieveDto>> GetAllStationBikes()
+    public async Task<List<BikeStationRetrieveDto>> GetAllStationBikes(string email)
     {
-        var stationBikes = await _unitOfWork.BikeStationRepository.All();
+        var isSuperManager =
+            await _unitOfWork.ManagerRepository.Exists(x => x.Email == email && x.IsSuperManager);
+        var stationBikes = await _unitOfWork.BikeStationRepository.Find(x => 
+            isSuperManager || x.BikeStationManagers.Any(xx => xx.Manager.Email == email));
         var bikeStations = stationBikes.Select(x => new BikeStationRetrieveDto
         {
             Description = x.Description,
@@ -186,7 +189,17 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
 
     public async Task<List<BikeStationRetrieveDto>> GetBikeStationsNearMe(BikeStationRetrieveParameter bikeStationRetrieveParameter)
     {
-        var bikeStations = (await GetAllStationBikes()).Take(bikeStationRetrieveParameter.Limit).ToList();
+        var bikeStations = (await _unitOfWork.BikeStationRepository.All()).Select(x => new BikeStationRetrieveDto
+        {
+            Description = x.Description,
+            Id = x.Id,
+            Address = x.Address,
+            Latitude = x.Latitude,
+            Longitude = x.Longitude,
+            Name = x.Name,
+            UsedParkingSpace = x.UsedParkingSpace
+        }).Take(bikeStationRetrieveParameter.Limit).ToList();
+        
         var originLocation = new GoogleMapLocation
         {
             Longitude = bikeStationRetrieveParameter.Longitude,
@@ -271,8 +284,6 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
 
     public async Task AssignBikeStationsToManager(BikeStationManagerAssignDto bikeStationManagerAssign)
     {
-        var bikeStations = await _unitOfWork.BikeStationManagerRepository
-            .Find(x => bikeStationManagerAssign.BikeStationIds.Contains(x.BikeStationId));
         foreach (var bikeStationId in bikeStationManagerAssign.BikeStationIds)
         {
             var bikeStationManager = (await _unitOfWork.BikeStationManagerRepository

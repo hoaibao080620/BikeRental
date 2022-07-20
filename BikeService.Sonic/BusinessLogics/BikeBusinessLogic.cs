@@ -50,8 +50,10 @@ public class BikeBusinessLogic : IBikeBusinessLogic
 
     public async Task<List<BikeRetrieveDto>> GetBikes(string managerEmail)
     {
+        var isSuperManager =
+            await _unitOfWork.ManagerRepository.Exists(x => x.Email == managerEmail && x.IsSuperManager);
         var bikes = (await _unitOfWork.BikeRepository
-                .Find(x => x.BikeStation != null && x.BikeStation.BikeStationManagers
+                .Find(x => isSuperManager || x.BikeStation != null && x.BikeStation.BikeStationManagers
                     .Any(b => b.Manager.Email == managerEmail)))
                 .AsNoTracking().Select(b => new BikeRetrieveDto
                 {
@@ -116,40 +118,20 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         var bike = await _unitOfWork.BikeRepository.GetById(id);
         if (bike is null) throw new InvalidOperationException();
         
+        if (bike.Status == BikeStatus.InUsed || bike.BikeStationId.HasValue)
+            throw new InvalidOperationException("Không thể xóa xe đang trong quá trình sử dụng hoặc đang thuộc về trạm!");
+        
         await _unitOfWork.BikeRepository.Delete(bike);
         await _unitOfWork.SaveChangesAsync();
         await _messageQueuePublisher.PublishBikeDeletedEvent(id);
     }
 
-    // public async Task<BikeRentingStatus> GetBikeRentingStatus(string accountEmail)
-    // {
-    //     var rentingStatus = await _unitOfWork.BikeRentalTrackingRepository
-    //         .Find(b => !b.CheckoutOn.HasValue);
-    //
-    //     return rentingStatus.Any()
-    //         ? rentingStatus.Select(x => new BikeRentingStatus
-    //         {
-    //             AccountEmail = accountEmail,
-    //             IsRenting = true,
-    //             BikeId = x.BikeId,
-    //             LicensePlate = x.Bike.LicensePlate,
-    //             LastLatitude = x.Bike.BikeLocationTrackings.FirstOrDefault(b => b.IsActive)!.Latitude,
-    //             LastLongitude = x.Bike.BikeLocationTrackings.FirstOrDefault(b => b.IsActive)!.Longitude,
-    //             LastAddress = x.Bike.BikeLocationTrackings.FirstOrDefault(b => b.IsActive)!.Address,
-    //         }).FirstOrDefault()!
-    //         : new BikeRentingStatus
-    //         {
-    //             AccountEmail = accountEmail,
-    //             IsRenting = false,
-    //             BikeId = null
-    //         };
-    // }
-
     public async Task DeleteBikes(List<int> bikeIds)
     {
         var bikes = (await _unitOfWork.BikeRepository.Find(x => bikeIds.Contains(x.Id))).ToList();
         if (bikes.Any(x => x.Status == BikeStatus.InUsed || x.BikeStationId.HasValue))
-            throw new InvalidOperationException("Cannot delete bike with status in used or belong to a bike station");
+            throw new InvalidOperationException("Một trong những xe bạn xóa có xe đang trong quá trình " +
+                                                "sử dụng hoặc đang thuộc về trạm!");
         
         foreach (var bike in bikes)
         {
@@ -172,28 +154,4 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         var bike = await _unitOfWork.BikeRepository.GetById(bikeId) ?? throw new BikeNotFoundException(bikeId);
         return bike ?? throw new BikeNotFoundException(bikeId);
     }
-
-    // private async Task UpdateBikeCache(BikeCacheParameter bikeCacheParameter)
-    // {
-    //     var key = string.Format(RedisCacheKey.SingleBike, bikeCacheParameter.BikeId);
-    //     var bikeCache = await _cacheService.Get(key);
-    //
-    //     if (bikeCache is null) return;
-    //     var bike = JsonSerializer.Deserialize<BikeRetrieveDto>(bikeCache);
-    //     ArgumentNullException.ThrowIfNull(bike);
-    //     bike.Status = bikeCacheParameter.Status ?? bike.Status;
-    //     await _cacheService.Add(key, JsonSerializer.Serialize(bike));
-    // }
-    //
-    // private static double GetRentingPoint(DateTime checkinOn, DateTime checkoutOn)
-    // {
-    //     var duration = checkoutOn.Subtract(checkinOn).TotalHours;
-    //
-    //     return duration switch
-    //     {
-    //         <= TimeDuration.TotalHourOfDay => duration * 2,
-    //         <= TimeDuration.TotalHourOfWeek => duration * 1.0 / TimeDuration.TotalHourOfDay * 20,
-    //         _ => duration * 1.0 / TimeDuration.TotalHourOfWeek * 100
-    //     };
-    // }
 }

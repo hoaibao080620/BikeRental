@@ -33,7 +33,9 @@ public class BikeStationController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllBikeStations()
     {
-        var bikeStations = await _bikeStationBusinessLogic.GetAllStationBikes();
+        var email = HttpContext.User.Claims.FirstOrDefault(x => 
+            x.Type == ClaimTypes.NameIdentifier)!.Value;
+        var bikeStations = await _bikeStationBusinessLogic.GetAllStationBikes(email);
         return Ok(bikeStations);
     }
     
