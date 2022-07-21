@@ -91,6 +91,20 @@ public class DashboardController : ControllerBase
         {
             val.Percentage = Math.Round(val.Percentage, 2, MidpointRounding.ToZero);
         }
+
+        double currentPercent = 0.0;
+        for (var i = 0; i < data.Result.Count; i++)
+        {
+            if (i == data.Result.Count - 1)
+            {
+                data.Result[i].Percentage = 100 - currentPercent;
+            }
+            else
+            {
+                data.Result[i].Percentage = Math.Round(data.Result[i].Percentage, 2, MidpointRounding.ToZero);
+                currentPercent += data.Result[i].Percentage;
+            }
+        }
         
         return Ok(data.Result);
     }
