@@ -139,7 +139,7 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
     public async Task BikeCheckout(BikeCheckoutDto bikeCheckout, string accountEmail)
     {
         var bikeRenting = (await _unitOfWork.BikeRentalTrackingRepository
-            .Find(x => x.Account.Email == accountEmail)).FirstOrDefault()!;
+            .Find(x => x.Account.Email == accountEmail && x.CheckoutOn == null)).FirstOrDefault()!;
         
         var managerEmails = (await _bikeServiceGrpc.GetManagerEmailsOfBikeIdAsync(new GetManagerEmailsRequest
         {
@@ -401,8 +401,7 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
     private static double GetRentingPoint(DateTime checkinOn, DateTime checkoutOn)
     {
         var duration = checkoutOn.Subtract(checkinOn).TotalHours;
-
-        return duration * 20;
+        return Math.Round(duration * 20, 2, MidpointRounding.ToZero);
     }
     
     private async Task UpdateBikeRentalTracking(BikeLocationDto bikeLocationDto, string address)
