@@ -87,6 +87,11 @@ public class DashboardController : ControllerBase
     public async Task<IActionResult> GetTotalRentByBikeStation()
     {
         var data = await _bikeBookingServiceGrpc.GetTotalTimesRentingByBikeStationAsync(new Empty());
+        foreach (var val in data.Result.ToList())
+        {
+            val.Percentage = Math.Round(val.Percentage, 2, MidpointRounding.ToZero);
+        }
+        
         return Ok(data.Result);
     }
     
