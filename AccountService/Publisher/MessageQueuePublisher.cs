@@ -14,39 +14,25 @@ public class MessageQueuePublisher : IMessageQueuePublisher
         _publisher = publisher;
         _configuration = configuration;
     }
-    
-
-    public async Task PublishBikeCheckedInEvent(BikeCheckedIn bikeCheckedIn)
-    {
-        var payload = JsonConvert.SerializeObject(bikeCheckedIn);
-        var topic = _configuration["MessageQueue:BikeTrackingTopic"];
-        await _publisher.SendMessage(payload, topic);
-    }
-
-    public async Task PublishBikeCheckedOutEvent(BikeCheckedOut bikeCheckedOut)
-    {
-        var payload = JsonConvert.SerializeObject(bikeCheckedOut);
-        var topic = _configuration["MessageQueue:BikeTrackingTopic"];
-        await _publisher.SendMessage(payload, topic);
-    }
 
     public async Task PublishAccountPointSubtractedEvent(AccountPointSubtracted accountPointSubtracted)
     {
         var payload = JsonConvert.SerializeObject(accountPointSubtracted);
-        var topic = _configuration["MessageQueue:BikeTrackingTopic"];
+        var topic = _configuration["MessageQueue:AccountTopic"];
         await _publisher.SendMessage(payload, topic);
     }
 
     public async Task PublishAccountPointLimitExceededEvent(AccountPointLimitExceeded accountPointLimitExceeded)
     {
         var payload = JsonConvert.SerializeObject(accountPointLimitExceeded);
-        var topic = _configuration["MessageQueue:BikeTrackingTopic"];
-        await _publisher.SendMessage(payload, topic);    }
+        var topic = _configuration["MessageQueue:AccountTopic"];
+        await _publisher.SendMessage(payload, topic);
+    }
 
     public async Task PublishAccountDebtHasBeenPaidEvent(AccountDebtHasBeenPaid accountDebtHasBeenPaid)
     {
         var payload = JsonConvert.SerializeObject(accountDebtHasBeenPaid);
-        var topic = _configuration["MessageQueue:BikeTrackingTopic"];
+        var topic = _configuration["MessageQueue:AccountTopic"];
         await _publisher.SendMessage(payload, topic);    
     }    
 }

@@ -100,7 +100,7 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
         var address = await _googleMapService.GetAddressOfLocation(
             bikeCheckinDto.Longitude,
             bikeCheckinDto.Latitude);
-        ArgumentNullException.ThrowIfNull(address);
+        address ??= "N/A";
         
         var pushEventToMapTask = _messageQueuePublisher.PublishBikeLocationChangeCommand(managerEmails);
         var pushNotificationToManagers = _messageQueuePublisher.PublishBikeCheckedInEvent(
@@ -150,8 +150,8 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
         var address = await _googleMapService.GetAddressOfLocation(
             bikeCheckout.Longitude,
             bikeCheckout.Latitude);
-        
-        ArgumentNullException.ThrowIfNull(address);
+
+        address ??= "N/A";
         var rentingPoint = GetRentingPoint(bikeRenting.CheckinOn, bikeCheckout.CheckoutOn);
         var pushEventToMapTask = _messageQueuePublisher.PublishBikeLocationChangeCommand(managerEmails);
         var stopTrackingBikeTask = StopTrackingBike(new StopTrackingBikeParam
@@ -204,8 +204,7 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
         var address = await _googleMapService.GetAddressOfLocation(
             bikeLocationDto.Longitude, 
             bikeLocationDto.Latitude);
-        
-        ArgumentNullException.ThrowIfNull(address);
+        address ??= "N/A";
 
         var updateBikeTracking = UpdateBikeRentalTracking(bikeLocationDto, address);
         
