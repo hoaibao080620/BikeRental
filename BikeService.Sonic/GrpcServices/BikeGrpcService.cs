@@ -42,9 +42,10 @@ public class BikeGrpcService : BikeServiceGrpc.BikeServiceGrpcBase
 
     public override async Task<GetManagerEmailsResponse> GetManagerEmailsOfBikeId(GetManagerEmailsRequest request, ServerCallContext context)
     {
+        var superManagerEmails = (await _unitOfWork.ManagerRepository.Find(x => x.IsSuperManager)).Select(x => x.Email);
         var managerEmails = (await _unitOfWork.BikeStationManagerRepository
                 .Find(x => x.BikeStation.Bikes.Any(b => b.Id == request.BikeId)))
-            .AsNoTracking().Select(x => x.Manager.Email).ToList();
+            .AsNoTracking().Select(x => x.Manager.Email).Union(superManagerEmails).ToList();
 
         return new GetManagerEmailsResponse
         {
