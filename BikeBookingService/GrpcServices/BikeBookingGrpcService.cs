@@ -140,7 +140,7 @@ public class BikeBookingGrpcService : BikeBookingServiceGrpc.BikeBookingServiceG
     public override async Task<GetTopThreeAccountRentingResponse> GetTopThreeAccountRenting(Empty request, ServerCallContext context)
     {
         var topThreeAccountRent = (await _unitOfWork.BikeRentalTrackingRepository
-                .Find(x => x.CheckoutOn == null && x.Bike.IsActive))
+                .Find(x => x.CheckoutOn != null && x.Bike.IsActive))
             .GroupBy(x => x.Account.PhoneNumber)
             .Select(x => new AccountRent
             {

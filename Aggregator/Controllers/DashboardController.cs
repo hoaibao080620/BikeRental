@@ -99,13 +99,15 @@ public class DashboardController : ControllerBase
     public async Task<IActionResult> GetTopThreeAccountReting()
     {
         var data = await _bikeBookingServiceGrpc.GetTopThreeAccountRentingAsync(new Empty());
-        return Ok(data.TopThreeAccountRent);
+        return Ok(data.TopThreeAccountRent.OrderByDescending(x => x.TotalRentingPoint)
+            .ThenByDescending(x => x.TotalRentingTimes));
     }
     
     [HttpGet]
     public async Task<IActionResult> GetTopThreeBikeRent()
     {
         var data = await _bikeBookingServiceGrpc.GetTopThreeBikeHasBeenRentAsync(new Empty());
-        return Ok(data.TopThreeBikeRent);
+        return Ok(data.TopThreeBikeRent.OrderByDescending(x => x.TotalRentingPoint)
+            .ThenByDescending(x => x.TotalRentingTimes));
     }
 }
