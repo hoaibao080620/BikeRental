@@ -25,7 +25,7 @@ public class AccountPointSubtractedHandler : IMessageQueueHandler
 
         if (bikeBooking is null) return;
 
-        bikeBooking.PaymentStatus = PaymentStatus.NOT_FULLY_PAID;
+        bikeBooking.PaymentStatus = PaymentStatus.APPROVED;
         await _unitOfWork.SaveChangesAsync();
     }
 }

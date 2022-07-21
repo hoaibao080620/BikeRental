@@ -26,7 +26,7 @@ public class AccountPointLimitExceededHandler : IMessageQueueHandler
 
         if (bikeBooking is null) return;
 
-        bikeBooking.PaymentStatus = PaymentStatus.APPROVED;
+        bikeBooking.PaymentStatus = PaymentStatus.NOT_FULLY_PAID;
         await _unitOfWork.SaveChangesAsync();
     }
 }
