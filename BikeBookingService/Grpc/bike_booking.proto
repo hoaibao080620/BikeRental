@@ -48,6 +48,6 @@ message GetTotalTimesRentingByBikeStationResponse {
 }
 
 message TotalTimesRentingByBikeStation {
-  int32 bikeStationId = 1;
+  string bikeStation = 1;
   double percentage = 2;
 }

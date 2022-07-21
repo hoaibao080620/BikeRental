@@ -87,19 +87,6 @@ public class DashboardController : ControllerBase
     public async Task<IActionResult> GetTotalRentByBikeStation()
     {
         var data = await _bikeBookingServiceGrpc.GetTotalTimesRentingByBikeStationAsync(new Empty());
-        var response = new List<TimeRentingByBikeStationDto>();
-        foreach (var result in data.Result)
-        {
-            response.Add(new TimeRentingByBikeStationDto
-            {
-                BikeStationId = result.BikeStationId,
-                Percentage = result.Percentage,
-                BikeStationName = (await _bikeServiceGrpc.GetBikeStationNameByIdAsync(new GetBikeStationNameByIdRequest
-                {
-                    Id = result.BikeStationId
-                })).Name
-            });
-        }
-        return Ok(response);
+        return Ok(data.Result);
     }
 }

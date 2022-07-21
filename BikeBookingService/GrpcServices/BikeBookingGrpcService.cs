@@ -165,10 +165,10 @@ public class BikeBookingGrpcService : BikeBookingServiceGrpc.BikeBookingServiceG
         if (totalBikeRental > 0)
         {
             var result = bikeRentals
-                .GroupBy(x => x.Bike.BikeStationId)
+                .GroupBy(x => x.CheckinBikeStation)
                 .Select(x => new TotalTimesRentingByBikeStation
                 {
-                    BikeStationId = x.Key!.Value,
+                    BikeStation = x.Key,
                     Percentage = x.Count() * 1.0 / totalBikeRental * 100
                 });
 
