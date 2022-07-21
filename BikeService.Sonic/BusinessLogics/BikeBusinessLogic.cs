@@ -102,6 +102,9 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         await _cacheService.Remove(string.Format(RedisCacheKey.SingleBike, bike.Id));
         await _unitOfWork.BikeRepository.Update(bike);
         await _unitOfWork.SaveChangesAsync();
+
+        var bikeStationColor = (await _unitOfWork.BikeStationColorRepository
+            .Find(x => x.BikeStationId == bike.BikeStationId)).FirstOrDefault();
         await _messageQueuePublisher.PublishBikeUpdatedEvent(new BikeUpdated
         {
             Id = bike.Id,
@@ -109,7 +112,8 @@ public class BikeBusinessLogic : IBikeBusinessLogic
             BikeStationName = bikeStation?.Name,
             Description = bike.Description,
             LicensePlate = bike.LicensePlate,
-            MessageType = MessageType.BikeUpdated
+            MessageType = MessageType.BikeUpdated,
+            Color = bikeStationColor?.Color
         });
     }
 
