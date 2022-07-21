@@ -64,13 +64,13 @@ public class BikeTrackingController : ControllerBase
         var email = HttpContext.User.Claims.FirstOrDefault(x => 
             x.Type == ClaimTypes.NameIdentifier)!.Value;
 
-        var isBikeRenting = await _bikeTrackingValidation.IsBikeAlreadyRent(bikeCheckinDto.BikeId);
-
-        if (isBikeRenting) return BadRequest("Xe này hiện tại đang được sử dụng, xin vui lòng chọn xe khác!");
-        
-        var isRenting = await _bikeTrackingValidation.IsAccountIsRentingBike(email);
-        if (isRenting)
-            return BadRequest("Bạn hiện tại đang thuê xe, xin vui lòng hoàn thành trả xe trước khi thuê xe mới!");
+        // var isBikeRenting = await _bikeTrackingValidation.IsBikeAlreadyRent(bikeCheckinDto.BikeId);
+        //
+        // if (isBikeRenting) return BadRequest("Xe này hiện tại đang được sử dụng, xin vui lòng chọn xe khác!");
+        //
+        // var isRenting = await _bikeTrackingValidation.IsAccountIsRentingBike(email);
+        // if (isRenting)
+        //     return BadRequest("Bạn hiện tại đang thuê xe, xin vui lòng hoàn thành trả xe trước khi thuê xe mới!");
         
         // var isBikeCheckinWrongTime = await _bikeTrackingValidation.IsBikeCheckinOrCheckoutWrongTime(bikeCheckinDto.CheckinTime);
         // if (isBikeCheckinWrongTime) return BadRequest("Bạn không thể checkin trong khoảng thời gian sau 10h tối và trước 6h sáng!");
