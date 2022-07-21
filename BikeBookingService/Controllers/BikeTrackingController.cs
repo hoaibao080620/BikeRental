@@ -101,7 +101,7 @@ public class BikeTrackingController : ControllerBase
 
         var isRenting = await _bikeTrackingValidation.IsAccountIsRentingBike(email);
 
-        if (!isRenting) return BadRequest("Tài khoản của bạn đang không thuê xe nên không thể trả xe!");
+        if (isRenting) return BadRequest("Tài khoản của bạn đang không thuê xe nên không thể trả xe!");
         
         await _bikeTrackingBusinessLogic.BikeCheckout(bikeCheckoutDto, email);
         
