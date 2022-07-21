@@ -158,7 +158,7 @@ public class BikeBookingGrpcService : BikeBookingServiceGrpc.BikeBookingServiceG
     public override async Task<GetTotalTimesRentingByBikeStationResponse> GetTotalTimesRentingByBikeStation(Empty request, ServerCallContext context)
     {
         var bikeRentals = await _unitOfWork.BikeRentalTrackingRepository
-            .Find(x => x.CheckoutOn == null && x.Bike.IsActive && x.Bike.BikeStationId.HasValue);
+            .Find(x => x.CheckoutOn != null);
 
         var totalBikeRental = bikeRentals.Count();
 
