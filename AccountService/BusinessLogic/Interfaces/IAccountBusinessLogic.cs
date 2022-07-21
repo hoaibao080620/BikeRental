@@ -1,6 +1,8 @@
-﻿namespace AccountService.BusinessLogic.Interfaces;
+﻿using AccountService.Dto;
+
+namespace AccountService.BusinessLogic.Interfaces;
 
 public interface IAccountBusinessLogic
 {
-    Task CreateAccount(string message);
+    Task<AccountProfileDto> GetAccountProfile(string accountEmail);
 }

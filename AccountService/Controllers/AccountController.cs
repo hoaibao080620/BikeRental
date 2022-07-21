@@ -1,6 +1,6 @@
-﻿using System.Net.Http.Headers;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using AccountService.DataAccess;
+using AccountService.Dto;
 using AccountService.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,12 +19,30 @@ public class AccountController : ControllerBase
     {
         _mongoService = mongoService;
     }
-    
-    [HttpGet]
-    [AllowAnonymous]
-    public async Task<IActionResult> TestSentry()
+
+    public async Task<IActionResult> GetAccountProfile()
     {
-        throw new InvalidOperationException();
+        var accountEmail = HttpContext.User.Claims.FirstOrDefault(x =>
+            x.Type == ClaimTypes.NameIdentifier)?.Value;
+
+        if (accountEmail is null) return Unauthorized();
+
+        var account = (await _mongoService.FindAccounts(x => x.Email == accountEmail)).FirstOrDefault();
+
+        if (account is null) return NotFound();
+
+        var accountProfile = new AccountProfileDto
+        {
+            Id = account.ExternalUserId,
+            Point = account.Point,
+            FirstName = account.FirstName,
+            LastName = account.LastName,
+            IsActive = account.IsActive,
+            Email = account.Email,
+            PhoneNumber = account.PhoneNumber
+        };
+
+        return Ok(accountProfile);
     }
 
     [HttpGet]

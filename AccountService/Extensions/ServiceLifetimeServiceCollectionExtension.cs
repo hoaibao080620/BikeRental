@@ -1,4 +1,6 @@
-﻿using AccountService.DataAccess;
+﻿using AccountService.BusinessLogic.Implementation;
+using AccountService.BusinessLogic.Interfaces;
+using AccountService.DataAccess;
 using AccountService.MessageQueueHandlers;
 using AccountService.Publisher;
 using BikeRental.MessageQueue.Consumer;
@@ -20,6 +22,7 @@ public static class ServiceLifetimeServiceCollectionExtension
         serviceCollection.AddScoped<IPublisher, SnsPublisher>();
         serviceCollection.AddScoped<IMongoService, MongoService>();
         serviceCollection.AddScoped<IMessageQueuePublisher, MessageQueuePublisher>();
+        serviceCollection.AddScoped<IAccountBusinessLogic, AccountBusinessLogic>();
     }
     
     public static void AddSingletonServices(this IServiceCollection serviceCollection)
