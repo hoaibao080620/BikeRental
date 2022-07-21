@@ -3,6 +3,7 @@
 service BikeServiceGrpc {
   rpc GetBikeIdsOfManager (GetBikeIdsRequest) returns (GetBikeIdsResponse);
   rpc GetManagerEmailsOfBikeId (GetManagerEmailsRequest) returns (GetManagerEmailsResponse);
+  rpc GetBikeStationNameById(GetBikeStationNameByIdRequest) returns (GetBikeStationNameByIdResponse);
 }
 
 message GetBikeIdsRequest {
@@ -19,4 +20,12 @@ message GetManagerEmailsRequest {
 
 message GetManagerEmailsResponse {
   repeated string managerEmails = 1;
+}
+
+message GetBikeStationNameByIdRequest{
+  int32 id = 1;
+}
+
+message GetBikeStationNameByIdResponse{
+  string name = 1;
 }

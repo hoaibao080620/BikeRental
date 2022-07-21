@@ -125,6 +125,16 @@ public class BikeTrackingController : ControllerBase
         return Ok(rentingStatus);
     }
     
+    [HttpGet]
+    public async Task<IActionResult> GetBikeBookingHistories()
+    {
+        var email = HttpContext.User.Claims.FirstOrDefault(x => 
+            x.Type == ClaimTypes.NameIdentifier)!.Value;
+        var rentingStatus = await _bikeTrackingBusinessLogic.GetBikeBookingHistories(email);
+    
+        return Ok(rentingStatus);
+    }
+    
     private async Task LockAccount(string accountEmail, string token)
     {
         using var httpClient = new HttpClient();

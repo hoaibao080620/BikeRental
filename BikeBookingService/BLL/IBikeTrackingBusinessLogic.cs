@@ -1,7 +1,6 @@
 ﻿using BikeBookingService.Dtos;
 using BikeBookingService.Dtos.BikeOperation;
 using BikeBookingService.Dtos.History;
-using BikeService.Sonic.Dtos.BikeOperation;
 
 namespace BikeBookingService.BLL;
 
@@ -13,4 +12,5 @@ public interface IBikeTrackingBusinessLogic
     Task BikeCheckout(BikeCheckoutDto bikeCheckingDto, string accountEmail);
     Task UpdateBikeLocation(BikeLocationDto bikeLocationDto);
     Task<BikeRentingStatus> GetBikeRentingStatus(string accountEmail);
+    Task<List<BikeBookingHistoryDto>> GetBikeBookingHistories(string accountEmail);
 }

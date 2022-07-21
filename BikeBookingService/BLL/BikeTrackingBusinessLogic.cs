@@ -8,7 +8,6 @@ using BikeBookingService.Models;
 using BikeBookingService.Services;
 using BikeRental.MessageQueue.Events;
 using BikeRental.MessageQueue.MessageType;
-using BikeService.Sonic.Dtos.BikeOperation;
 using Grpc.Net.ClientFactory;
 using Microsoft.EntityFrameworkCore;
 
@@ -178,7 +177,7 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
             {
                 ManagerEmails = managerEmails,
                 BikeId = bike.Id,
-                BikeStationId = bikeCheckout.BikeStationId.GetValueOrDefault(),
+                BikeStationId = bikeCheckout.BikeStationId,
                 AccountEmail = accountEmail,
                 LicensePlate = bike.LicensePlate,
                 CheckoutOn = bikeCheckout.CheckoutOn,
@@ -246,6 +245,26 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
             };
     }
 
+    public async Task<List<BikeBookingHistoryDto>> GetBikeBookingHistories(string accountEmail)
+    {
+        var bikeBookings = (await _unitOfWork.BikeRentalTrackingRepository
+                .Find(x => x.Account.Email == accountEmail && x.CheckoutOn.HasValue))
+            .Select(x => new BikeBookingHistoryDto
+            {
+                CheckinOn = x.CheckinOn,
+                CheckoutOn = x.CheckoutOn!.Value,
+                AccountPhoneNumber = x.Account.PhoneNumber,
+                BikeLicensePlate = x.Bike.LicensePlate,
+                CheckinBikeStation = x.CheckinBikeStation,
+                CheckoutBikeStation = x.CheckoutBikeStation!,
+                PaymentStatus = x.PaymentStatus!,
+                TotalPoint = x.TotalPoint,
+                TotalDistance = x.BikeLocationTrackingHistories.Sum(xx => xx.DistanceFromPreviousLocation)
+            });
+
+        return bikeBookings.ToList();
+    }
+
     private async Task<Bike> GetBikeById(int bikeId)
     {
         var bike = await _unitOfWork.BikeRepository.GetById(bikeId) ?? throw new InvalidOperationException();
@@ -306,7 +325,7 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
             BikeId = bikeCheckinDto.BikeId,
             IsActive = true,
             CreatedOn = DateTime.UtcNow,
-            CheckinBikeStationId = bike.BikeStationId!.Value
+            CheckinBikeStation = bike.BikeStationName!
         };
         
         await _unitOfWork.BikeRentalTrackingRepository.Add(bikeRentalTracking);
@@ -342,23 +361,40 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
             Latitude = stopTrackingBikeParam.BikeCheckoutDto.Latitude,
             Longitude = stopTrackingBikeParam.BikeCheckoutDto.Longitude,
             Address = stopTrackingBikeParam.Address,
-            BikeRentalBooking = finishBikeRentalBooking
+            BikeRentalBooking = finishBikeRentalBooking,
+            DistanceFromPreviousLocation = 10
         });
     }
     
     private async Task<BikeRentalBooking> FinishBikeRentalBooking(BikeCheckoutDto bikeCheckoutDto, string accountEmail, double rentingPoint)
     {
+        
         var bikeRentalBooking = (await _unitOfWork.BikeRentalTrackingRepository.Find(b =>
                 !b.CheckoutOn.HasValue && b.Account.Email == accountEmail))
             .OrderByDescending(b => b.CreatedOn).
             FirstOrDefault();
         
         ArgumentNullException.ThrowIfNull(bikeRentalBooking);
+        var bike = await GetBikeById(bikeRentalBooking.BikeId);
+        
         bikeRentalBooking.CheckoutOn = bikeCheckoutDto.CheckoutOn;
         bikeRentalBooking.UpdatedOn = DateTime.UtcNow;
         bikeRentalBooking.TotalPoint = rentingPoint;
         bikeRentalBooking.PaymentStatus = PaymentStatus.PENDING;
-        bikeRentalBooking.CheckoutBikeStationId = bikeCheckoutDto.BikeStationId;
+
+        if (bikeCheckoutDto.BikeStationId != bike.BikeStationId)
+        {
+            var bikeStationName = (await _bikeServiceGrpc.GetBikeStationNameByIdAsync(new GetBikeStationNameByIdRequest
+            {
+                Id = bikeCheckoutDto.BikeStationId
+            })).Name;
+
+            bikeRentalBooking.CheckoutBikeStation = bikeStationName;
+        }
+        else
+        {
+            bikeRentalBooking.CheckoutBikeStation = bikeRentalBooking.CheckinBikeStation;
+        }
 
         return bikeRentalBooking;
     }
