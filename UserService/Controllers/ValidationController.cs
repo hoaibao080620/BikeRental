@@ -38,6 +38,23 @@ public class ValidationController : ControllerBase
         return Ok();
     }
     
+    [HttpPost]
+    public async Task<IActionResult> ForgotPasswordVerification([FromBody] PhoneVerificationDto phoneVerificationDto)
+    {
+        var accountSid = Environment.GetEnvironmentVariable("Twilio_Account_Sid");
+        var authToken = Environment.GetEnvironmentVariable("Twilio_Account_Auth_Token");
+
+        TwilioClient.Init(accountSid, authToken);
+
+        await VerificationResource.CreateAsync(
+            to: phoneVerificationDto.PhoneNumber,
+            channel: "sms",
+            pathServiceSid: Environment.GetEnvironmentVariable("Twilio_Verification_Service_Sid")
+        );
+        
+        return Ok();
+    }
+    
     [HttpGet]
     public async Task<IActionResult> CheckVerificationStatus([FromQuery] string verificationCode, string phoneNumber)
     {

@@ -29,16 +29,11 @@ public class SqsConsumer : IConsumer
         var result = await _amazonSqs.ReceiveMessageAsync(request);
         if (result.HttpStatusCode != HttpStatusCode.OK) throw new Exception("Error when pull messages from queue");
 
-        if (result.Messages.Any())
-        {
-            await _amazonSqs.DeleteMessageBatchAsync(queue, result.Messages.Select(x => 
-                new DeleteMessageBatchRequestEntry
-                {
-                    Id = x.MessageId,
-                    ReceiptHandle = x.ReceiptHandle
-                }).ToList());
-        }
-        
         return result.Messages;
+    }
+
+    public async Task DeleteMessage(string queue, Message message)
+    {
+        await _amazonSqs.DeleteMessageAsync(queue, message.ReceiptHandle);
     }
 }

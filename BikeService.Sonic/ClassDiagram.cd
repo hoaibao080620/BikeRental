@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="BikeService.Sonic.Controllers.BikeController">
+    <Position X="1" Y="1.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAAAAAAIUABQgAAAAAAAAEAAAAAAAAAAAABAgAA=</HashCode>
+      <FileName>Controllers\BikeController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BikeService.Sonic.Controllers.BikeReportController">
+    <Position X="8" Y="1.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAEUAAQAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Controllers\BikeReportController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BikeService.Sonic.Controllers.BikeStationController">
+    <Position X="4.25" Y="1.75" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>QCAAAAAYABAAAACAACIAAAIAIAQAAAAAAAACAgAACAQ=</HashCode>
+      <FileName>Controllers\BikeStationController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BikeService.Sonic.Validation.BikeStationValidation">
+    <Position X="10.75" Y="1.75" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAAgAAAAAAAAAAAACAAAAAAAAAAAA=</HashCode>
+      <FileName>Validation\BikeStationValidation.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Interface Name="BikeService.Sonic.Validation.IBikeStationValidation">
+    <Position X="10.75" Y="4.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAAAAAAAAAAAAAAACAAAAAAAAAAAA=</HashCode>
+      <FileName>Validation\IBikeStationValidation.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

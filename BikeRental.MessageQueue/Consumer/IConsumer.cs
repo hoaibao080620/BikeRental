@@ -4,5 +4,6 @@ namespace BikeRental.MessageQueue.Consumer;
 
 public interface IConsumer
 {
-    public Task<List<Message>> ReceiveMessages(string queue);
+    Task<List<Message>> ReceiveMessages(string queue);
+    Task DeleteMessage(string queue, Message message);
 }
