@@ -7,5 +7,5 @@ public class UserUpdateDto
     public string? Address { get; set; } = null;
     public string? PhoneNumber { get; set; } = null;
     public DateTime? DateOfBirth { get; set; } = null;
-    public string RoleName { get; set; }
+    public string? RoleName { get; set; }
 }

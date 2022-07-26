@@ -97,11 +97,12 @@ public class UserBusinessLogic : IUserBusinessLogic
     public async Task UpdateUser(string userId, UserUpdateDto user)
     {
         var userUpdated = (await _mongoService.FindUser(x => x.Id == userId)).First();
+
         var originalRole = userUpdated.RoleName;
         var builder = Builders<User>.Update
             .Set(x => x.FirstName, user.FirstName)
             .Set(x => x.LastName, user.LastName)
-            .Set(x => x.RoleName, user.RoleName)
+            .Set(x => x.RoleName, string.IsNullOrEmpty(user.RoleName) ? userUpdated.RoleName : user.RoleName)
             .Set(x => x.Address, user.Address)
             .Set(x => x.PhoneNumber, user.PhoneNumber)
             .Set(x => x.DateOfBirth, user.DateOfBirth)
