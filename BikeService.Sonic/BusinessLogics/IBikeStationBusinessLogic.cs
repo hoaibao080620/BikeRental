@@ -19,5 +19,6 @@ public interface IBikeStationBusinessLogic
     Task AssignBikesToBikeStation(BikeStationBikeAssignDto bikeAssignDto);
     Task<List<BikeStationAssignDto>> GetAssignableBikeStations(int totalBikeAssign);
     Task<List<AssignableManager>> GetAssignableManagers();
+    Task<List<AssignableStation>> GetAssignableStations();
     Task AssignBikeStationsToManager(BikeStationManagerAssignDto bikeStationManagerAssign);
 }

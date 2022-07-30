@@ -55,7 +55,8 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
             Latitude = x.Latitude,
             Longitude = x.Longitude,
             Name = x.Name,
-            UsedParkingSpace = x.UsedParkingSpace
+            UsedParkingSpace = x.UsedParkingSpace,
+            Managers = x.BikeStationManagers.Select(xx => xx.Manager.Email).ToList()
         }).ToList();
 
         return bikeStations;
@@ -271,7 +272,7 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
 
     public async Task<List<AssignableManager>> GetAssignableManagers()
     {
-        var managers = (await _unitOfWork.ManagerRepository.All())
+        var managers = (await _unitOfWork.ManagerRepository.Find(x => x.IsSuperManager == false))
             .AsNoTracking()
             .Select(x => new AssignableManager
             {
@@ -280,6 +281,19 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
             }).ToList();
 
         return managers;
+    }
+
+    public async Task<List<AssignableStation>> GetAssignableStations()
+    {
+        var stations = (await _unitOfWork.BikeStationRepository.Find(x => x.BikeStationManagers.Count < 3))
+            .AsNoTracking()
+            .Select(x => new AssignableStation
+            {
+                Id = x.Id,
+                Name = x.Name
+            }).ToList();
+
+        return stations;
     }
 
     public async Task AssignBikeStationsToManager(BikeStationManagerAssignDto bikeStationManagerAssign)

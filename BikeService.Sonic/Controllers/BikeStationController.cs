@@ -123,6 +123,13 @@ public class BikeStationController : ControllerBase
         return Ok(managers);
     }
     
+    [HttpGet]
+    public async Task<IActionResult> GetAssignableStations()
+    {
+        var managers = await _bikeStationBusinessLogic.GetAssignableManagers();
+        return Ok(managers);
+    }
+    
     [HttpPut]
     public async Task<IActionResult> AssignBikeStationsToManager([FromBody] BikeStationManagerAssignDto bikeAssignDto)
     {
