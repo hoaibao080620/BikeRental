@@ -11,4 +11,6 @@ public interface IOktaClient
     public Task DeleteOktaUser(string? oktaUserId);
     public Task UpdateOktaUserRole(string oldGroupId, string newGroupId, string oktaUserId);
     public Task UpdateOktaUserPassword(string oktaUserId, string password);
+    public Task DeactivateOktaUser(string oktaUserId);
+    public Task ActivateOktaUser(string oktaUserId);
 }

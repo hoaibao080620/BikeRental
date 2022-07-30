@@ -42,6 +42,7 @@ public class MessageQueueConsumer : BackgroundService
                 
                 var messageHandler = _messageQueueSubscriptionManager.GetHandler(messageType);
                 await messageHandler.Handle(message.Body);
+                await consumer.DeleteMessage(_configuration["MessageQueue:AccountQueue"], message);
             }
         }
     }

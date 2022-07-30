@@ -7,8 +7,6 @@ using BikeRental.MessageQueue.Consumer;
 using BikeRental.MessageQueue.MessageType;
 using BikeRental.MessageQueue.Publisher;
 using BikeRental.MessageQueue.SubscriptionManager;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 
 namespace AccountService.Extensions;
@@ -46,11 +44,7 @@ public static class ServiceLifetimeServiceCollectionExtension
         messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserDeletedEventHandler>(
             serviceProvider.CreateScope().ServiceProvider, 
             MessageType.UserDeleted);
-        
-        messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserRoleUpdatedHandler>(
-            serviceProvider.CreateScope().ServiceProvider, 
-            MessageType.UserRoleUpdated);
-        
+
         messageQueueSubscriptionManager.RegisterEventHandlerSubscription<BikeCheckedOutEventHandler>(
             serviceProvider.CreateScope().ServiceProvider, 
             MessageType.BikeCheckedOut);
@@ -58,6 +52,14 @@ public static class ServiceLifetimeServiceCollectionExtension
         messageQueueSubscriptionManager.RegisterEventHandlerSubscription<PaymentPointSucceedEventHandler>(
             serviceProvider.CreateScope().ServiceProvider, 
             MessageType.PaymentSucceeded);
+        
+        messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserDeactivatedEventHandler>(
+            serviceProvider.CreateScope().ServiceProvider, 
+            MessageType.AccountDeactivated);
+        
+        messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserReactivatedEventHandler>(
+            serviceProvider.CreateScope().ServiceProvider, 
+            MessageType.AccountReactivated);
     }
     
     public static void AddMongoDb(this IServiceCollection serviceCollection, IConfiguration configuration)

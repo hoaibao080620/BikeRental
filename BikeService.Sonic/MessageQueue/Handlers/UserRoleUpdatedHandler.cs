@@ -26,7 +26,7 @@ public class UserRoleUpdatedHandler : IMessageQueueHandler
                 .Find(x => x.ExternalId == payload.UserId))
                 .FirstOrDefault();
         
-        if (payload.NewRole is UserRole.Manager or UserRole.SuperManager)
+        if (payload.NewRole is UserRole.Manager or UserRole.Director)
         {
             if (manager is null)
             {
@@ -36,19 +36,19 @@ public class UserRoleUpdatedHandler : IMessageQueueHandler
                     IsActive = true,
                     Email = payload.Email,
                     ExternalId = payload.UserId,
-                    IsSuperManager = payload.NewRole == UserRole.SuperManager
+                    IsSuperManager = payload.NewRole == UserRole.Director
                 });
             }
             else
             {
-                manager.IsSuperManager = payload.NewRole == UserRole.SuperManager;
+                manager.IsSuperManager = payload.NewRole == UserRole.Director;
             }
 
             await _unitOfWork.SaveChangesAsync();
             return;
         }
 
-        if (manager is not null && (payload.NewRole != UserRole.Manager || payload.NewRole != UserRole.SuperManager))
+        if (manager is not null && (payload.NewRole != UserRole.Manager || payload.NewRole != UserRole.Director))
         {
             await _unitOfWork.ManagerRepository.Delete(manager);
             await _unitOfWork.SaveChangesAsync();

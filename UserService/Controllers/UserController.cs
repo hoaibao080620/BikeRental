@@ -37,6 +37,7 @@ public class UserController : ControllerBase
         return Ok(users);
     }
     
+    
     [HttpGet("{userId}")]
     public async Task<IActionResult> GetUser(string userId)
     {
@@ -63,6 +64,30 @@ public class UserController : ControllerBase
     public async Task<IActionResult> DeleteUser(string userId)
     {
         await _userBusinessLogic.DeleteUser(userId);
+        return Ok();
+    }
+    
+    [HttpGet]
+    [Route("[action]")]
+    public async Task<IActionResult> GetManagers()
+    {
+        var users = await _userBusinessLogic.GetManagers();
+        return Ok(users);
+    }
+    
+    [HttpPut]
+    [Route("[action]")]
+    public async Task<IActionResult> DeactivateUser([FromBody] ActivateUserDto activateUserDto)
+    {
+        await _userBusinessLogic.DeactivateUser(activateUserDto);
+        return Ok();
+    }
+    
+    [HttpPut]
+    [Route("[action]")]
+    public async Task<IActionResult> ActivateUser([FromBody] ActivateUserDto activateUserDto)
+    {
+        await _userBusinessLogic.ActivateUser(activateUserDto);
         return Ok();
     }
 }

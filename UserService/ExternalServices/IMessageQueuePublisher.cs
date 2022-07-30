@@ -9,4 +9,6 @@ public interface IMessageQueuePublisher
     Task PublishUserUpdatedEventToMessageQueue(User user);
     Task PublishUserDeletedEventToMessageQueue(User user);
     Task PublishUserRoleUpdatedEvent(UserRoleUpdated userRoleUpdated);
+    Task PublishUserDeactivatedEvent(UserDeactivated userDeactivated);
+    Task PublishUserActivatedEvent(UserReactivated userReactivated);
 }

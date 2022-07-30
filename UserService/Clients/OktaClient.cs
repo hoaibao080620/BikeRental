@@ -105,4 +105,14 @@ public class OktaClient : IOktaClient
 
         await _httpClient.PostAsync($"{_baseUrl}/api/v1/users/{oktaUserId}", content);
     }
+
+    public async Task DeactivateOktaUser(string oktaUserId)
+    {
+        await _httpClient.PostAsync($"{_baseUrl}/api/v1/users/{oktaUserId}/lifecycle/suspend", null);
+    }
+
+    public async Task ActivateOktaUser(string oktaUserId)
+    {
+        await _httpClient.PostAsync($"{_baseUrl}/api/v1/users/{oktaUserId}/lifecycle/unsuspend", null);
+    }
 }

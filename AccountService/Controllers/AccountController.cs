@@ -39,7 +39,7 @@ public class AccountController : ControllerBase
             LastName = account.LastName,
             IsActive = account.IsActive,
             Email = account.Email,
-            PhoneNumber = account.PhoneNumber
+            PhoneNumber = account.PhoneNumber,
         };
 
         return Ok(accountProfile);

@@ -14,7 +14,9 @@ public class BikeReport : BaseEntity
     public Manager AssignTo { get; set; } = null!;
     public DateTime? CompletedOn { get; set; }
     public string ReportDescription { get; set; } = null!;
-    public string? ManagerFeedback { get; set; }
     public string Status { get; set; } = null!;
     public string AccountEmail { get; set; } = null!;
+    public int ReportTypeId { get; set; }
+    [ForeignKey(nameof(ReportTypeId))]
+    public BikeReportType ReportType { get; set; } = null!;
 }

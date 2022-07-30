@@ -14,4 +14,7 @@ public interface IUserBusinessLogic
     public Task SyncOktaUsers();
     public Task ForgetPassword(ForgetPasswordDto forgetPasswordDto);
     public Task SignUp(SignUpDto signUpDto);
+    public Task DeactivateUser(ActivateUserDto dto);
+    public Task ActivateUser(ActivateUserDto dto);
+    Task<List<UserRetrieveDto>> GetManagers();
 }

@@ -71,4 +71,20 @@ public class MessageQueuePublisher : IMessageQueuePublisher
 
         await _publisher.SendMessage(payload, topic);
     }
+
+    public async Task PublishUserDeactivatedEvent(UserDeactivated userDeactivated)
+    {
+        var topic = _configuration["Topic:UserTopic"];
+        var payload = JsonConvert.SerializeObject(userDeactivated);
+
+        await _publisher.SendMessage(payload, topic);
+    }
+
+    public async Task PublishUserActivatedEvent(UserReactivated userReactivated)
+    {
+        var topic = _configuration["Topic:UserTopic"];
+        var payload = JsonConvert.SerializeObject(userReactivated);
+
+        await _publisher.SendMessage(payload, topic);
+    }
 }

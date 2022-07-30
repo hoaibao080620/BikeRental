@@ -15,5 +15,7 @@ public class Account
     public string ExternalUserId { get; set; } = null!;
     public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedOn { get; set; } = DateTime.UtcNow;
+    public DateTime? DateOfBirth { get; set; }
+    public string? Address { get; set; }
     public bool IsActive { get; set; }
 }

@@ -113,6 +113,11 @@ public class UserBusinessLogic : IUserBusinessLogic
         var newUserUpdated = (await _mongoService.FindUser(x => x.Id == userId)).First();
         await _messageQueuePublisher.PublishUserUpdatedEventToMessageQueue(newUserUpdated);
 
+        if (!string.IsNullOrEmpty(user.Password))
+        {
+            await _oktaClient.UpdateOktaUserPassword(userUpdated.OktaUserId!, user.Password);
+        }
+
         if (originalRole != user.RoleName)
         {
             await UpdateOktaUserGroup(originalRole, newUserUpdated.RoleName, newUserUpdated.OktaUserId!);
@@ -232,6 +237,54 @@ public class UserBusinessLogic : IUserBusinessLogic
 
         var updateOktaUserBuilder = Builders<User>.Update.Set(x => x.OktaUserId, oktaUserId);
         await _mongoService.UpdateUser(userAdded.Id, updateOktaUserBuilder);
+    }
+
+    public async Task DeactivateUser(ActivateUserDto dto)
+    {
+        var user = await _mongoService.FindUser(x => x.Id == dto.UserId);
+        if (user.Any())
+        {
+            var updateBuilder = Builders<User>.Update.Set(x => x.IsActive, false);
+            await _mongoService.UpdateUser(dto.UserId, updateBuilder);
+            await _messageQueuePublisher.PublishUserDeactivatedEvent(new UserDeactivated
+            {
+                UserId = dto.UserId,
+                MessageType = MessageType.AccountDeactivated
+            });
+            await _oktaClient.DeactivateOktaUser(user.First().OktaUserId!);
+        }
+    }
+
+    public async Task ActivateUser(ActivateUserDto dto)
+    {
+        var user = await _mongoService.FindUser(x => x.Id == dto.UserId);
+        if (user.Any())
+        {
+            var updateBuilder = Builders<User>.Update.Set(x => x.IsActive, true);
+            await _mongoService.UpdateUser(dto.UserId, updateBuilder);
+            await _messageQueuePublisher.PublishUserActivatedEvent(new UserReactivated
+            {
+                UserId = dto.UserId,
+                MessageType = MessageType.AccountReactivated
+            });
+            await _oktaClient.ActivateOktaUser(user.First().OktaUserId!);
+        }
+    }
+
+    public async Task<List<UserRetrieveDto>> GetManagers()
+    {
+        var managers = await _mongoService.FindUser(x => x.RoleName == UserRole.Manager);
+        return managers.Select(u => new UserRetrieveDto
+        {
+            Id = u.Id,
+            RoleName = u.RoleName,
+            Address = u.Address,
+            Email = u.Email,
+            FirstName = u.FirstName,
+            LastName = u.LastName,
+            PhoneNumber = u.PhoneNumber,
+            DateOfBirth = u.DateOfBirth
+        }).ToList();
     }
 
     private async Task<string?> AddUserToOkta(OktaUserInsertParam oktaInsertParam)
