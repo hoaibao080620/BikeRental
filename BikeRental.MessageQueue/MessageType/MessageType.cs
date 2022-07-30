@@ -20,5 +20,5 @@ public class MessageType
     public const string AccountPointLimitExceeded = "AccountPointLimitExceeded";
     public const string AccountDebtHasBeenPaid = "AccountDebtHasBeenPaid";
     public const string AccountDeactivated = "AccountDeactivated";
-    public const string AccountReactivated = "AccountDeactivated";
+    public const string AccountReactivated = "AccountReactivated";
 }
