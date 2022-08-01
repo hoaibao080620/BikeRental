@@ -7,6 +7,7 @@ service BikeBookingServiceGrpc {
   rpc GetTopThreeBikeHasBeenRent (google.protobuf.Empty) returns (GetTopThreeBikeHasBeenRentResponse);
   rpc GetTopThreeAccountRenting (google.protobuf.Empty) returns (GetTopThreeAccountRentingResponse);
   rpc GetTotalTimesRentingByBikeStation (google.protobuf.Empty) returns (GetTotalTimesRentingByBikeStationResponse);
+  rpc GetRentingInfo(GetRentingInfoRequest) returns (GetRentingInfoResponse);
 }
 
 message BikeBookingGetStatisticsRequest {
@@ -50,4 +51,13 @@ message GetTotalTimesRentingByBikeStationResponse {
 message TotalTimesRentingByBikeStation {
   string bikeStation = 1;
   double percentage = 2;
+}
+
+message GetRentingInfoRequest {
+  string email = 1;
+}
+
+message GetRentingInfoResponse {
+  double totalDistance = 1;
+  int32 totalRenting = 2;
 }

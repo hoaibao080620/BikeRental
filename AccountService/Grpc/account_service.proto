@@ -1,9 +1,11 @@
 ﻿syntax = "proto3";
+import "google/protobuf/timestamp.proto";
 
 service AccountServiceGrpc {
   rpc GetPaymentStatistics(GetStatisticsRequest) returns (GetStatisticsResponse);
   rpc GetAccountStatistics(GetStatisticsRequest) returns (GetStatisticsResponse);
   rpc GetRecentTransactions(GetRecentTransactionsRequest) returns (GetRecentTransactionsResponse);
+  rpc GetAccountInfo(GetAccountInfoRequest) returns (GetAccountInfoResponse);
 }
 
 message GetStatisticsRequest {
@@ -26,4 +28,19 @@ message GetRecentTransactionsResponse {
 message RecentTransaction {
   string status = 1;
   string content = 2;
+}
+
+message GetAccountInfoRequest {
+  string email = 1;
+}
+
+message GetAccountInfoResponse {
+  string email = 1;
+  string id = 2;
+  string phoneNumber = 3;
+  double point = 4;
+  string address = 5;
+  google.protobuf.Timestamp dateOfBirth = 6;
+  string firstName = 7;
+  string lastName = 8;
 }

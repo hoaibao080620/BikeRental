@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using AccountService.DataAccess;
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Shared.Service;
 using TimeZone = Shared.Consts.TimeZone;
@@ -180,6 +181,25 @@ public class AccountGrpcService : AccountServiceGrpc.AccountServiceGrpcBase
         return new GetRecentTransactionsResponse
         {
             Transactions = { recentTransactions }
+        };
+    }
+
+    public override async Task<GetAccountInfoResponse> GetAccountInfo(GetAccountInfoRequest request, ServerCallContext context)
+    {
+        var account = (await _mongoService.FindAccounts(x => x.Email == request.Email)).FirstOrDefault();
+
+        if (account is null) return new GetAccountInfoResponse();
+
+        return new GetAccountInfoResponse
+        {
+            Id = account.ExternalUserId,
+            Address = account.Address,
+            Email = account.Email,
+            PhoneNumber = account.PhoneNumber,
+            FirstName = account.FirstName,
+            LastName = account.LastName,
+            DateOfBirth = account.DateOfBirth.HasValue ? Timestamp.FromDateTime(account.DateOfBirth.Value) : null,
+            Point = account.Point
         };
     }
 }

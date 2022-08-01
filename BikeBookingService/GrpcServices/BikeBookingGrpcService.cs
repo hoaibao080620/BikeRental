@@ -183,4 +183,21 @@ public class BikeBookingGrpcService : BikeBookingServiceGrpc.BikeBookingServiceG
             Result = { Array.Empty<TotalTimesRentingByBikeStation>() }
         };
     }
+
+    public override async Task<GetRentingInfoResponse> GetRentingInfo(GetRentingInfoRequest request, ServerCallContext context)
+    {
+        var totalDistance = (await _unitOfWork.BikeRentalTrackingRepository
+                .Find(x => x.Account.Email == request.Email))
+            .Select(x => x.BikeLocationTrackingHistories.Sum(xx => xx.DistanceFromPreviousLocation))
+            .Sum();
+
+        var totalRenting = (await _unitOfWork.BikeRentalTrackingRepository
+            .Find(x => x.Account.Email == request.Email)).Count();
+
+        return new GetRentingInfoResponse
+        {
+            TotalDistance = totalDistance,
+            TotalRenting = totalRenting
+        };
+    }
 }
