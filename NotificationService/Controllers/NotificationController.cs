@@ -44,4 +44,12 @@ public class NotificationController : ControllerBase
         await _notificationRepository.MarkNotificationOpen(markNotificationOpenDto.Id);
         return Ok();
     }
+    
+    [HttpPost]
+    [Route("[action]")]
+    public async Task<IActionResult> CreateNotification([FromBody] MarkNotificationOpenDto markNotificationOpenDto)
+    {
+        await _notificationRepository.MarkNotificationOpen(markNotificationOpenDto.Id);
+        return Ok();
+    }
 }

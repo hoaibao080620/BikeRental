@@ -29,7 +29,7 @@ public class BikeReportBusinessLogic : IBikeReportBusinessLogic
             BikeId = bikeReportInsertDto.BikeId,
             Status = BikeReportStatus.NoFix,
             ReportDescription = bikeReportInsertDto.ReportDescription,
-            AccountEmail = accountEmail,
+            AccountPhoneNumber = accountEmail.Split("@")[0],
             AssignToId = manager!.ManagerId
         });
 
@@ -38,6 +38,7 @@ public class BikeReportBusinessLogic : IBikeReportBusinessLogic
 
     public async Task<List<BikeReportRetriveDto>> GetBikeReports(string email)
     {
+        var phoneNumber = email.Split("@")[0];
         var manager = (await _unitOfWork.ManagerRepository.Find(x => x.Email == email)).FirstOrDefault();
         Expression<Func<BikeReport, bool>> expression;
 
@@ -47,7 +48,7 @@ public class BikeReportBusinessLogic : IBikeReportBusinessLogic
         }
         else
         {
-            expression = x => x.AccountEmail == email;
+            expression = x => x.AccountPhoneNumber == phoneNumber;
         }
 
         return (await _unitOfWork.BikeReportRepository
@@ -57,7 +58,7 @@ public class BikeReportBusinessLogic : IBikeReportBusinessLogic
             {
                 Id = x.Id,
                 BikeId = x.BikeId,
-                AccountReport = x.AccountEmail,
+                AccountPhoneNumber = phoneNumber,
                 BikeLicensePlate = x.Bike.LicensePlate,
                 CompletedBy = x.AssignTo.Email,
                 CompletedOn = x.CompletedOn,

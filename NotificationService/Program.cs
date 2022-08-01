@@ -1,3 +1,4 @@
+using Grpc.Net.Client.Web;
 using NotificationService.Extensions;
 using NotificationService.Hubs;
 using NotificationService.MessageQueue.BackgroundJob;
@@ -20,6 +21,15 @@ builder.Services.AddCors(options =>
         .AllowAnyHeader()
         .AllowCredentials().SetIsOriginAllowed(_ => true));
 });
+builder.Services.AddGrpcClient<BikeServiceGrpc.BikeServiceGrpcClient>("BikeService", c =>
+{
+    c.Address = new Uri("https://localhost:7199");
+}).ConfigureChannel(o =>
+{
+    o.HttpHandler = new GrpcWebHandler(new HttpClientHandler());
+});
+
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddMongoDb(builder.Configuration);
 
 

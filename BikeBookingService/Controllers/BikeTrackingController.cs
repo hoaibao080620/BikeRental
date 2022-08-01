@@ -149,4 +149,12 @@ public class BikeTrackingController : ControllerBase
             "https://bike-rental-account-service.herokuapp.com/account/" +
             $"lockAccount?accountEmail={accountEmail}", null);
     }
+    
+    [HttpGet]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetAccountRentingStatus([FromQuery] string email)
+    {
+        var bikeStatus = await _bikeTrackingBusinessLogic.GetBikeRentingStatus(email);
+        return Ok(bikeStatus);
+    }
 }

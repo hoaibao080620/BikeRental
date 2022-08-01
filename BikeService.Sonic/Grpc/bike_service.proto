@@ -1,10 +1,14 @@
 ﻿syntax = "proto3";
 
+import "google/protobuf/empty.proto";
+
 service BikeServiceGrpc {
   rpc GetBikeIdsOfManager (GetBikeIdsRequest) returns (GetBikeIdsResponse);
   rpc GetManagerEmailsOfBikeId (GetManagerEmailsRequest) returns (GetManagerEmailsResponse);
   rpc GetBikeReportStatistics(GetStatisticsRequest) returns (GetStatisticsResponse);
   rpc GetBikeStationNameById(GetBikeStationNameByIdRequest) returns (GetBikeStationNameByIdResponse);
+  rpc GetCallManagersByAccountPhone(GetManagersByAccountEmailRequest) returns (GetManagersByAccountEmailResponse);
+  rpc GetDirectors(google.protobuf.Empty) returns (GetManagersByAccountEmailResponse);
 }
 
 message GetBikeIdsRequest {
@@ -38,4 +42,12 @@ message GetBikeStationNameByIdRequest{
 
 message GetBikeStationNameByIdResponse{
   string name = 1;
+}
+
+message GetManagersByAccountEmailRequest{
+  string accountPhone = 1;
+}
+
+message GetManagersByAccountEmailResponse{
+  repeated string emails = 1;
 }

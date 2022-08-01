@@ -1,19 +1,23 @@
 ﻿using System.Globalization;
+using System.Net.Http.Headers;
 using BikeService.Sonic.DAL;
+using BikeService.Sonic.Dtos;
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
-using Shared.Service;
-using TimeZone = Shared.Consts.TimeZone;
+using Newtonsoft.Json;
 
 namespace BikeService.Sonic.GrpcServices;
 
 public class BikeGrpcService : BikeServiceGrpc.BikeServiceGrpcBase
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly HttpClient _httpClient;
 
-    public BikeGrpcService(IUnitOfWork unitOfWork)
+    public BikeGrpcService(IUnitOfWork unitOfWork, HttpClient httpClient)
     {
         _unitOfWork = unitOfWork;
+        _httpClient = httpClient;
     }
     
     public override async Task<GetBikeIdsResponse> GetBikeIdsOfManager(GetBikeIdsRequest request, ServerCallContext context)
@@ -135,6 +139,26 @@ public class BikeGrpcService : BikeServiceGrpc.BikeServiceGrpcBase
         return new GetBikeStationNameByIdResponse
         {
             Name = bikeStation!.Name
+        };
+    }
+
+    public override async Task<GetManagersByAccountEmailResponse> GetCallManagersByAccountPhone(GetManagersByAccountEmailRequest request, ServerCallContext context)
+    {
+        var accountStatus = await _httpClient
+            .GetStringAsync("https://bike-rental-booking-service.herokuapp.com/bikeTracking" +
+                            $"/GetAccountRentingStatus?email={request.AccountPhone}@gmail.com");
+
+        var response = JsonConvert.DeserializeObject<BikeRentingStatus>(accountStatus);
+
+        return new GetManagersByAccountEmailResponse();
+    }
+
+    public override async Task<GetManagersByAccountEmailResponse> GetDirectors(Empty request, ServerCallContext context)
+    {
+        var directors = await _unitOfWork.ManagerRepository.Find(x => x.IsSuperManager && x.IsActive);
+        return new GetManagersByAccountEmailResponse
+        {
+            Emails = {directors.Select(x => x.Email).ToList()}
         };
     }
 }
