@@ -1,6 +1,11 @@
+using System.Globalization;
+using System.Text;
 using Aggregator.Dto;
+using Aggregator.Services;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Net.ClientFactory;
+using iText.Html2pdf;
+
 using Microsoft.AspNetCore.Mvc;
 
 namespace Aggregator.Controllers;
@@ -10,12 +15,14 @@ namespace Aggregator.Controllers;
 // [Authorize]
 public class DashboardController : ControllerBase
 {
+    private readonly IViewRender _viewRender;
     private readonly BikeServiceGrpc.BikeServiceGrpcClient _bikeServiceGrpc;
     private readonly AccountServiceGrpc.AccountServiceGrpcClient _accountServiceGrpc;
     private readonly BikeBookingServiceGrpc.BikeBookingServiceGrpcClient _bikeBookingServiceGrpc;
 
-    public DashboardController(GrpcClientFactory grpcClientFactory)
+    public DashboardController(GrpcClientFactory grpcClientFactory, IViewRender viewRender)
     {
+        _viewRender = viewRender;
         _bikeServiceGrpc = grpcClientFactory.CreateClient<BikeServiceGrpc.BikeServiceGrpcClient>("BikeService");
         _accountServiceGrpc = grpcClientFactory.CreateClient<AccountServiceGrpc.AccountServiceGrpcClient>("AccountService");
         _bikeBookingServiceGrpc = grpcClientFactory.CreateClient<BikeBookingServiceGrpc.BikeBookingServiceGrpcClient>(
@@ -123,5 +130,73 @@ public class DashboardController : ControllerBase
         var data = await _bikeBookingServiceGrpc.GetTopThreeBikeHasBeenRentAsync(new Empty());
         return Ok(data.TopThreeBikeRent.OrderByDescending(x => x.TotalRentingPoint)
             .ThenByDescending(x => x.TotalRentingTimes));
+    }
+    
+    [HttpGet]
+    public async Task<IActionResult> DownloadReport(string? filterType = "week")
+    {
+        var now = DateTime.Now;
+        var weekNumber = ISOWeek.GetWeekOfYear(now);
+        var startDate = new DateTime();
+        var endDate = new DateTime();
+        var reportTypeDisplay = string.Empty;
+
+        switch (filterType)
+        {
+            case "week":
+                startDate = ISOWeek.ToDateTime(now.Year, weekNumber, DayOfWeek.Monday);
+                endDate = ISOWeek.ToDateTime(now.Year, weekNumber, DayOfWeek.Sunday);
+                reportTypeDisplay = "tuần";
+                break;
+            case "month":
+                startDate = new DateTime(now.Year, now.Month, 1);
+                endDate = new DateTime(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month));
+                reportTypeDisplay = "tháng";
+                break;
+            case "year":
+                startDate = new DateTime(now.Year, 1, 1);
+                endDate = new DateTime(now.Year, 12, 31);
+                reportTypeDisplay = "năm";
+                break;
+        }
+
+        var paymentStatistic = await _accountServiceGrpc.GetPaymentStatisticsAsync(new AccountGetStatisticsRequest
+        {
+            FilterType = filterType
+        });
+        
+        var accountStatistics = await _accountServiceGrpc.GetAccountStatisticsAsync(new AccountGetStatisticsRequest
+        {
+            FilterType = filterType
+        });
+        
+        var bikeBookingStatistics = await _bikeBookingServiceGrpc.GetBikeRentingStatisticsAsync(
+            new BikeBookingGetStatisticsRequest
+            {
+                FilterType = filterType
+            });
+
+        var bikeReportStatistics = await _bikeServiceGrpc.GetBikeReportStatisticsAsync(new BikeGetStatisticsRequest
+        {
+            FilterType = filterType
+        });
+
+        var htmlContent = await _viewRender.RenderPartialViewToString("report", new ReportExportDto
+        {
+            StartDate = startDate,
+            EndDate = endDate,
+            ReportType = reportTypeDisplay,
+            TotalTransaction = paymentStatistic.TotalCount,
+            Revenue = paymentStatistic.Total,
+            TotalAccount = (int) accountStatistics.Total,
+            TotalBooking = (int) bikeBookingStatistics.Total,
+            TotalBikeReport = (int) bikeReportStatistics.Total
+        });
+
+        var memoryStream = new MemoryStream();
+        HtmlConverter.ConvertToPdf(htmlContent, memoryStream);
+        
+        return File(memoryStream.ToArray(), "application/pdf", 
+            $"report_{DateTime.Now.ToShortDateString()}.pdf");
     }
 }

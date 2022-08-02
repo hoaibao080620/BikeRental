@@ -1,4 +1,5 @@
 using Aggregator.Extensions;
+using Aggregator.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddOktaAuthenticationService(builder.Configuration);
 builder.Services.RegisterGrpcClient();
+builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
+builder.Services.AddScoped<IViewRender, ViewRender>();
 
 var app = builder.Build();
 

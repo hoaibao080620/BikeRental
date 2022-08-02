@@ -21,17 +21,20 @@ public class AccountGrpcService : AccountServiceGrpc.AccountServiceGrpcBase
         double totalPayment = 0;
         double previousTotalPayment = 0;
         var now = DateTime.UtcNow;
+        var totalCount = 0;
         switch (request.FilterType)
         {
             case "week":
                 var dayOfWeek = now.DayOfWeek;
                 var firstDateOfWeek = now.AddDays((int) dayOfWeek * -1);
-                totalPayment = (await _mongoService
+                var payments = await _mongoService
                     .FindAccountTransactions(x =>
                         x.Status == "Success" &&
                         x.CreatedOn >= firstDateOfWeek.Date &&
-                        x.CreatedOn <= now)
-                    ).Sum(x => x.Amount);
+                        x.CreatedOn <= now);
+                
+                totalPayment = payments.Sum(x => x.Amount);
+                totalCount = payments.Count;
 
                 var previousWeek = ISOWeek.GetWeekOfYear(now) - 1;
                 var firstDateOfPreviousWeek = ISOWeek.ToDateTime(now.Year, previousWeek, DayOfWeek.Monday);
@@ -45,12 +48,14 @@ public class AccountGrpcService : AccountServiceGrpc.AccountServiceGrpcBase
                 break;
             case "month":
                 var firstDateOfMonth = new DateTime(now.Year, now.Month, 1);
-                totalPayment = (await _mongoService
+                payments = await _mongoService
                     .FindAccountTransactions(x =>
                         x.Status == "Success" &&
                         x.CreatedOn >= firstDateOfMonth.Date &&
-                        x.CreatedOn <= now)
-                    ).Sum(x => x.Amount);
+                        x.CreatedOn <= now);
+                
+                totalPayment = payments.Sum(x => x.Amount);
+                totalCount = payments.Count;
 
                 var previousMonth = now.AddMonths(-1).AddDays(1).AddTicks(-1);
                 var firstDateOfPreviousMonth= new DateTime(previousMonth.Year, previousMonth.Month, 1);
@@ -63,11 +68,14 @@ public class AccountGrpcService : AccountServiceGrpc.AccountServiceGrpcBase
                 break;
             case "year":
                 var firstDateOfYear = new DateTime(now.Year, 1, 1);
-                totalPayment = (await _mongoService
+                payments = await _mongoService
                     .FindAccountTransactions(x =>
                         x.Status == "Success" &&
                         x.CreatedOn >= firstDateOfYear.Date &&
-                        x.CreatedOn <= now)).Sum(x => x.Amount);
+                        x.CreatedOn <= now);
+                
+                totalPayment = payments.Sum(x => x.Amount);
+                totalCount = payments.Count;
 
                 var previousYear = now.AddYears(-1).AddDays(1).AddTicks(-1);
                 var firstDateOfPreviousYear= new DateTime(previousYear.Year, 1, 1);
@@ -93,7 +101,8 @@ public class AccountGrpcService : AccountServiceGrpc.AccountServiceGrpcBase
         return new GetStatisticsResponse
         {
             RateCompare = rateCompare,
-            Total = totalPayment
+            Total = totalPayment,
+            TotalCount = totalCount
         };
     }
 

@@ -14,7 +14,8 @@ message GetStatisticsRequest {
 
 message GetStatisticsResponse {
   double total = 1;
-  double rateCompare = 2;
+  double totalCount = 2;
+  double rateCompare = 3;
 }
 
 message GetRecentTransactionsRequest {
