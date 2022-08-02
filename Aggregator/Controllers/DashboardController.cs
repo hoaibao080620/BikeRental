@@ -186,7 +186,7 @@ public class DashboardController : ControllerBase
             StartDate = startDate,
             EndDate = endDate,
             ReportType = reportTypeDisplay,
-            TotalTransaction = paymentStatistic.TotalCount,
+            TotalTransaction = (int) paymentStatistic.TotalCount,
             Revenue = paymentStatistic.Total,
             TotalAccount = (int) accountStatistics.Total,
             TotalBooking = (int) bikeBookingStatistics.Total,
