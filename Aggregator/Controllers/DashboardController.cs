@@ -160,37 +160,43 @@ public class DashboardController : ControllerBase
                 break;
         }
 
-        var paymentStatistic = await _accountServiceGrpc.GetPaymentStatisticsAsync(new AccountGetStatisticsRequest
+        var paymentStatistic = _accountServiceGrpc.GetPaymentStatisticsAsync(new AccountGetStatisticsRequest
         {
             FilterType = filterType
         });
         
-        var accountStatistics = await _accountServiceGrpc.GetAccountStatisticsAsync(new AccountGetStatisticsRequest
+        var accountStatistics = _accountServiceGrpc.GetAccountStatisticsAsync(new AccountGetStatisticsRequest
         {
             FilterType = filterType
         });
         
-        var bikeBookingStatistics = await _bikeBookingServiceGrpc.GetBikeRentingStatisticsAsync(
+        var bikeBookingStatistics = _bikeBookingServiceGrpc.GetBikeRentingStatisticsAsync(
             new BikeBookingGetStatisticsRequest
             {
                 FilterType = filterType
             });
 
-        var bikeReportStatistics = await _bikeServiceGrpc.GetBikeReportStatisticsAsync(new BikeGetStatisticsRequest
+        var bikeReportStatistics = _bikeServiceGrpc.GetBikeReportStatisticsAsync(new BikeGetStatisticsRequest
         {
             FilterType = filterType
         });
+
+        await Task.WhenAll(
+            paymentStatistic.ResponseAsync,
+            accountStatistics.ResponseAsync,
+            bikeBookingStatistics.ResponseAsync,
+            bikeReportStatistics.ResponseAsync);
 
         var htmlContent = await _viewRender.RenderPartialViewToString("report", new ReportExportDto
         {
             StartDate = startDate,
             EndDate = endDate,
             ReportType = reportTypeDisplay,
-            TotalTransaction = (int) paymentStatistic.TotalCount,
-            Revenue = paymentStatistic.Total,
-            TotalAccount = (int) accountStatistics.Total,
-            TotalBooking = (int) bikeBookingStatistics.Total,
-            TotalBikeReport = (int) bikeReportStatistics.Total
+            TotalTransaction = (int) paymentStatistic.ResponseAsync.Result.TotalCount,
+            Revenue = paymentStatistic.ResponseAsync.Result.Total,
+            TotalAccount = (int) accountStatistics.ResponseAsync.Result.Total,
+            TotalBooking = (int) bikeBookingStatistics.ResponseAsync.Result.Total,
+            TotalBikeReport = (int) bikeReportStatistics.ResponseAsync.Result.Total
         });
 
         var memoryStream = new MemoryStream();

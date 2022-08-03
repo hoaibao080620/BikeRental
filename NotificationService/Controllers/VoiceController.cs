@@ -129,7 +129,7 @@ public class VoiceController : ControllerBase
             Duration = Convert.ToDouble(queryString["DialCallDuration"]),
             From = queryString.Get("From")!,
             To = queryString.Get("To")!,
-            AnsweredByManager = "Test@gmail.com",
+            AnsweredBy = "Test@gmail.com",
             Status = queryString.Get("DialCallStatus")!,
             Direction = queryString.Get("Direction")!,
             RecordingUrl = queryString.Get("RecordingUrl"),
@@ -159,7 +159,7 @@ public class VoiceController : ControllerBase
             Duration = Convert.ToDouble(queryString["CallDuration"]),
             From = queryString.Get("From")!,
             To = queryString.Get("To")!,
-            AnsweredByManager = "Test@gmail.com",
+            AnsweredBy = "Test@gmail.com",
             Status = queryString.Get("CallStatus")!,
             Direction = "outbound",
             RecordingUrl = queryString.Get("RecordingUrl"),
@@ -178,5 +178,13 @@ public class VoiceController : ControllerBase
     public IActionResult HandleCompletedRecording()
     {
         return Ok();
+    }
+    
+    [HttpGet]
+    [Route("[action]")]
+    public async Task<IActionResult> GetCalls()
+    {
+        var calls = await _notificationRepository.GetCalls(_ => true);
+        return Ok(calls);
     }
 }

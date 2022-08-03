@@ -17,5 +17,5 @@ public class Call
     public DateTime CalledOn { get; set; }
     public string? RecordingUrl { get; set; }
     public string CallSid { get; set; } = null!;
-    public string? AnsweredByManager { get; set; }
+    public string? AnsweredBy { get; set; }
 }
