@@ -10,4 +10,7 @@ public class BikeRentingHistory
     public double? TotalTime { get; set; }
     public string AccountEmail { get; set; } = null!;
     public string AccountPhone { get; set; } = null!;
+    public double TotalPoint { get; set; }
+    public string? PaymentStatus { get; set; }
+    public string Status { get; set; } = null!;
 }
