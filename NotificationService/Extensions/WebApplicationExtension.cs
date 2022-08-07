@@ -12,15 +12,12 @@ public static class WebApplicationExtension
         var messageQueueSubscriptionManager = serviceProvider.GetRequiredService<IMessageQueueSubscriptionManager>();
         
         messageQueueSubscriptionManager.RegisterEventHandlerSubscription<NotifyBikeLocationChangeCommandHandler>(
-            serviceProvider.CreateScope().ServiceProvider, 
             MessageType.NotifyBikeLocationChange);
         
         messageQueueSubscriptionManager.RegisterEventHandlerSubscription<BikeCheckinCommandHandler>(
-            serviceProvider.CreateScope().ServiceProvider, 
             MessageType.BikeCheckedIn);
         
         messageQueueSubscriptionManager.RegisterEventHandlerSubscription<BikeCheckoutCommandHandler>(
-            serviceProvider.CreateScope().ServiceProvider, 
             MessageType.BikeCheckedOut);
     }
 }
