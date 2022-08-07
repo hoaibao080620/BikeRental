@@ -53,6 +53,9 @@ public static class ServiceLifetimeServiceCollectionExtension
         
         messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserReactivatedEventHandler>(
             MessageType.AccountReactivated);
+        
+        messageQueueSubscriptionManager.RegisterEventHandlerSubscription<PaymentPointFailedEventHandler>(
+            MessageType.PaymentFailed);
     }
     
     public static void AddMongoDb(this IServiceCollection serviceCollection, IConfiguration configuration)

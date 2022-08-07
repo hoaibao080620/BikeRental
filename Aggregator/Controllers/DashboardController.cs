@@ -74,9 +74,16 @@ public class DashboardController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetRentingChart()
+    public async Task<IActionResult> GetRentingChart(string filterType = "week")
     {
-        var rentingChartData = await _bikeBookingServiceGrpc.GetBikeRentingChartDataAsync(new Empty());
+        var (startDate, endDate) = GetFilterDate(filterType);
+        var rentingChartData = await _bikeBookingServiceGrpc.GetBikeRentingChartDataAsync(new BikeBookingGetStatisticsRequest
+        {
+            FilterType = filterType,
+            StartDate = startDate.ToTimestamp(),
+            EndDate = endDate.ToTimestamp()
+        });
+        
         return Ok(rentingChartData.ChartData.ToList());
     }
     
@@ -135,30 +142,47 @@ public class DashboardController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> DownloadReport(string? filterType = "week")
     {
-        var now = DateTime.Now;
-        var weekNumber = ISOWeek.GetWeekOfYear(now);
-        var startDate = new DateTime();
-        var endDate = new DateTime();
-        var reportTypeDisplay = string.Empty;
-
-        switch (filterType)
+        var (startDate, endDate) = GetFilterDate(filterType!);
+        var reportDisplayDict = new Dictionary<string, string>
         {
-            case "week":
-                startDate = ISOWeek.ToDateTime(now.Year, weekNumber, DayOfWeek.Monday);
-                endDate = ISOWeek.ToDateTime(now.Year, weekNumber, DayOfWeek.Sunday);
-                reportTypeDisplay = "tuần";
-                break;
-            case "month":
-                startDate = new DateTime(now.Year, now.Month, 1);
-                endDate = new DateTime(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month));
-                reportTypeDisplay = "tháng";
-                break;
-            case "year":
-                startDate = new DateTime(now.Year, 1, 1);
-                endDate = new DateTime(now.Year, 12, 31);
-                reportTypeDisplay = "năm";
-                break;
-        }
+            {"week", "tuần"},
+            {"month", "tháng"},
+            {"year", "năm"}
+        };
+        
+        var chartColumnDict = new Dictionary<string, List<string>>
+        {
+            {"week", new List<string>
+            {
+                "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ nhật"
+            }},
+            {"month", new List<string>
+            {
+                "Tuần 1", "Tuần 2", "Tuần 3", "Tuần 4"
+            }},
+            {"year", new List<string>
+            {
+                "Tháng 1", 
+                "Tháng 2",
+                "Tháng 3",
+                "Tháng 4",
+                "Tháng 5",
+                "Tháng 6",
+                "Tháng 7",
+                "Tháng 8",
+                "Tháng 9",
+                "Tháng 10",
+                "Tháng 11",
+                "Tháng 12",
+            }}
+        };
+
+        var chartData = _accountServiceGrpc.GetPaymentChartAsync(new GetPaymentChartRequest
+        {
+            FilterType = filterType,
+            StartDate = startDate.ToTimestamp(),
+            EndDate = endDate.ToTimestamp()
+        });
 
         var paymentStatistic = _accountServiceGrpc.GetPaymentStatisticsAsync(new AccountGetStatisticsRequest
         {
@@ -185,24 +209,53 @@ public class DashboardController : ControllerBase
             paymentStatistic.ResponseAsync,
             accountStatistics.ResponseAsync,
             bikeBookingStatistics.ResponseAsync,
-            bikeReportStatistics.ResponseAsync);
+            bikeReportStatistics.ResponseAsync,
+            chartData.ResponseAsync);
 
         var htmlContent = await _viewRender.RenderPartialViewToString("report", new ReportExportDto
         {
             StartDate = startDate,
             EndDate = endDate,
-            ReportType = reportTypeDisplay,
+            ReportType = reportDisplayDict[filterType!],
             TotalTransaction = (int) paymentStatistic.ResponseAsync.Result.TotalCount,
             Revenue = paymentStatistic.ResponseAsync.Result.Total,
             TotalAccount = (int) accountStatistics.ResponseAsync.Result.Total,
             TotalBooking = (int) bikeBookingStatistics.ResponseAsync.Result.Total,
-            TotalBikeReport = (int) bikeReportStatistics.ResponseAsync.Result.Total
+            TotalBikeReport = (int) bikeReportStatistics.ResponseAsync.Result.Total,
+            ChartData = chartData.ResponseAsync.Result.ChartData.ToList(),
+            ChartColumns = chartColumnDict[filterType!]
         });
 
-        var memoryStream = new MemoryStream();
+        await using var memoryStream = new MemoryStream();
         HtmlConverter.ConvertToPdf(htmlContent, memoryStream);
         
         return File(memoryStream.ToArray(), "application/pdf", 
             $"report_{DateTime.Now.ToShortDateString()}.pdf");
+    }
+
+    private (DateTime StartDate, DateTime EndDate) GetFilterDate(string filterType)
+    {
+        var now = DateTime.Now;
+        var weekNumber = ISOWeek.GetWeekOfYear(now);
+        var startDate = new DateTime();
+        var endDate = new DateTime();
+        
+        switch (filterType)
+        {
+            case "week":
+                startDate = ISOWeek.ToDateTime(now.Year, weekNumber, DayOfWeek.Monday);
+                endDate = ISOWeek.ToDateTime(now.Year, weekNumber, DayOfWeek.Sunday);
+                break;
+            case "month":
+                startDate = new DateTime(now.Year, now.Month, 1);
+                endDate = new DateTime(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month));
+                break;
+            case "year":
+                startDate = new DateTime(now.Year, 1, 1);
+                endDate = new DateTime(now.Year, 12, 31);
+                break;
+        }
+
+        return (DateTime.SpecifyKind(startDate.Date, DateTimeKind.Utc), DateTime.SpecifyKind(endDate.Date, DateTimeKind.Utc));
     }
 }

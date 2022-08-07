@@ -499,9 +499,12 @@
                                   </table>
                                 </td>
                               </tr>
-                              <tr style="font-weight: 300">
-                                <td
-                                  style="
+                            <tr style="font-weight: 300">
+                              @{
+                                foreach (var column in Model.ChartColumns)
+                                {
+                                  <td
+                                    style="
                                     font-weight: 300;
                                     text-align: center;
                                     font-size: 14px;
@@ -510,101 +513,12 @@
                                     width: 14%;
                                     margin: 0;
                                     padding: 10px 0 0;
-                                  "
-                                >
-                                  Mon
-                                </td>
-
-                                <td
-                                  style="
-                                    font-weight: 300;
-                                    text-align: center;
-                                    font-size: 14px;
-                                    border-right: 10px solid #fff;
-                                    color: #848296;
-                                    width: 14%;
-                                    margin: 0;
-                                    padding: 10px 0 0;
-                                  "
-                                >
-                                  Tue
-                                </td>
-
-                                <td
-                                  style="
-                                    font-weight: 300;
-                                    text-align: center;
-                                    font-size: 14px;
-                                    border-right: 10px solid #fff;
-                                    color: #848296;
-                                    width: 14%;
-                                    margin: 0;
-                                    padding: 10px 0 0;
-                                  "
-                                >
-                                  Wed
-                                </td>
-
-                                <td
-                                  style="
-                                    font-weight: 300;
-                                    text-align: center;
-                                    font-size: 14px;
-                                    border-right: 10px solid #fff;
-                                    color: #848296;
-                                    width: 14%;
-                                    margin: 0;
-                                    padding: 10px 0 0;
-                                  "
-                                >
-                                  Thu
-                                </td>
-
-                                <td
-                                  style="
-                                    font-weight: 300;
-                                    text-align: center;
-                                    font-size: 14px;
-                                    border-right: 10px solid #fff;
-                                    color: #848296;
-                                    width: 14%;
-                                    margin: 0;
-                                    padding: 10px 0 0;
-                                  "
-                                >
-                                  Fri
-                                </td>
-
-                                <td
-                                  style="
-                                    font-weight: 300;
-                                    text-align: center;
-                                    font-size: 14px;
-                                    border-right: 10px solid #fff;
-                                    color: #848296;
-                                    width: 14%;
-                                    margin: 0;
-                                    padding: 10px 0 0;
-                                  "
-                                >
-                                  Sat
-                                </td>
-
-                                <td
-                                  style="
-                                    font-weight: 300;
-                                    text-align: center;
-                                    font-size: 14px;
-                                    border-right: none;
-                                    color: #848296;
-                                    width: 14%;
-                                    margin: 0;
-                                    padding: 10px 0 0;
-                                  "
-                                >
-                                  Sun
-                                </td>
-                              </tr>
+                                  ">
+                                    @column
+                                  </td>
+                                }
+                              }
+                            </tr>
                             </tbody>
                           </table>
                         </td>

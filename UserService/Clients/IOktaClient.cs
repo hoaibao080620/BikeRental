@@ -13,4 +13,5 @@ public interface IOktaClient
     public Task UpdateOktaUserPassword(string oktaUserId, string password);
     public Task DeactivateOktaUser(string oktaUserId);
     public Task ActivateOktaUser(string oktaUserId);
+    public Task<bool> IsPasswordValid(string username, string password);
 }

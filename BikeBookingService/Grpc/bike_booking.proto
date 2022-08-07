@@ -1,9 +1,10 @@
 ﻿syntax = "proto3";
 import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 
 service BikeBookingServiceGrpc {
   rpc GetBikeRentingStatistics (GetStatisticsRequest) returns (GetStatisticsResponse);
-  rpc GetBikeRentingChartData (google.protobuf.Empty) returns (GetRentingChartDataResponse);
+  rpc GetBikeRentingChartData (GetStatisticsRequest) returns (GetRentingChartDataResponse);
   rpc GetTopThreeBikeHasBeenRent (google.protobuf.Empty) returns (GetTopThreeBikeHasBeenRentResponse);
   rpc GetTopThreeAccountRenting (google.protobuf.Empty) returns (GetTopThreeAccountRentingResponse);
   rpc GetTotalTimesRentingByBikeStation (google.protobuf.Empty) returns (GetTotalTimesRentingByBikeStationResponse);
@@ -12,6 +13,8 @@ service BikeBookingServiceGrpc {
 
 message GetStatisticsRequest {
   string filterType = 1;
+  google.protobuf.Timestamp startDate = 2;
+  google.protobuf.Timestamp endDate = 3;
 }
 
 message GetStatisticsResponse { 

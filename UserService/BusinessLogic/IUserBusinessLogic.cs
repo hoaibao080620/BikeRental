@@ -17,4 +17,5 @@ public interface IUserBusinessLogic
     public Task DeactivateUser(ActivateUserDto dto);
     public Task ActivateUser(ActivateUserDto dto);
     Task<List<UserRetrieveDto>> GetManagers();
+    public Task ChangePassword(string email, ChangePasswordDto changePasswordDto);
 }

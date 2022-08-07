@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UserService.BusinessLogic;
 using UserService.Dtos;
@@ -29,5 +30,22 @@ public class AuthController : ControllerBase
     {
         await _userBusinessLogic.SignUp(signUpDto);
         return Ok();
+    }
+    
+    [HttpPut]
+    [Authorize]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto changePasswordDto)
+    {
+        try
+        {
+            var email = HttpContext.User.Claims.FirstOrDefault(x =>
+                x.Type == ClaimTypes.NameIdentifier)!.Value;
+            await _userBusinessLogic.ChangePassword(email, changePasswordDto);
+            return Ok();
+        }
+        catch (InvalidOperationException)
+        {
+            return BadRequest("Mật khẩu cũ không đúng, xin vui lòng thử lại!");
+        }
     }
 }

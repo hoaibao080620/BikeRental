@@ -287,6 +287,19 @@ public class UserBusinessLogic : IUserBusinessLogic
         }).ToList();
     }
 
+    public async Task ChangePassword(string email, ChangePasswordDto changePasswordDto)
+    {
+        var isOldPasswordCorrect = await _oktaClient.IsPasswordValid(email, changePasswordDto.OldPassword);
+        if (!isOldPasswordCorrect) throw new InvalidOperationException();
+        
+        var user = (await _mongoService
+                .FindUser(x => x.Email == email))
+            .FirstOrDefault();
+
+        if (user is null) return;
+        await _oktaClient.UpdateOktaUserPassword(user.OktaUserId!, changePasswordDto.NewPassword);
+    }
+
     private async Task<string?> AddUserToOkta(OktaUserInsertParam oktaInsertParam)
     {
         var group = (await _mongoService.GetRoles()).FirstOrDefault(x => x.Name == oktaInsertParam.RoleName)!;

@@ -73,34 +73,19 @@ public class StripeService : IStripeService
                 });
                 break;
             }
-            // case Events.PaymentIntentPaymentFailed:
-            // {
-            //     var paymentIntent = stripeEvent.Data.Object as PaymentIntent;
-            //     var paymentCharge = paymentIntent!.Charges.Data.FirstOrDefault()!;
-            //     await _messageQueuePublisher.PublishPaymentFailedEvent(new PaymentFailed
-            //     {
-            //         Amount = paymentIntent.Amount,
-            //         Email = paymentIntent.Customer?.Email ?? paymentCharge.ReceiptEmail,
-            //         FailedOn = DateTime.UtcNow,
-            //         FailureMessage = paymentCharge.FailureMessage,
-            //         MessageType = MessageType.PaymentFailed
-            //     });
-            //     break;
-            // }
-            // case Events.PaymentIntentRequiresAction:
-            // {
-            //     var paymentIntent = stripeEvent.Data.Object as PaymentIntent;
-            //     var paymentCharge = paymentIntent!.Charges.Data.FirstOrDefault()!;
-            //     await _messageQueuePublisher.PublishPaymentFailedEvent(new PaymentFailed
-            //     {
-            //         Amount = paymentIntent.Amount,
-            //         Email = paymentIntent.Customer?.Email ?? paymentCharge.ReceiptEmail,
-            //         FailedOn = DateTime.UtcNow,
-            //         FailureMessage = paymentCharge.FailureMessage,
-            //         MessageType = MessageType.PaymentFailed
-            //     });
-            //     break;
-            // }
+            case Events.PaymentIntentPaymentFailed:
+            {
+                var paymentIntent = stripeEvent.Data.Object as PaymentIntent;
+                var paymentCharge = paymentIntent!.Charges.Data.FirstOrDefault()!;
+                await _messageQueuePublisher.PublishPaymentFailedEvent(new PaymentFailed
+                {
+                    Amount = paymentIntent.Amount,
+                    Email = paymentIntent.Customer?.Email ?? paymentCharge.ReceiptEmail,
+                    FailedOn = DateTime.UtcNow,
+                    MessageType = MessageType.PaymentFailed
+                });
+                break;
+            }
             default:
                 Console.WriteLine("Unhandled event type: {0}", stripeEvent.Type);
                 break;

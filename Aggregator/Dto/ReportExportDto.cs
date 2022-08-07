@@ -10,4 +10,6 @@ public class ReportExportDto
     public int TotalAccount { get; set; }
     public int TotalBooking { get; set; }
     public int TotalBikeReport { get; set; }
+    public List<int> ChartData { get; set; } = null!;
+    public List<string> ChartColumns { get; set; } = null!;
 }

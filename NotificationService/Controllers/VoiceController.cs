@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using System.Web;
+﻿using System.Web;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Net.ClientFactory;
 using Microsoft.AspNetCore.Mvc;
@@ -17,16 +16,13 @@ namespace NotificationService.Controllers;
 public class VoiceController : ControllerBase
 {
     private readonly INotificationRepository _notificationRepository;
-    private readonly string? _email;
     private readonly BikeServiceGrpc.BikeServiceGrpcClient _client;
 
     public VoiceController(INotificationRepository notificationRepository,
-        IHttpContextAccessor httpContextAccessor,
         GrpcClientFactory grpcClientFactory)
     {
         _notificationRepository = notificationRepository;
         _client = grpcClientFactory.CreateClient<BikeServiceGrpc.BikeServiceGrpcClient>("BikeService");
-        _email = httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
     }
     
     [HttpPost]
@@ -73,7 +69,7 @@ public class VoiceController : ControllerBase
                     response.Say("You need support. We will help!");
                     break;
                 case "2":
-                    var emails = _client.GetDirectors(new Empty()).Emails.ToList();
+                    var emails = (await _client.GetDirectorsAsync(new Empty())).Emails.ToList();
                     emails.ForEach(email =>
                     {
                         dial.Append(new Client().Identity(email));

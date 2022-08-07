@@ -6,6 +6,7 @@ service AccountServiceGrpc {
   rpc GetAccountStatistics(AccountGetStatisticsRequest) returns (AccountGetStatisticsResponse);
   rpc GetRecentTransactions(GetRecentTransactionsRequest) returns (GetRecentTransactionsResponse);
   rpc GetAccountInfo(GetAccountInfoRequest) returns (GetAccountInfoResponse);
+  rpc GetPaymentChart(GetPaymentChartRequest) returns (GetPaymentChartResponse);
 }
 
 message AccountGetStatisticsRequest {
@@ -44,4 +45,14 @@ message GetAccountInfoResponse {
   google.protobuf.Timestamp dateOfBirth = 6;
   string firstName = 7;
   string lastName = 8;
+}
+
+message GetPaymentChartRequest {
+  google.protobuf.Timestamp startDate = 1;
+  google.protobuf.Timestamp endDate = 2;
+  string filterType = 3;
+}
+
+message GetPaymentChartResponse {
+  repeated int32 chartData = 1;
 }

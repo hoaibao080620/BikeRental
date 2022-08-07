@@ -2,8 +2,6 @@
 using AccountService.DataAccess;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
-using Shared.Service;
-using TimeZone = Shared.Consts.TimeZone;
 
 namespace AccountService.GrpcServices;
 
@@ -209,6 +207,53 @@ public class AccountGrpcService : AccountServiceGrpc.AccountServiceGrpcBase
             LastName = account.LastName,
             DateOfBirth = account.DateOfBirth.HasValue ? Timestamp.FromDateTime(account.DateOfBirth.Value) : null,
             Point = account.Point
+        };
+    }
+
+    public override async Task<GetPaymentChartResponse> GetPaymentChart(GetPaymentChartRequest request, ServerCallContext context)
+    {
+        var chartColumnNumberDict = new Dictionary<string, int>
+        {
+            {"week", 7},
+            {"month", 4},
+            {"year", 12}
+        };
+        var startDate = request.StartDate.ToDateTime();
+        var endDate = request.EndDate.ToDateTime();
+        var startWeek = ISOWeek.GetWeekOfYear(startDate);
+        var numberOfCharts = chartColumnNumberDict[request.FilterType];
+        var chartData = new List<int>();
+        var bikeRentalBookings = (await _mongoService.FindAccountTransactions(x =>
+                x.TransactionTime >= startDate &&
+                x.TransactionTime <= endDate.AddDays(1).AddTicks(-1))).ToList();
+
+        var statistic = request.FilterType switch
+        {
+            "year" => bikeRentalBookings.GroupBy(x => x.TransactionTime.Month)
+                .OrderBy(x => x.Key)
+                .ToDictionary(x => x.Key, x => x.Count()),
+            "month" => bikeRentalBookings.GroupBy(x => ISOWeek.GetWeekOfYear(x.TransactionTime))
+                .OrderBy(x => x.Key)
+                .ToDictionary(x => x.Key, x => x.Count()),
+            "week" => bikeRentalBookings.GroupBy(x => x.TransactionTime.DayOfWeek)
+                .OrderBy(x => x.Key)
+                .ToDictionary(x => (int) x.Key, x => x.Count()),
+            _ => new Dictionary<int, int>()
+        };
+        
+        for (var i = 1; i <= numberOfCharts; i++)
+        {
+            chartData.Add(statistic.GetValueOrDefault(i, statistic.GetValueOrDefault(startWeek + i - 1)));
+        }
+        
+        if (request.FilterType == "week")
+        {
+            chartData[6] = statistic.GetValueOrDefault(0);
+        }
+        
+        return new GetPaymentChartResponse()
+        {
+            ChartData = {chartData}
         };
     }
 }

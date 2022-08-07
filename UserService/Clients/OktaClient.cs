@@ -1,9 +1,11 @@
-﻿using System.Text;
+﻿using System.Net;
+using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UserService.Dtos;
 using UserService.Dtos.OktaClient;
 using UserService.Extensions;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace UserService.Clients;
 
@@ -114,5 +116,16 @@ public class OktaClient : IOktaClient
     public async Task ActivateOktaUser(string oktaUserId)
     {
         await _httpClient.PostAsync($"{_baseUrl}/api/v1/users/{oktaUserId}/lifecycle/unsuspend", null);
+    }
+
+    public async Task<bool> IsPasswordValid(string username, string password)
+    {
+        var result = await _httpClient
+            .PostAsJsonAsync($"{_baseUrl}/api/v1/authn", new
+            {
+                username, password
+            });
+
+        return result.StatusCode == HttpStatusCode.OK;
     }
 }

@@ -92,22 +92,49 @@ public class BikeBookingGrpcService : BikeBookingServiceGrpc.BikeBookingServiceG
         };
     }
 
-    public override async Task<GetRentingChartDataResponse> GetBikeRentingChartData(Empty request, ServerCallContext context)
+    public override async Task<GetRentingChartDataResponse> GetBikeRentingChartData(GetStatisticsRequest request, ServerCallContext context)
     {
-        var today = DateTime.UtcNow;
-        var dayOfWeek = today.DayOfWeek == DayOfWeek.Sunday ? 7 : (int) today.DayOfWeek;
-        var chartData = new List<int>();
-
-        for (var i = 1; i <= dayOfWeek; i++)
+        var chartColumnNumberDict = new Dictionary<string, int>
         {
-            var dateByDateOfWeek = today.Subtract(TimeSpan.FromDays(dayOfWeek - i)).Date;
-            var totalByDate = (await _unitOfWork.BikeRentalTrackingRepository
-                .Find(x => x.CheckoutOn != null && x.UpdatedOn.HasValue
-                                                && x.UpdatedOn.Value.Date == dateByDateOfWeek)).Count();
-            
-            chartData.Add(totalByDate);
-        }
+            {"week", 7},
+            {"month", 4},
+            {"year", 12}
+        };
+        var startDate = request.StartDate.ToDateTime();
+        var endDate = request.EndDate.ToDateTime();
+        var startWeek = ISOWeek.GetWeekOfYear(startDate);
+        var numberOfCharts = chartColumnNumberDict[request.FilterType];
+        var chartData = new List<int>();
+        var bikeRentalBookings = (await _unitOfWork.BikeRentalTrackingRepository
+            .Find(x =>
+                x.CheckoutOn != null &&
+                x.CheckinOn >= startDate &&
+                x.CheckinOn <= endDate.AddDays(1).AddTicks(-1))).ToList();
 
+        var statistic = request.FilterType switch
+        {
+            "year" => bikeRentalBookings.GroupBy(x => x.CheckinOn.Month)
+                .OrderBy(x => x.Key)
+                .ToDictionary(x => x.Key, x => x.Count()),
+            "month" => bikeRentalBookings.GroupBy(x => ISOWeek.GetWeekOfYear(x.CheckinOn))
+                .OrderBy(x => x.Key)
+                .ToDictionary(x => x.Key, x => x.Count()),
+            "week" => bikeRentalBookings.GroupBy(x => x.CheckinOn.DayOfWeek)
+                .OrderBy(x => x.Key)
+                .ToDictionary(x => (int) x.Key, x => x.Count()),
+            _ => new Dictionary<int, int>()
+        };
+        
+        for (var i = 1; i <= numberOfCharts; i++)
+        {
+            chartData.Add(statistic.GetValueOrDefault(i, statistic.GetValueOrDefault(startWeek + i - 1)));
+        }
+        
+        if (request.FilterType == "week")
+        {
+            chartData[6] = statistic.GetValueOrDefault(0);
+        }
+        
         return new GetRentingChartDataResponse
         {
             ChartData = {chartData}
@@ -200,4 +227,5 @@ public class BikeBookingGrpcService : BikeBookingServiceGrpc.BikeBookingServiceG
             TotalRenting = totalRenting
         };
     }
+    
 }
