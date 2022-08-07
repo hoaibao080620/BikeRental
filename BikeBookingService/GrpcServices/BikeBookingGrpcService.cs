@@ -121,7 +121,7 @@ public class BikeBookingGrpcService : BikeBookingServiceGrpc.BikeBookingServiceG
             .GroupBy(x => new
             {
                 x.BikeId,
-                BikeLicensePlate = x.Bike.LicensePlate
+                BikeLicensePlate = x.Bike.BikeCode
             })
             .Select(x => new BikeRent
             {

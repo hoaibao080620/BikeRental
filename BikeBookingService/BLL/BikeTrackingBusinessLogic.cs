@@ -47,7 +47,7 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
             {
                 Id = x.Id,
                 BikeId = x.BikeId,
-                BikePlate = x.Bike.LicensePlate,
+                BikePlate = x.Bike.BikeCode,
                 AccountEmail = x.Account.Email,
                 CheckedInOn = x.CheckinOn,
                 CheckedOutOn = x.CheckoutOn,
@@ -72,7 +72,7 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
             .Select(x => new BikeTrackingRetrieveDto
             {
                 BikeId = x.Id,
-                LicensePlate = x.LicensePlate,
+                LicensePlate = x.BikeCode,
                 BikeStationColor = x.Color,
                 BikeStationId = x.BikeStationId,
                 BikeStationName = x.BikeStationName,
@@ -91,12 +91,12 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
 
     public async Task BikeChecking(BikeCheckinDto bikeCheckinDto, string accountEmail)
     {
+        var bike = await GetBikeByCode(bikeCheckinDto.BikeCode);
         var managerEmails = (await _bikeServiceGrpc.GetManagerEmailsOfBikeIdAsync(new GetManagerEmailsRequest
         {
-            BikeId = bikeCheckinDto.BikeId
+            BikeId = bike.Id
         })).ManagerEmails.ToList();
-
-        var bike = await GetBikeById(bikeCheckinDto.BikeId);
+        
         var address = await _googleMapService.GetAddressOfLocation(
             bikeCheckinDto.Longitude,
             bikeCheckinDto.Latitude);
@@ -111,12 +111,12 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
                 BikeStationId = bike.BikeStationId!.Value,
                 BikeStationName = bike.BikeStationName!,
                 AccountEmail = accountEmail,
-                LicensePlate = bike.LicensePlate,
+                LicensePlate = bike.BikeCode,
                 CheckinOn = bikeCheckinDto.CheckinTime,
                 MessageType = MessageType.BikeCheckedIn
             });
         
-        var startTrackingBikeTask = StartTrackingBike(bikeCheckinDto, address, accountEmail);
+        var startTrackingBikeTask = StartTrackingBike(bikeCheckinDto, address, accountEmail, bike.Id);
         // var updateCachedTask = UpdateBikeCache(new BikeCacheParameter
         // {
         //     BikeId = bike.Id,
@@ -179,7 +179,7 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
                 BikeId = bike.Id,
                 BikeStationId = bikeCheckout.BikeStationId,
                 AccountEmail = accountEmail,
-                LicensePlate = bike.LicensePlate,
+                LicensePlate = bike.BikeCode,
                 CheckoutOn = bikeCheckout.CheckoutOn,
                 RentingPoint = rentingPoint,
                 MessageType = MessageType.BikeCheckedOut
@@ -195,18 +195,18 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
 
     public async Task UpdateBikeLocation(BikeLocationDto bikeLocationDto)
     {
+        var bike = await GetBikeByCode(bikeLocationDto.BikeCode);
         var managerEmails = (await _bikeServiceGrpc.GetManagerEmailsOfBikeIdAsync(new GetManagerEmailsRequest
         {
-            BikeId = bikeLocationDto.BikeId
+            BikeId = bike.Id
         })).ManagerEmails.ToList();
         
-        // var bike = await GetBikeById(bikeLocationDto.BikeId);
         var address = await _googleMapService.GetAddressOfLocation(
             bikeLocationDto.Longitude, 
             bikeLocationDto.Latitude);
         address ??= "N/A";
 
-        var updateBikeTracking = UpdateBikeRentalTracking(bikeLocationDto, address);
+        var updateBikeTracking = UpdateBikeRentalTracking(bikeLocationDto, address, bike.Id);
         
         var pushEventTask = _messageQueuePublisher.PublishBikeLocationChangeCommand(managerEmails);
         // var updateBikeCache = UpdateBikeCache(new BikeCacheParameter
@@ -232,7 +232,7 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
                 AccountEmail = accountEmail,
                 IsRenting = true,
                 BikeId = x.BikeId,
-                LicensePlate = x.Bike.LicensePlate,
+                LicensePlate = x.Bike.BikeCode,
                 TimeUsing = DateTime.UtcNow.Subtract(x.CheckinOn).Milliseconds,
                 Cost = Math.Round(GetRentingPoint(x.CheckinOn, DateTime.UtcNow), 2)
             }).FirstOrDefault()!
@@ -253,7 +253,7 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
                 CheckinOn = x.CheckinOn,
                 CheckoutOn = x.CheckoutOn!.Value,
                 AccountPhoneNumber = x.Account.PhoneNumber,
-                BikeLicensePlate = x.Bike.LicensePlate,
+                BikeLicensePlate = x.Bike.BikeCode,
                 CheckinBikeStation = x.CheckinBikeStation,
                 CheckoutBikeStation = x.CheckoutBikeStation!,
                 PaymentStatus = x.PaymentStatus!,
@@ -270,19 +270,25 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
         return bike;
     }
     
-    private async Task StartTrackingBike(BikeCheckinDto bikeCheckinDto, string address, string accountEmail)
+    private async Task<Bike> GetBikeByCode(string code)
+    {
+        var bike = await _unitOfWork.BikeRepository.Find(x => x.BikeCode == code);
+        return bike.FirstOrDefault() ?? throw new InvalidOperationException();;
+    }
+    
+    private async Task StartTrackingBike(BikeCheckinDto bikeCheckinDto, string address, string accountEmail, int bikeId)
     {
         var bikeRentalTracking = await CreateBikeRentalBooking(
             bikeCheckinDto, accountEmail);
 
         var bikeTracking = (await _unitOfWork.BikeLocationTrackingRepository.Find(b =>
-            b.BikeId == bikeCheckinDto.BikeId && b.IsActive == false)).FirstOrDefault();
+            b.BikeId == bikeId&& b.IsActive == false)).FirstOrDefault();
 
         if (bikeTracking is null)
         {
             await _unitOfWork.BikeLocationTrackingRepository.Add(new BikeLocationTracking
             {
-                BikeId = bikeCheckinDto.BikeId,
+                BikeId = bikeId,
                 CreatedOn = DateTime.UtcNow,
                 UpdatedOn = DateTime.UtcNow,
                 IsActive = true,
@@ -302,7 +308,7 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
         
         await _unitOfWork.BikeLocationTrackingHistoryRepository.Add(new BikeLocationTrackingHistory
         {
-            BikeId = bikeCheckinDto.BikeId,
+            BikeId = bikeId,
             CreatedOn = DateTime.UtcNow,
             UpdatedOn = DateTime.UtcNow,
             IsActive = true,
@@ -315,13 +321,13 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
     
     private async Task<BikeRentalBooking> CreateBikeRentalBooking(BikeCheckinDto bikeCheckinDto, string accountEmail)
     {
-        var bike = await GetBikeById(bikeCheckinDto.BikeId);
+        var bike = await GetBikeByCode(bikeCheckinDto.BikeCode);
         var account = await GetAccountByEmail(accountEmail);
         var bikeRentalTracking = new BikeRentalBooking
         {
             CheckinOn = bikeCheckinDto.CheckinTime,
             AccountId = account.Id,
-            BikeId = bikeCheckinDto.BikeId,
+            BikeId = bike.Id,
             IsActive = true,
             CreatedOn = DateTime.UtcNow,
             CheckinBikeStation = bike.BikeStationName!
@@ -404,10 +410,10 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
         return Math.Round(duration * 20, 2, MidpointRounding.ToZero);
     }
     
-    private async Task UpdateBikeRentalTracking(BikeLocationDto bikeLocationDto, string address)
+    private async Task UpdateBikeRentalTracking(BikeLocationDto bikeLocationDto, string address, int bikeId)
     {
         var bikeRentalTracking = (await _unitOfWork.BikeLocationTrackingRepository.Find(
-            b => b.BikeId == bikeLocationDto.BikeId)).FirstOrDefault();
+            b => b.BikeId == bikeId)).FirstOrDefault();
         
         bikeRentalTracking!.Latitude = bikeLocationDto.Latitude;
         bikeRentalTracking.Longitude = bikeLocationDto.Longitude;
@@ -415,11 +421,11 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
         bikeRentalTracking.Address = address;
 
         var latestBikeRentalHistory = (await _unitOfWork.BikeLocationTrackingHistoryRepository.Find(
-            x => x.BikeId == bikeLocationDto.BikeId)).FirstOrDefault();
+            x => x.BikeId == bikeId)).FirstOrDefault();
         
         await _unitOfWork.BikeLocationTrackingHistoryRepository.Add(new BikeLocationTrackingHistory
         {
-            BikeId = bikeLocationDto.BikeId,
+            BikeId = bikeId,
             CreatedOn = DateTime.UtcNow,
             UpdatedOn = DateTime.UtcNow,
             IsActive = true,

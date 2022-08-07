@@ -24,7 +24,7 @@ public class BikeUpdatedHandler : IMessageQueueHandler
         bike.BikeStationName = payload.BikeStationName ?? bike.BikeStationName;
         bike.UpdatedOn = DateTime.UtcNow;
         bike.Description = payload.Description ?? bike.Description;
-        bike.LicensePlate = payload.LicensePlate ?? bike.LicensePlate;
+        bike.BikeCode = payload.LicensePlate ?? bike.BikeCode;
         bike.Color = payload.Color ?? bike.Color;
 
         await _unitOfWork.SaveChangesAsync();

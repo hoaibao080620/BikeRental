@@ -58,10 +58,10 @@ public class BikeTrackingValidation : IBikeTrackingValidation
         return isAccountHasRentingBike;
     }
 
-    public async ValueTask<bool> IsBikeAlreadyRent(int bikeId)
+    public async ValueTask<bool> IsBikeAlreadyRent(string bikeCode)
     {
         var isBikeHasBeenRenting = await _unitOfWork.BikeRentalTrackingRepository
-            .Find(x => x.BikeId == bikeId && x.CheckoutOn == null);
+            .Find(x => x.Bike.BikeCode == bikeCode && x.CheckoutOn == null);
 
         return isBikeHasBeenRenting.Any();
     }

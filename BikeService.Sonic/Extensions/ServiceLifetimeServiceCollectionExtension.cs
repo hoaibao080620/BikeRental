@@ -52,23 +52,18 @@ public static class ServiceLifetimeServiceCollectionExtension
         var messageQueueSubscriptionManager = serviceProvider.GetRequiredService<IMessageQueueSubscriptionManager>();
         
         messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserCreatedEventHandler>(
-            serviceProvider.CreateScope().ServiceProvider, 
             MessageType.UserAdded);
         
         messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserDeletedEventHandler>(
-            serviceProvider.CreateScope().ServiceProvider, 
             MessageType.UserDeleted);
         
         messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserRoleUpdatedHandler>(
-            serviceProvider.CreateScope().ServiceProvider, 
             MessageType.UserRoleUpdated);
         
         messageQueueSubscriptionManager.RegisterEventHandlerSubscription<BikeCheckedInEventHandler>(
-            serviceProvider.CreateScope().ServiceProvider, 
             MessageType.BikeCheckedIn);
         
         messageQueueSubscriptionManager.RegisterEventHandlerSubscription<BikeCheckedOutHandler>(
-            serviceProvider.CreateScope().ServiceProvider, 
             MessageType.BikeCheckedOut);
     }
     

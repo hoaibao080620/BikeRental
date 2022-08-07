@@ -1,4 +1,5 @@
 ﻿using BikeRental.MessageQueue.Consumer;
+using BikeRental.MessageQueue.Handlers;
 using BikeRental.MessageQueue.SubscriptionManager;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -37,10 +38,8 @@ public class MessageQueueConsumer : BackgroundService
             foreach (var message in receiveMessages)
             {
                 var messageType = (JsonConvert.DeserializeObject(message.Body) as JObject)?["MessageType"]?.ToString();
-                
-                if(string.IsNullOrEmpty(messageType)) continue;
-                
-                var messageHandler = _messageQueueSubscriptionManager.GetHandler(messageType);
+                var messageHandlerType = _messageQueueSubscriptionManager.GetHandler(messageType ?? string.Empty);
+                var messageHandler = (IMessageQueueHandler) ActivatorUtilities.CreateInstance(scope.ServiceProvider, messageHandlerType);
                 await messageHandler.Handle(message.Body);
                 await consumer.DeleteMessage(_configuration["MessageQueue:BikeTrackingQueue"], message);
             }

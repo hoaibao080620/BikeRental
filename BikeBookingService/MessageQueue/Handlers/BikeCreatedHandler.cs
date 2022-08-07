@@ -27,7 +27,7 @@ public class BikeCreatedHandler : IMessageQueueHandler
             CreatedOn = DateTime.UtcNow,
             Description = payload.Description,
             IsActive = true,
-            LicensePlate = payload.LicensePlate,
+            BikeCode = payload.LicensePlate,
             Color = payload.Color
         });
 

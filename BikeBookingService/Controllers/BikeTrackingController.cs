@@ -65,7 +65,7 @@ public class BikeTrackingController : ControllerBase
         var email = HttpContext.User.Claims.FirstOrDefault(x => 
             x.Type == ClaimTypes.NameIdentifier)!.Value;
 
-        var isBikeRenting = await _bikeTrackingValidation.IsBikeAlreadyRent(bikeCheckinDto.BikeId);
+        var isBikeRenting = await _bikeTrackingValidation.IsBikeAlreadyRent(bikeCheckinDto.BikeCode);
         
         if (isBikeRenting) return BadRequest("Xe này hiện tại đang được sử dụng, xin vui lòng chọn xe khác!");
         

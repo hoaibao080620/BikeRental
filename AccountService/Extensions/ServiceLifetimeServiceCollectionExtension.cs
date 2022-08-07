@@ -34,31 +34,24 @@ public static class ServiceLifetimeServiceCollectionExtension
         var messageQueueSubscriptionManager = serviceProvider.GetRequiredService<IMessageQueueSubscriptionManager>();
         
         messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserCreatedEventHandler>(
-            serviceProvider.CreateScope().ServiceProvider, 
             MessageType.UserAdded);
         
         messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserUpdatedEventHandler>(
-            serviceProvider.CreateScope().ServiceProvider, 
             MessageType.UserUpdated);
         
         messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserDeletedEventHandler>(
-            serviceProvider.CreateScope().ServiceProvider, 
             MessageType.UserDeleted);
 
         messageQueueSubscriptionManager.RegisterEventHandlerSubscription<BikeCheckedOutEventHandler>(
-            serviceProvider.CreateScope().ServiceProvider, 
             MessageType.BikeCheckedOut);
         
         messageQueueSubscriptionManager.RegisterEventHandlerSubscription<PaymentPointSucceedEventHandler>(
-            serviceProvider.CreateScope().ServiceProvider, 
             MessageType.PaymentSucceeded);
         
         messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserDeactivatedEventHandler>(
-            serviceProvider.CreateScope().ServiceProvider, 
             MessageType.AccountDeactivated);
         
         messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserReactivatedEventHandler>(
-            serviceProvider.CreateScope().ServiceProvider, 
             MessageType.AccountReactivated);
     }
     

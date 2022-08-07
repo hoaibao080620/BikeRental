@@ -27,6 +27,7 @@ public class BikeCheckedOutHandler : IMessageQueueHandler
         if(bike is null) return;
 
         bike.Status = BikeStatus.Available;
+        bike.UpdatedOn = DateTime.UtcNow;
         if (bike.BikeStationId != payload.BikeStationId)
         {
             var oldBikeStation = await _unitOfWork.BikeStationRepository.GetById(bike.BikeStationId!.Value);

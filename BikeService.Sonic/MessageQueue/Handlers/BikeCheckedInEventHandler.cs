@@ -24,6 +24,7 @@ public class BikeCheckedInEventHandler : IMessageQueueHandler
         if(bike is null) return;
 
         bike.Status = BikeStatus.InUsed;
+        bike.UpdatedOn = DateTime.UtcNow;
         await _unitOfWork.SaveChangesAsync();
     }
 }
