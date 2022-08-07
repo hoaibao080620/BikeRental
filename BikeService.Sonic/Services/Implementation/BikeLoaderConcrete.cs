@@ -26,7 +26,7 @@ public class BikeLoaderConcrete : IBikeLoaderAdapter
                 BikeStationName = b.BikeStation != null ? b.BikeStation.Name : null,
                 Id = b.Id,
                 Description = b.Description,
-                LicensePlate = b.LicensePlate,
+                LicensePlate = b.BikeCode,
                 Status = b.Status,
                 UpdatedOn = b.UpdatedOn
             }).FirstOrDefaultAsync() ?? throw new BikeNotFoundException(bikeId);

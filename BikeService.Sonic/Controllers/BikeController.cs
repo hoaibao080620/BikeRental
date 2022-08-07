@@ -2,6 +2,7 @@
 using BikeService.Sonic.BusinessLogics;
 using BikeService.Sonic.Dtos;
 using BikeService.Sonic.Dtos.Bike;
+using Bogus;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Service;
@@ -93,6 +94,37 @@ public class BikeController : ControllerBase
     public async Task<IActionResult> UnlockBike([FromBody] BikeUnlockDto bikeUnlockDto)
     {
         await _bikeBusinessLogic.UnlockBike(bikeUnlockDto.BikeId);
+        return Ok();
+    }
+    
+    [HttpGet]
+    [Route("[action]")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GenerateData(int? numberOfItems = 0)
+    {
+        var bikeModel = new List<string>
+        {
+            "Merida",
+            "Trek",
+            "Giant",
+            "Kona",
+            "Marin",
+            "GT",
+            "Jek",
+            "Trinx"
+        };
+        
+        var faker = new Faker("vi");
+        for (var i = 0; i < numberOfItems; i++)
+        {
+            var bike = new BikeInsertDto
+            {
+                Description = $"{faker.PickRandom(bikeModel)} {faker.Vehicle.Model()}"
+            };
+
+            await _bikeBusinessLogic.AddBike(bike);
+        }
+
         return Ok();
     }
 }

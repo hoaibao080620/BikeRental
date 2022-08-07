@@ -9,6 +9,7 @@
     <ItemGroup>
         <PackageReference Include="BikeRental.MessageQueue" Version="1.4.4-alpha" />
         <PackageReference Include="BikeRental.Shared" Version="1.2.3-alpha" />
+        <PackageReference Include="Bogus" Version="34.0.2" />
         <PackageReference Include="EFCore.NamingConventions" Version="6.0.0" />
         <PackageReference Include="Google.Protobuf" Version="3.21.2" />
         <PackageReference Include="Grpc.AspNetCore" Version="2.47.0" />

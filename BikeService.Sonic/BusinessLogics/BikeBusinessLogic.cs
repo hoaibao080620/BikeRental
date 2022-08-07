@@ -40,7 +40,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
                 BikeStationName = b.BikeStation != null ? b.BikeStation.Name : null,
                 Id = b.Id,
                 Description = b.Description,
-                LicensePlate = b.LicensePlate,
+                LicensePlate = b.BikeCode,
                 Status = b.Status,
                 UpdatedOn = b.UpdatedOn
             }).FirstOrDefaultAsync() ?? throw new BikeNotFoundException(id);
@@ -61,10 +61,10 @@ public class BikeBusinessLogic : IBikeBusinessLogic
                     BikeStationName = b.BikeStation != null ? b.BikeStation.Name : null,
                     Id = b.Id,
                     Description = b.Description,
-                    LicensePlate = b.LicensePlate,
+                    LicensePlate = b.BikeCode,
                     Status = b.Status,
                     UpdatedOn = b.UpdatedOn
-                }).ToList();
+                }).OrderByDescending(x => x.UpdatedOn).ToList();
         
         return bikes;
     }
@@ -77,6 +77,12 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         var bike = _mapper.Map<Bike>(bikeInsertDto);
         bike.Status = BikeStatus.Available;
         await _unitOfWork.BikeRepository.Add(bike);
+        bike.CreatedOn = DateTime.UtcNow;
+        bike.IsActive = true;
+        bike.BikeCode = "Temp";
+
+        await _unitOfWork.SaveChangesAsync();
+        bike.BikeCode = $"BR-{bike.Id.ToString().PadLeft(6, '0')}";
         await _unitOfWork.SaveChangesAsync();
         var bikeStation = bike.BikeStationId.HasValue ?
             await _unitOfWork.BikeStationRepository.GetById(bike.BikeStationId.Value) : null;
@@ -86,7 +92,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
             BikeStationId = bike.BikeStationId,
             BikeStationName = bikeStation?.Name,
             Description = bike.Description,
-            LicensePlate = bike.LicensePlate,
+            LicensePlate = bike.BikeCode,
             Status = bike.Status,
             MessageType = MessageType.BikeCreated,
             Color = bikeStationColor?.Color
@@ -111,7 +117,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
             BikeStationId = bike.BikeStationId,
             BikeStationName = bikeStation?.Name,
             Description = bike.Description,
-            LicensePlate = bike.LicensePlate,
+            LicensePlate = bike.BikeCode,
             MessageType = MessageType.BikeUpdated,
             Color = bikeStationColor?.Color
         });

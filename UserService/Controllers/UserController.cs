@@ -1,6 +1,8 @@
 ﻿using System.Security.Claims;
+using Bogus;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Consts;
 using UserService.BusinessLogic;
 using UserService.Dtos;
 
@@ -89,5 +91,58 @@ public class UserController : ControllerBase
     {
         await _userBusinessLogic.ActivateUser(activateUserDto);
         return Ok();
+    }
+    
+    [HttpGet]
+    [Route("[action]")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GenerateData(int? numberOfItems = 0)
+    {
+        var roles = new List<string>
+        {
+            UserRole.User,
+            UserRole.Manager,
+            UserRole.Director,
+            UserRole.SysAdmin
+        };
+        
+        var faker = new Faker("vi");
+        var users = new List<UserInsertDto>();
+        for (var i = 0; i < numberOfItems; i++)
+        {
+            var firstName = faker.Name.FirstName();
+            var lastName = faker.Name.LastName();
+            var user = new UserInsertDto
+            {
+                FirstName = firstName,
+                LastName = lastName,
+                Address = $"{faker.Address.StreetName()} - {faker.Address.City()}",
+                DateOfBirth = faker.Date.Between(new DateTime(1990 ,1 ,1), new DateTime(2006,1, 1)),
+                Email = faker.Internet.Email(firstName, lastName, "gmail.com"),
+                Password = "RinRin123^^!",
+                PhoneNumber = faker.Phone.PhoneNumber("+84#########"),
+                RoleName = faker.PickRandom(roles)
+            };
+            users.Add(user);
+
+            if (user.RoleName == UserRole.User)
+            {
+                await _userBusinessLogic.SignUp(new SignUpDto
+                {
+                    Address = user.Address,
+                    DateOfBirth = user.DateOfBirth,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Password = user.Password,
+                    PhoneNumber = user.PhoneNumber
+                });
+            }
+            else
+            {
+                await _userBusinessLogic.AddUser(user);
+            }
+        }
+        
+        return Ok(users);
     }
 }

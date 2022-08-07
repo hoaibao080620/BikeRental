@@ -181,7 +181,7 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
             Id = x.Id,
             BikeStationId = x.BikeStationId,
             BikeStationName = x.BikeStation!.Name,
-            LicensePlate = x.LicensePlate,
+            LicensePlate = x.BikeCode,
             Description = x.Description,
             UpdatedOn = x.UpdatedOn,
             Status = x.Status

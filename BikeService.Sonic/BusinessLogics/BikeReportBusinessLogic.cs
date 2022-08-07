@@ -59,7 +59,7 @@ public class BikeReportBusinessLogic : IBikeReportBusinessLogic
                 Id = x.Id,
                 BikeId = x.BikeId,
                 AccountPhoneNumber = phoneNumber,
-                BikeLicensePlate = x.Bike.LicensePlate,
+                BikeLicensePlate = x.Bike.BikeCode,
                 CompletedBy = x.AssignTo.Email,
                 CompletedOn = x.CompletedOn,
                 Status = x.Status,

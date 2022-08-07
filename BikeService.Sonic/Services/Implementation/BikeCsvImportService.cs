@@ -54,7 +54,7 @@ public class BikeCsvImportService : IImportService
 
             await _unitOfWork.BikeRepository.Add(new Bike
             {
-                LicensePlate = licensePlate,
+                BikeCode = licensePlate,
                 Description = string.IsNullOrEmpty(description) ? null : description,
                 BikeStationId = bikeStationDict[bikeStationName]?.Id,
                 IsActive = true,
