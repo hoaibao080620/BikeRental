@@ -24,7 +24,7 @@ public static class GrpcClientServiceCollectionExtension
         
         serviceCollection.AddGrpcClient<BikeBookingServiceGrpc.BikeBookingServiceGrpcClient>("BikeBookingService", c =>
         {
-            c.Address = new Uri("https://localhost:7230");
+            c.Address = new Uri("https://bike-rental-booking-service.herokuapp.com");
         }).ConfigureChannel(o =>
         {
             o.HttpHandler = new GrpcWebHandler(new HttpClientHandler());
