@@ -32,11 +32,11 @@ public class VoiceController : ControllerBase
         var gather = new Gather(
                 new List<Gather.InputEnum> {Twilio.TwiML.Voice.Gather.InputEnum.Dtmf},
                 numDigits: 1,
-                action: new Uri("/voice/gather", UriKind.Relative),
+                action: new Uri("api/v1/voice/gather", UriKind.Relative),
                 method: HttpMethods.Post)
             .Play(new Uri("https://bike-rental-fe.s3.amazonaws.com/redirect_call.mp3"));
         response.Append(gather);
-        response.Redirect(new Uri("/voice", UriKind.Relative), HttpMethod.Post);
+        response.Redirect(new Uri("api/v1/voice", UriKind.Relative), HttpMethod.Post);
         
         return Content(response.ToString(), "application/xml");
     }
@@ -49,10 +49,10 @@ public class VoiceController : ControllerBase
         var response = new VoiceResponse();
         var dial = new Dial
         {
-            Action = new Uri("/voice/HandleCompletedIncomingCall", UriKind.Relative),
+            Action = new Uri("api/v1/voice/HandleCompletedIncomingCall", UriKind.Relative),
             Method = HttpMethod.Get,
             Record = Dial.RecordEnum.RecordFromAnswerDual,
-            RecordingStatusCallback = new Uri("/voice/HandleCompletedRecording", UriKind.Relative),
+            RecordingStatusCallback = new Uri("api/v1/voice/HandleCompletedRecording", UriKind.Relative),
             RecordingStatusCallbackMethod = HttpMethod.Get,
             RecordingStatusCallbackEvent = new List<Dial.RecordingEventEnum>
             {
@@ -78,14 +78,14 @@ public class VoiceController : ControllerBase
                     break;
                 default:
                     response.Say("Sorry, I don't understand that choice.").Pause();
-                    response.Redirect(new Uri("/voice", UriKind.Relative), HttpMethod.Post);
+                    response.Redirect(new Uri("api/v1/voice", UriKind.Relative), HttpMethod.Post);
                     break;
             }
         }
         else
         {
             // If no input was sent, redirect to the /voice route
-            response.Redirect(new Uri("/voice", UriKind.Relative), HttpMethod.Post);
+            response.Redirect(new Uri("api/v1/voice", UriKind.Relative), HttpMethod.Post);
         }
         
         response.Append(dial);
@@ -101,11 +101,11 @@ public class VoiceController : ControllerBase
         var response = new VoiceResponse();
         var dial = new Dial(callerId: "+19379091267");
         dial.Number(phoneNumber,
-            statusCallback: new Uri("/voice/HandleCompletedOutgoingCall", UriKind.Relative),
+            statusCallback: new Uri("api/v1/voice/HandleCompletedOutgoingCall", UriKind.Relative),
             statusCallbackMethod: HttpMethod.Get);
         dial.Record = Dial.RecordEnum.RecordFromAnswerDual;
         dial.RecordingStatusCallback =
-            new Uri("/voice/HandleCompletedRecording", UriKind.Relative);
+            new Uri("api/v1/voice/HandleCompletedRecording", UriKind.Relative);
         dial.RecordingStatusCallbackMethod = HttpMethod.Get;
 
         response.Append(dial);
