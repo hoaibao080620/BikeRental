@@ -51,10 +51,10 @@ public class VoiceController : ControllerBase
         var response = new VoiceResponse();
         var dial = new Dial
         {
-            Action = new Uri("voice/HandleCompletedIncomingCall", UriKind.Relative),
+            Action = new Uri("HandleCompletedIncomingCall", UriKind.Relative),
             Method = HttpMethod.Get,
             Record = Dial.RecordEnum.RecordFromAnswerDual,
-            RecordingStatusCallback = new Uri("voice/HandleCompletedRecording", UriKind.Relative),
+            RecordingStatusCallback = new Uri("HandleCompletedRecording", UriKind.Relative),
             RecordingStatusCallbackMethod = HttpMethod.Get,
             RecordingStatusCallbackEvent = new List<Dial.RecordingEventEnum>
             {
@@ -103,11 +103,11 @@ public class VoiceController : ControllerBase
         var response = new VoiceResponse();
         var dial = new Dial(callerId: "+19379091267");
         dial.Number(phoneNumber,
-            statusCallback: new Uri("voice/HandleCompletedOutgoingCall", UriKind.Relative),
+            statusCallback: new Uri("HandleCompletedOutgoingCall", UriKind.Relative),
             statusCallbackMethod: HttpMethod.Get);
         dial.Record = Dial.RecordEnum.RecordFromAnswerDual;
         dial.RecordingStatusCallback =
-            new Uri("voice/HandleCompletedRecording", UriKind.Relative);
+            new Uri("HandleCompletedRecording", UriKind.Relative);
         dial.RecordingStatusCallbackMethod = HttpMethod.Get;
 
         response.Append(dial);
