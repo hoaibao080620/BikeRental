@@ -229,7 +229,7 @@ public class VoiceController : ControllerBase
             twilioAccountSid,
             twilioApiKey,
             twilioApiSecret,
-            token
+            jwt = token.ToJwt()
         });
     }
 }
