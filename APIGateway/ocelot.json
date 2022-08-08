@@ -16,6 +16,22 @@
       }
     },
     {
+      "DownstreamPathTemplate": "/voice/getToken",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "bike-rental-notification.herokuapp.com",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/api/v1/notification/voice/getToken",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "OktaProvider",
+        "AllowedScopes": []
+      }
+    },
+    {
       "DownstreamPathTemplate": "/voice",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
