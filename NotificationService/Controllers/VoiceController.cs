@@ -63,33 +63,34 @@ public class VoiceController : ControllerBase
         };
 
 
-        if (!string.IsNullOrEmpty(voiceRequest.Digits))
-        {
-            switch (voiceRequest.Digits)
-            {
-                case "1":
-                    response.Say("You need support. We will help!");
-                    break;
-                case "2":
-                    // var emails = (await _client.GetDirectorsAsync(new Empty())).Emails.Take(4).ToList();
-                    // emails.ForEach(email =>
-                    // {
-                    //     dial.Append(new Client().Identity(email));
-                    // });
-                    dial.Append(new Client().Identity("testmanager@gmail.com"));
-                    break;
-                default:
-                    response.Say("Sorry, I don't understand that choice.").Pause();
-                    response.Redirect(new Uri("voice", UriKind.Relative), HttpMethod.Post);
-                    break;
-            }
-        }
-        else
-        {
-            // If no input was sent, redirect to the /voice route
-            response.Redirect(new Uri("voice", UriKind.Relative), HttpMethod.Post);
-        }
+        // if (!string.IsNullOrEmpty(voiceRequest.Digits))
+        // {
+        //     switch (voiceRequest.Digits)
+        //     {
+        //         case "1":
+        //             response.Say("You need support. We will help!");
+        //             break;
+        //         case "2":
+        //             // var emails = (await _client.GetDirectorsAsync(new Empty())).Emails.Take(4).ToList();
+        //             // emails.ForEach(email =>
+        //             // {
+        //             //     dial.Append(new Client().Identity(email));
+        //             // });
+        //             dial.Append(new Client().Identity("testmanager@gmail.com"));
+        //             break;
+        //         default:
+        //             response.Say("Sorry, I don't understand that choice.").Pause();
+        //             response.Redirect(new Uri("voice", UriKind.Relative), HttpMethod.Post);
+        //             break;
+        //     }
+        // }
+        // else
+        // {
+        //     // If no input was sent, redirect to the /voice route
+        //     response.Redirect(new Uri("voice", UriKind.Relative), HttpMethod.Post);
+        // }
         
+        dial.Append(new Client().Identity("testmanager@gmail.com"));
         response.Append(dial);
         return Content(response.ToString(), "application/xml");
     }
