@@ -204,7 +204,7 @@ public class AccountGrpcService : AccountServiceGrpc.AccountServiceGrpcBase
             PhoneNumber = account.PhoneNumber,
             FirstName = account.FirstName,
             LastName = account.LastName,
-            Point = account.Point
+            Point = account.Point,
         };
 
         if (account.Address != null)

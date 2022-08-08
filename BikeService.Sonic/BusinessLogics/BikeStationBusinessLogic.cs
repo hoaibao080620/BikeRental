@@ -88,9 +88,13 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
     {
         var bikeStation = _mapper.Map<BikeStation>(bikeInsertDto);
         bikeStation.UpdatedOn = DateTime.UtcNow;
-        var (latitude, longitude) = await _googleMapService.GetLocationOfAddress(bikeInsertDto.PlaceId);
-        bikeStation.Latitude = latitude;
-        bikeStation.Longitude = longitude;
+        if (!string.IsNullOrEmpty(bikeInsertDto.PlaceId))
+        {
+            var (latitude, longitude) = await _googleMapService.GetLocationOfAddress(bikeInsertDto.PlaceId);
+            bikeStation.Latitude = latitude;
+            bikeStation.Longitude = longitude;
+        }
+        
         await _unitOfWork.BikeStationRepository.Update(bikeStation);
         await _unitOfWork.SaveChangesAsync();
     }

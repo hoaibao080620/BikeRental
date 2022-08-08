@@ -10,5 +10,5 @@ public class BikeStationUpdateDto
     public string? Description { get; set; }
     public int ParkingSpace { get; set; }
     public int UsedParkingSpace { get; set; }
-    public string PlaceId { get; set; } = null!;
+    public string? PlaceId { get; set; }
 }
