@@ -1,6 +1,7 @@
 ﻿using System.Web;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Net.ClientFactory;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NotificationService.DAL;
 using NotificationService.Models;
@@ -13,6 +14,7 @@ namespace NotificationService.Controllers;
 
 [Route("[controller]")]
 [ApiController]
+[AllowAnonymous]
 public class VoiceController : ControllerBase
 {
     private readonly INotificationRepository _notificationRepository;
