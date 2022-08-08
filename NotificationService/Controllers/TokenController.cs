@@ -35,7 +35,7 @@ public class TokenController : ControllerBase
             twilioAccountSid,
             twilioApiKey,
             twilioApiSecret,
-            email,
+            "testmanager@gmail.com",
             grants: grants);
 
         return Ok(token.ToJwt());

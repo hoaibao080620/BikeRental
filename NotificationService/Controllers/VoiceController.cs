@@ -1,4 +1,5 @@
-﻿using System.Web;
+﻿using System.Security.Claims;
+using System.Web;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Net.ClientFactory;
 using Microsoft.AspNetCore.Authorization;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using NotificationService.DAL;
 using NotificationService.Models;
 using Twilio.AspNet.Common;
+using Twilio.Jwt.AccessToken;
 using Twilio.TwiML;
 using Twilio.TwiML.Voice;
 using HttpMethod = Twilio.Http.HttpMethod;
@@ -185,5 +187,37 @@ public class VoiceController : ControllerBase
     {
         var calls = await _notificationRepository.GetCalls(_ => true);
         return Ok(calls);
+    }
+    
+    [HttpGet]
+    [Route("[action]")]
+    [Authorize]
+    public IActionResult GetToken()
+    {
+        var email = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
+        var twilioAccountSid = Environment.GetEnvironmentVariable("Twilio_Api_Key");
+        var twilioApiKey = Environment.GetEnvironmentVariable("Twilio_Api_Secret");
+        var twilioApiSecret = Environment.GetEnvironmentVariable("Account_Sid");
+
+        var grant = new VoiceGrant
+        {
+            IncomingAllow = true,
+            OutgoingApplicationSid = Environment.GetEnvironmentVariable("Out_Application_Sid")
+        };
+
+        var grants = new HashSet<IGrant>
+        {
+            grant
+        };
+
+        // Create an Access Token generator
+        var token = new Token(
+            twilioAccountSid,
+            twilioApiKey,
+            twilioApiSecret,
+            email,
+            grants: grants);
+
+        return Ok(token.ToJwt());
     }
 }
