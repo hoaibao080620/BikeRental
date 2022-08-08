@@ -199,6 +199,11 @@ public class VoiceController : ControllerBase
         var twilioApiKey = Environment.GetEnvironmentVariable("Twilio_Api_Secret");
         var twilioApiSecret = Environment.GetEnvironmentVariable("Account_Sid");
 
+        if (string.IsNullOrEmpty(twilioAccountSid))
+        {
+            throw new Exception();
+        }
+
         var grant = new VoiceGrant
         {
             IncomingAllow = true,
@@ -218,6 +223,13 @@ public class VoiceController : ControllerBase
             email,
             grants: grants);
 
-        return Ok(token.ToJwt());
+        return Ok(new 
+        {
+            email,
+            twilioAccountSid,
+            twilioApiKey,
+            twilioApiSecret,
+            token
+        });
     }
 }
