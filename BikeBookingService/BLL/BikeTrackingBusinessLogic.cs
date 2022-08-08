@@ -227,7 +227,7 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
     public async Task<BikeRentingStatus> GetBikeRentingStatus(string accountEmail)
     {
         var rentingStatus = await _unitOfWork.BikeRentalTrackingRepository
-            .Find(b => !b.CheckoutOn.HasValue);
+            .Find(b => !b.CheckoutOn.HasValue && b.Account.Email == accountEmail);
     
         return rentingStatus.Any()
             ? rentingStatus.Select(x => new BikeRentingStatus
