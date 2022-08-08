@@ -86,7 +86,12 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
 
     public async Task UpdateStationBike(BikeStationUpdateDto bikeInsertDto)
     {
-        await _unitOfWork.BikeStationRepository.Update(_mapper.Map<BikeStation>(bikeInsertDto));
+        var bikeStation = _mapper.Map<BikeStation>(bikeInsertDto);
+        bikeStation.UpdatedOn = DateTime.UtcNow;
+        var (latitude, longitude) = await _googleMapService.GetLocationOfAddress(bikeInsertDto.PlaceId);
+        bikeStation.Latitude = latitude;
+        bikeStation.Longitude = longitude;
+        await _unitOfWork.BikeStationRepository.Update(bikeStation);
         await _unitOfWork.SaveChangesAsync();
     }
 
