@@ -11,4 +11,6 @@ public class AccountProfileDto
     public int TotalRenting { get; set; }
     public double TotalDistance { get; set; }
     public int TotalRentingTime { get; set; }
+    public string? Address { get; set; }
+    public DateTime? DateOfBirth { get; set; }
 }

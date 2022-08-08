@@ -41,8 +41,8 @@ message GetAccountInfoResponse {
   string id = 2;
   string phoneNumber = 3;
   double point = 4;
-  string address = 5;
-  google.protobuf.Timestamp dateOfBirth = 6;
+  optional string address = 5;
+  optional google.protobuf.Timestamp dateOfBirth = 6;
   string firstName = 7;
   string lastName = 8;
 }

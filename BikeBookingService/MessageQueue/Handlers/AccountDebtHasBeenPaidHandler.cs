@@ -22,8 +22,9 @@ public class AccountDebtHasBeenPaidHandler : IMessageQueueHandler
         if (payload is null) return;
 
         var bikeRentalNotFullyPaid = (await _unitOfWork.BikeRentalTrackingRepository
-            .Find(x => x.Account.Email == payload.AccountEmail)).First();
-
+            .Find(x => x.Account.Email == payload.AccountEmail)).FirstOrDefault();
+        if (bikeRentalNotFullyPaid is null) return;
+        
         bikeRentalNotFullyPaid.PaymentStatus = PaymentStatus.APPROVED;
         await _unitOfWork.SaveChangesAsync();
     }

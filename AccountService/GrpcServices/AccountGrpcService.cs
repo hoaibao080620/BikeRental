@@ -196,18 +196,28 @@ public class AccountGrpcService : AccountServiceGrpc.AccountServiceGrpcBase
         var account = (await _mongoService.FindAccounts(x => x.Email == request.Email)).FirstOrDefault();
 
         if (account is null) return new GetAccountInfoResponse();
-
-        return new GetAccountInfoResponse
+        
+        var response = new GetAccountInfoResponse
         {
             Id = account.ExternalUserId,
-            Address = account.Address,
             Email = account.Email,
             PhoneNumber = account.PhoneNumber,
             FirstName = account.FirstName,
             LastName = account.LastName,
-            DateOfBirth = account.DateOfBirth.HasValue ? Timestamp.FromDateTime(account.DateOfBirth.Value) : null,
             Point = account.Point
         };
+
+        if (account.Address != null)
+        {
+            response.Address = account.Address;
+        }
+        
+        if (account.DateOfBirth != null)
+        {
+            response.DateOfBirth = Timestamp.FromDateTime(account.DateOfBirth.Value);
+        }
+
+        return response;
     }
 
     public override async Task<GetPaymentChartResponse> GetPaymentChart(GetPaymentChartRequest request, ServerCallContext context)

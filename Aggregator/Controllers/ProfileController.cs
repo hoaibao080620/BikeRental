@@ -39,6 +39,8 @@ public class ProfileController : ControllerBase
         return Ok(new AccountProfileDto
         {
             FirstName = accountInfo.FirstName,
+            Address = string.IsNullOrEmpty(accountInfo.Address) ? null : accountInfo.Address,
+            DateOfBirth = accountInfo.DateOfBirth?.ToDateTime(),
             LastName = accountInfo.LastName,
             Email = accountInfo.Email,
             Id = accountInfo.Id,
