@@ -195,9 +195,9 @@ public class VoiceController : ControllerBase
     public IActionResult GetToken()
     {
         var email = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
-        var twilioAccountSid = Environment.GetEnvironmentVariable("Twilio_Api_Key");
-        var twilioApiKey = Environment.GetEnvironmentVariable("Twilio_Api_Secret");
-        var twilioApiSecret = Environment.GetEnvironmentVariable("Account_Sid");
+        var twilioAccountSid = Environment.GetEnvironmentVariable("Account_Sid");
+        var twilioApiKey = Environment.GetEnvironmentVariable("Twilio_Api_Key");
+        var twilioApiSecret = Environment.GetEnvironmentVariable("Twilio_Api_Secret");
 
         if (string.IsNullOrEmpty(twilioAccountSid))
         {
