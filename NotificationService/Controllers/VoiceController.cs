@@ -71,11 +71,12 @@ public class VoiceController : ControllerBase
                     response.Say("You need support. We will help!");
                     break;
                 case "2":
-                    var emails = (await _client.GetDirectorsAsync(new Empty())).Emails.Take(4).ToList();
-                    emails.ForEach(email =>
-                    {
-                        dial.Append(new Client().Identity(email));
-                    });
+                    // var emails = (await _client.GetDirectorsAsync(new Empty())).Emails.Take(4).ToList();
+                    // emails.ForEach(email =>
+                    // {
+                    //     dial.Append(new Client().Identity(email));
+                    // });
+                    dial.Append(new Client().Identity("testmanager@gmail.com"));
                     break;
                 default:
                     response.Say("Sorry, I don't understand that choice.").Pause();
