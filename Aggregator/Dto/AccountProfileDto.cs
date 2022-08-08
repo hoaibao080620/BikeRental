@@ -10,4 +10,5 @@ public class AccountProfileDto
     public string PhoneNumber { get; set; } = null!;
     public int TotalRenting { get; set; }
     public double TotalDistance { get; set; }
+    public int TotalRentingTime { get; set; }
 }

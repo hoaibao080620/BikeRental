@@ -45,7 +45,8 @@ public class ProfileController : ControllerBase
             PhoneNumber = accountInfo.PhoneNumber,
             Point = accountInfo.Point,
             TotalDistance = accountRentingInfo.TotalDistance,
-            TotalRenting = accountRentingInfo.TotalRenting
+            TotalRenting = accountRentingInfo.TotalRenting,
+            TotalRentingTime = accountRentingInfo.TotalRentingTime
         });
     }
 }

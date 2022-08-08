@@ -63,4 +63,5 @@ message GetRentingInfoRequest {
 message GetRentingInfoResponse {
   double totalDistance = 1;
   int32 totalRenting = 2;
+  int32 totalRentingTime = 3;
 }

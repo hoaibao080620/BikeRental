@@ -27,6 +27,7 @@
       "UpstreamPathTemplate": "/aggregator/{everything}",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "AuthenticationOptions": {
+        "AuthenticationProviderKey": "OktaProvider",
         "AllowedScopes": []
       }
     },

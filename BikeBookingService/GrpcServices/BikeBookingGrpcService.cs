@@ -219,12 +219,18 @@ public class BikeBookingGrpcService : BikeBookingServiceGrpc.BikeBookingServiceG
             .Sum();
 
         var totalRenting = (await _unitOfWork.BikeRentalTrackingRepository
-            .Find(x => x.Account.Email == request.Email)).Count();
+            .Find(x => x.Account.Email == request.Email && x.CheckoutOn.HasValue)).Count();
+        
+        var totalRentingTime = (await _unitOfWork.BikeRentalTrackingRepository
+                .Find(x => x.Account.Email == request.Email && x.CheckoutOn.HasValue))
+            .Select(x => x.CheckoutOn!.Value.Subtract(x.CheckinOn).Seconds)
+            .Sum();
 
         return new GetRentingInfoResponse
         {
             TotalDistance = totalDistance,
-            TotalRenting = totalRenting
+            TotalRenting = totalRenting,
+            TotalRentingTime = totalRentingTime
         };
     }
     
