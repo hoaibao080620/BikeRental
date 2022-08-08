@@ -12,6 +12,7 @@
         margin: 0;
       }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
   </head>
   <body>
     <div
@@ -194,333 +195,24 @@
                           <h1 style="font-weight: 300; margin: 0">
                             @Model.TotalTransaction
                           </h1>
-                          
-                          <table
+                          <h2
                             style="
-                              font-weight: 300;
-                              width: 100%;
-                              border-collapse: collapse;
-                              table-layout: fixed;
-                              margin: 0;
+                              text-align: center;
+                              margin-top: 20px;
+                              margin-bottom: 10px;
                             "
                           >
-                            <tbody>
-                              <tr style="font-weight: 300">
-                                <td
-                                  valign="bottom"
-                                  style="
-                                    font-weight: 300;
-                                    text-align: left;
-                                    font-size: 0;
-                                    border-right: 10px solid #fff;
-                                    height: 110px;
-                                    width: 14%;
-                                    margin: 0;
-                                    padding: 0;
-                                  "
-                                >
-                                  <table
-                                    style="
-                                      font-weight: 300;
-                                      margin-bottom: 0;
-                                      width: 100%;
-                                      border-collapse: collapse;
-                                    "
-                                  >
-                                    <tbody>
-                                      <tr style="font-weight: 300">
-                                        <td
-                                          height="1"
-                                          style="
-                                            font-weight: 300;
-                                            text-align: left;
-                                            line-height: 0;
-                                            font-size: 0;
-                                            border-right: none;
-                                            background-color: #ebe9f7;
-                                            margin: 0;
-                                            padding: 0;
-                                          "
-                                        ></td>
-                                      </tr>
-                                    </tbody>
-                                  </table>
-                                </td>
-
-                                <td
-                                  valign="bottom"
-                                  style="
-                                    font-weight: 300;
-                                    text-align: left;
-                                    font-size: 0;
-                                    border-right: 10px solid #fff;
-                                    height: 110px;
-                                    width: 14%;
-                                    margin: 0;
-                                    padding: 0;
-                                  "
-                                >
-                                  <table
-                                    style="
-                                      font-weight: 300;
-                                      margin-bottom: 0;
-                                      width: 100%;
-                                      border-collapse: collapse;
-                                    "
-                                  >
-                                    <tbody>
-                                      <tr style="font-weight: 300">
-                                        <td
-                                          height="1"
-                                          style="
-                                            font-weight: 300;
-                                            text-align: left;
-                                            line-height: 0;
-                                            font-size: 0;
-                                            border-right: none;
-                                            background-color: #ebe9f7;
-                                            margin: 0;
-                                            padding: 0;
-                                          "
-                                        ></td>
-                                      </tr>
-                                    </tbody>
-                                  </table>
-                                </td>
-
-                                <td
-                                  valign="bottom"
-                                  style="
-                                    font-weight: 300;
-                                    text-align: left;
-                                    font-size: 0;
-                                    border-right: 10px solid #fff;
-                                    height: 110px;
-                                    width: 14%;
-                                    margin: 0;
-                                    padding: 0;
-                                  "
-                                >
-                                  <table
-                                    style="
-                                      font-weight: 300;
-                                      margin-bottom: 0;
-                                      width: 100%;
-                                      border-collapse: collapse;
-                                    "
-                                  >
-                                    <tbody>
-                                      <tr style="font-weight: 300">
-                                        <td
-                                          height="80"
-                                          style="
-                                            font-weight: 300;
-                                            text-align: left;
-                                            line-height: 0;
-                                            font-size: 0;
-                                            border-right: none;
-                                            background-color: #422c6e;
-                                            margin: 0;
-                                            padding: 0;
-                                          "
-                                        >
-                                          &nbsp;
-                                        </td>
-                                      </tr>
-                                    </tbody>
-                                  </table>
-                                </td>
-
-                                <td
-                                  valign="bottom"
-                                  style="
-                                    font-weight: 300;
-                                    text-align: left;
-                                    font-size: 0;
-                                    border-right: 10px solid #fff;
-                                    height: 110px;
-                                    width: 14%;
-                                    margin: 0;
-                                    padding: 0;
-                                  "
-                                >
-                                  <table
-                                    style="
-                                      font-weight: 300;
-                                      margin-bottom: 0;
-                                      width: 100%;
-                                      border-collapse: collapse;
-                                    "
-                                  >
-                                    <tbody>
-                                      <tr style="font-weight: 300">
-                                        <td
-                                          height="110"
-                                          style="
-                                            font-weight: 300;
-                                            text-align: left;
-                                            line-height: 0;
-                                            font-size: 0;
-                                            border-right: none;
-                                            background-color: #422c6e;
-                                            margin: 0;
-                                            padding: 0;
-                                          "
-                                        >
-                                          &nbsp;
-                                        </td>
-                                      </tr>
-                                    </tbody>
-                                  </table>
-                                </td>
-
-                                <td
-                                  valign="bottom"
-                                  style="
-                                    font-weight: 300;
-                                    text-align: left;
-                                    font-size: 0;
-                                    border-right: 10px solid #fff;
-                                    height: 110px;
-                                    width: 14%;
-                                    margin: 0;
-                                    padding: 0;
-                                  "
-                                >
-                                  <table
-                                    style="
-                                      font-weight: 300;
-                                      margin-bottom: 0;
-                                      width: 100%;
-                                      border-collapse: collapse;
-                                    "
-                                  >
-                                    <tbody>
-                                      <tr style="font-weight: 300">
-                                        <td
-                                          height="34"
-                                          style="
-                                            font-weight: 300;
-                                            text-align: left;
-                                            line-height: 0;
-                                            font-size: 0;
-                                            border-right: none;
-                                            background-color: #422c6e;
-                                            margin: 0;
-                                            padding: 0;
-                                          "
-                                        >
-                                          &nbsp;
-                                        </td>
-                                      </tr>
-                                    </tbody>
-                                  </table>
-                                </td>
-
-                                <td
-                                  valign="bottom"
-                                  style="
-                                    font-weight: 300;
-                                    text-align: left;
-                                    font-size: 0;
-                                    border-right: 10px solid #fff;
-                                    height: 110px;
-                                    width: 14%;
-                                    margin: 0;
-                                    padding: 0;
-                                  "
-                                >
-                                  <table
-                                    style="
-                                      font-weight: 300;
-                                      margin-bottom: 0;
-                                      width: 100%;
-                                      border-collapse: collapse;
-                                    "
-                                  >
-                                    <tbody>
-                                      <tr style="font-weight: 300">
-                                        <td
-                                          height="1"
-                                          style="
-                                            font-weight: 300;
-                                            text-align: left;
-                                            line-height: 0;
-                                            font-size: 0;
-                                            border-right: none;
-                                            background-color: #ebe9f7;
-                                            margin: 0;
-                                            padding: 0;
-                                          "
-                                        ></td>
-                                      </tr>
-                                    </tbody>
-                                  </table>
-                                </td>
-
-                                <td
-                                  valign="bottom"
-                                  style="
-                                    font-weight: 300;
-                                    text-align: left;
-                                    font-size: 0;
-                                    border-right: none;
-                                    height: 110px;
-                                    width: 14%;
-                                    margin: 0;
-                                    padding: 0;
-                                  "
-                                >
-                                  <table
-                                    style="
-                                      font-weight: 300;
-                                      margin-bottom: 0;
-                                      width: 100%;
-                                      border-collapse: collapse;
-                                    "
-                                  >
-                                    <tbody>
-                                      <tr style="font-weight: 300">
-                                        <td
-                                          height="1"
-                                          style="
-                                            font-weight: 300;
-                                            text-align: left;
-                                            line-height: 0;
-                                            font-size: 0;
-                                            border-right: none;
-                                            background-color: #ebe9f7;
-                                            margin: 0;
-                                            padding: 0;
-                                          "
-                                        ></td>
-                                      </tr>
-                                    </tbody>
-                                  </table>
-                                </td>
-                              </tr>
-                            <tr style="font-weight: 300">
-                              @{
-                                foreach (var column in Model.ChartColumns)
-                                {
-                                  <td
-                                    style="
-                                    font-weight: 300;
-                                    text-align: center;
-                                    font-size: 14px;
-                                    border-right: 10px solid #fff;
-                                    color: #848296;
-                                    width: 14%;
-                                    margin: 0;
-                                    padding: 10px 0 0;
-                                  ">
-                                    @column
-                                  </td>
-                                }
-                              }
-                            </tr>
-                            </tbody>
-                          </table>
+                            Biểu đồ giao dịch theo @Model.ReportType
+                          </h2>
+                          <canvas
+                            id="myChart"
+                            style="
+                              width: 100%;
+                              max-width: 600px;
+                              margin-left: -30px;
+                            "
+                          ></canvas>
+                          
                         </td>
                       </tr>
                     </tbody>
@@ -654,5 +346,33 @@
         </tbody>
       </table>
     </div>
+    
+    <script type="text/javascript">
+ 
+          var xValues = @Html.Raw(Json.Serialize(Model.ChartData));
+          var yValues = @Html.Raw(Json.Serialize(Model.ChartColumns));
+    
+          new Chart("myChart", {
+            type: "line",
+            data: {
+              labels: yValues,
+              datasets: [
+                {
+                  fill: false,
+                  lineTension: 0,
+                  backgroundColor: "rgba(0,0,255,1.0)",
+                  borderColor: "rgba(0,0,255,0.1)",
+                  data: xValues,
+                },
+              ],
+            },
+            options: {
+              legend: { display: false },
+              scales: {
+                yAxes: [{ ticks: { min: 6, max: 16 } }],
+              },
+            },
+          });
+        </script>
   </body>
 </html>

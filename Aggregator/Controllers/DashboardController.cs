@@ -1,11 +1,8 @@
 using System.Globalization;
-using System.Text;
 using Aggregator.Dto;
 using Aggregator.Services;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Net.ClientFactory;
-using iText.Html2pdf;
-
 using Microsoft.AspNetCore.Mvc;
 
 namespace Aggregator.Controllers;
@@ -225,12 +222,25 @@ public class DashboardController : ControllerBase
             ChartData = chartData.ResponseAsync.Result.ChartData.ToList(),
             ChartColumns = chartColumnDict[filterType!]
         });
-
-        await using var memoryStream = new MemoryStream();
-        HtmlConverter.ConvertToPdf(htmlContent, memoryStream);
+        IronPdf.License.LicenseKey = Environment.GetEnvironmentVariable("IRON_PDF_KEY");
+            
+        var renderer = new IronPdf.ChromePdfRenderer
+        {
+            RenderingOptions =
+            {
+                EnableJavaScript = true,
+                RenderDelay = 1000,
+                CssMediaType = IronPdf.Rendering.PdfCssMediaType.Print
+            }
+        };
         
-        return File(memoryStream.ToArray(), "application/pdf", 
+        var pdfDoc = renderer.RenderHtmlAsPdf(htmlContent);
+        pdfDoc.RemovePage(1);
+
+        return File(pdfDoc.BinaryData, 
+            System.Net.Mime.MediaTypeNames.Application.Pdf, 
             $"report_{DateTime.Now.ToShortDateString()}.pdf");
+
     }
 
     private (DateTime StartDate, DateTime EndDate) GetFilterDate(string filterType)
