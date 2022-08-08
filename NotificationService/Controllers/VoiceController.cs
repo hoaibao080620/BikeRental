@@ -223,13 +223,8 @@ public class VoiceController : ControllerBase
             email,
             grants: grants);
 
-        return Ok(new 
-        {
-            email,
-            twilioAccountSid,
-            twilioApiKey,
-            twilioApiSecret,
-            jwt = token.ToJwt()
-        });
+        return Ok(
+            token.ToJwt()
+        );
     }
 }
