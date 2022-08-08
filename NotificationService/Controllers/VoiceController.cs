@@ -49,10 +49,10 @@ public class VoiceController : ControllerBase
         var response = new VoiceResponse();
         var dial = new Dial
         {
-            Action = new Uri("https://5d5e-123-26-105-248.ngrok.io/voice/HandleCompletedIncomingCall"),
+            Action = new Uri("/voice/HandleCompletedIncomingCall", UriKind.Relative),
             Method = HttpMethod.Get,
             Record = Dial.RecordEnum.RecordFromAnswerDual,
-            RecordingStatusCallback = new Uri("https://5d5e-123-26-105-248.ngrok.io/voice/HandleCompletedRecording"),
+            RecordingStatusCallback = new Uri("/voice/HandleCompletedRecording", UriKind.Relative),
             RecordingStatusCallbackMethod = HttpMethod.Get,
             RecordingStatusCallbackEvent = new List<Dial.RecordingEventEnum>
             {
@@ -99,13 +99,13 @@ public class VoiceController : ControllerBase
         var phoneNumber = HttpUtility.ParseQueryString(HttpContext.Request.QueryString.Value!)["to"]?
             .Replace(",", "");
         var response = new VoiceResponse();
-        var dial = new Dial(callerId: "+19789614575");
+        var dial = new Dial(callerId: "+19379091267");
         dial.Number(phoneNumber,
-            statusCallback: new Uri("https://5d5e-123-26-105-248.ngrok.io/voice/HandleCompletedOutgoingCall"),
+            statusCallback: new Uri("/voice/HandleCompletedOutgoingCall", UriKind.Relative),
             statusCallbackMethod: HttpMethod.Get);
         dial.Record = Dial.RecordEnum.RecordFromAnswerDual;
         dial.RecordingStatusCallback =
-            new Uri("https://5d5e-123-26-105-248.ngrok.io/voice/HandleCompletedRecording");
+            new Uri("/voice/HandleCompletedRecording", UriKind.Relative);
         dial.RecordingStatusCallbackMethod = HttpMethod.Get;
 
         response.Append(dial);
