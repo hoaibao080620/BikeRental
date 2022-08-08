@@ -47,6 +47,22 @@
       }
     },
     {
+      "DownstreamPathTemplate": "/auth/changePassword",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "user-service-13062022.herokuapp.com",
+          "Port": 443
+        }
+      ],
+      "UpstreamPathTemplate": "/api/v1/user-api/auth/changePassword",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "OktaProvider",
+        "AllowedScopes": []
+      }
+    },
+    {
       "DownstreamPathTemplate": "/auth/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
