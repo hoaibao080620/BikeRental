@@ -188,9 +188,9 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
         }).ToList();
     }
 
-    public async Task<List<BikeStationRetrieveDto>> GetBikeStationsNearMe(BikeStationRetrieveParameter bikeStationRetrieveParameter)
+    public async Task<List<BikeStationNearMeDto>> GetBikeStationsNearMe(BikeStationRetrieveParameter bikeStationRetrieveParameter)
     {
-        var bikeStations = (await _unitOfWork.BikeStationRepository.All()).Select(x => new BikeStationRetrieveDto
+        var bikeStations = (await _unitOfWork.BikeStationRepository.All()).Select(x => new BikeStationNearMeDto
         {
             Description = x.Description,
             Id = x.Id,
@@ -198,7 +198,8 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
             Latitude = x.Latitude,
             Longitude = x.Longitude,
             Name = x.Name,
-            UsedParkingSpace = x.UsedParkingSpace
+            UsedParkingSpace = x.Bikes.Count,
+            ParkingSpace = x.ParkingSpace
         }).Take(bikeStationRetrieveParameter.Limit).ToList();
         
         var originLocation = new GoogleMapLocation
@@ -218,7 +219,7 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
             bikeStation.Distance = await _googleMapService.GetDistanceBetweenTwoLocations(originLocation, destination);
         }
 
-        return bikeStations;
+        return bikeStations.OrderBy(x => x.Distance).ToList();
     }
 
     public async Task AssignBikesToBikeStation(BikeStationBikeAssignDto bikeAssignDto)
