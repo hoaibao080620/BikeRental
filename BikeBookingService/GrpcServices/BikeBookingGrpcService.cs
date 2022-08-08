@@ -223,6 +223,7 @@ public class BikeBookingGrpcService : BikeBookingServiceGrpc.BikeBookingServiceG
         
         var totalRentingTime = (await _unitOfWork.BikeRentalTrackingRepository
                 .Find(x => x.Account.Email == request.Email && x.CheckoutOn.HasValue))
+            .ToList()
             .Select(x => x.CheckoutOn!.Value.Subtract(x.CheckinOn).Seconds)
             .Sum();
 
