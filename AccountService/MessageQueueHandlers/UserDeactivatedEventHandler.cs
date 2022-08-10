@@ -28,5 +28,7 @@ public class UserDeactivatedEventHandler : IMessageQueueHandler
 
         var builder = Builders<Account>.Update
             .Set(x => x.IsActive, false);
+
+        await _mongoService.UpdateAccount(account.Id, builder);
     }
 }
