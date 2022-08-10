@@ -31,7 +31,8 @@ public class UserCreatedEventHandler : IMessageQueueHandler
             PhoneNumber = userCreatedMessage.PhoneNumber!,
             Point = 0,
             ExternalUserId = userCreatedMessage.Id,
-            DateOfBirth = userCreatedMessage.DateOfBirth
+            DateOfBirth = userCreatedMessage.DateOfBirth,
+            Address = userCreatedMessage.Address
         });
     }
 }
