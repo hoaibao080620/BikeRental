@@ -1,0 +1,21 @@
+﻿syntax = "proto3";
+import "google/protobuf/timestamp.proto";
+
+service AccountServiceGrpc {
+  rpc GetAccountInfo(GetAccountInfoRequest) returns (GetAccountInfoResponse);
+}
+
+message GetAccountInfoRequest {
+  string email = 1;
+}
+
+message GetAccountInfoResponse {
+  string email = 1;
+  string id = 2;
+  string phoneNumber = 3;
+  double point = 4;
+  optional string address = 5;
+  optional google.protobuf.Timestamp dateOfBirth = 6;
+  string firstName = 7;
+  string lastName = 8;
+}

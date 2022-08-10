@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using BikeService.Sonic.BusinessLogics;
+using BikeService.Sonic.DAL;
 using BikeService.Sonic.Dtos;
 using BikeService.Sonic.Dtos.BikeStation;
 using BikeService.Sonic.Validation;
@@ -15,11 +16,15 @@ public class BikeStationController : ControllerBase
 {
     private readonly IBikeStationBusinessLogic _bikeStationBusinessLogic;
     private readonly IBikeStationValidation _bikeStationValidation;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public BikeStationController(IBikeStationBusinessLogic bikeStationBusinessLogic, IBikeStationValidation bikeStationValidation)
+    public BikeStationController(IBikeStationBusinessLogic bikeStationBusinessLogic, 
+        IBikeStationValidation bikeStationValidation,
+        IUnitOfWork unitOfWork)
     {
         _bikeStationBusinessLogic = bikeStationBusinessLogic;
         _bikeStationValidation = bikeStationValidation;
+        _unitOfWork = unitOfWork;
     }
 
     [HttpGet]
@@ -134,6 +139,21 @@ public class BikeStationController : ControllerBase
     public async Task<IActionResult> AssignBikeStationsToManager([FromBody] BikeStationManagerAssignDto bikeAssignDto)
     {
         await _bikeStationBusinessLogic.AssignBikeStationsToManager(bikeAssignDto);
+        return Ok();
+    }
+    
+    
+    [HttpGet]
+    [AllowAnonymous]
+    public async Task<IActionResult> GenerateData()
+    {
+        var bikeStations = await _unitOfWork.BikeStationRepository.Find(x => x.Code == "<null>");
+        foreach (var bikeStation in bikeStations.ToList())
+        {
+            bikeStation.Code = $"BS-{bikeStation.Id.ToString().PadLeft(6, '0')}";
+        }
+
+        await _unitOfWork.SaveChangesAsync();
         return Ok();
     }
 }

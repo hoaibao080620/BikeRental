@@ -1,8 +1,10 @@
 ﻿using System.Net.Http.Headers;
 using System.Security.Claims;
 using BikeBookingService.BLL;
+using BikeBookingService.DAL;
 using BikeBookingService.Dtos.BikeOperation;
 using BikeBookingService.Validations;
+using Grpc.Net.ClientFactory;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
@@ -17,11 +19,20 @@ public class BikeTrackingController : ControllerBase
 {
     private readonly IBikeTrackingBusinessLogic _bikeTrackingBusinessLogic;
     private readonly IBikeTrackingValidation _bikeTrackingValidation;
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly BikeServiceGrpc.BikeServiceGrpcClient _bikeServiceGrpc;
 
-    public BikeTrackingController(IBikeTrackingBusinessLogic bikeTrackingBusinessLogic, IBikeTrackingValidation bikeTrackingValidation)
+    public BikeTrackingController(
+        IBikeTrackingBusinessLogic bikeTrackingBusinessLogic,
+        IBikeTrackingValidation bikeTrackingValidation,
+        IUnitOfWork unitOfWork,
+        GrpcClientFactory grpcClientFactory
+        )
     {
+        _bikeServiceGrpc = grpcClientFactory.CreateClient<BikeServiceGrpc.BikeServiceGrpcClient>("BikeService");
         _bikeTrackingBusinessLogic = bikeTrackingBusinessLogic;
         _bikeTrackingValidation = bikeTrackingValidation;
+        _unitOfWork = unitOfWork;
     }
     
     [AllowAnonymous]
@@ -156,5 +167,24 @@ public class BikeTrackingController : ControllerBase
     {
         var bikeStatus = await _bikeTrackingBusinessLogic.GetBikeRentingStatus(email);
         return Ok(bikeStatus);
+    }
+    
+    [HttpGet]
+    [AllowAnonymous]
+    public async Task<IActionResult> SyncData()
+    {
+        var bikes = await _unitOfWork.BikeRepository.Find(x => x.BikeStationCode == null && x.BikeStationId.HasValue);
+        foreach (var bike in bikes.ToList())
+        {
+            var bikeStation = await _bikeServiceGrpc.GetBikeStationByCodeOrIdAsync(new GetBikeStationByCodeOrIdRequest
+            {
+                Id = bike.BikeStationId!.Value
+            });
+
+            bike.BikeStationCode = bikeStation.Code;
+        }
+
+        await _unitOfWork.SaveChangesAsync();
+        return Ok();
     }
 }

@@ -5,6 +5,7 @@ using BikeService.Sonic.Dtos;
 using BikeService.Sonic.Dtos.Bike;
 using BikeService.Sonic.Models;
 using Microsoft.EntityFrameworkCore;
+using Shared.Service;
 
 namespace BikeService.Sonic.BusinessLogics;
 
@@ -22,6 +23,13 @@ public class BikeReportBusinessLogic : IBikeReportBusinessLogic
         var manager = (await _unitOfWork.BikeStationManagerRepository
             .Find(x => x.BikeStation.Bikes.Any(b => x.Id == bikeReportInsertDto.BikeId))).FirstOrDefault();
 
+        string? imageUrl = null;
+        if (!string.IsNullOrEmpty(bikeReportInsertDto.ImageBase64))
+        {
+            imageUrl = $"report-{new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds()}";
+            await FileUploadService.UploadBase64Image(bikeReportInsertDto.ImageBase64, imageUrl);
+        }
+
         await _unitOfWork.BikeReportRepository.Add(new BikeReport
         {
             CreatedOn = DateTime.UtcNow,
@@ -29,8 +37,11 @@ public class BikeReportBusinessLogic : IBikeReportBusinessLogic
             BikeId = bikeReportInsertDto.BikeId,
             Status = BikeReportStatus.NoFix,
             ReportDescription = bikeReportInsertDto.ReportDescription,
-            AccountPhoneNumber = accountEmail.Split("@")[0],
-            AssignToId = manager!.ManagerId
+            AccountPhoneNumber = $"+{accountEmail.Split("@")[0]}",
+            AssignToId = manager?.ManagerId,
+            ImageUrl = imageUrl,
+            AccountEmail = accountEmail,
+            Title = bikeReportInsertDto.Title
         });
 
         await _unitOfWork.SaveChangesAsync();
@@ -57,14 +68,15 @@ public class BikeReportBusinessLogic : IBikeReportBusinessLogic
             .Select(x => new BikeReportRetriveDto
             {
                 Id = x.Id,
-                BikeId = x.BikeId,
                 AccountPhoneNumber = phoneNumber,
-                BikeLicensePlate = x.Bike.BikeCode,
+                BikeCode = x.Bike.BikeCode,
                 CompletedBy = x.AssignTo.Email,
                 CompletedOn = x.CompletedOn,
                 Status = x.Status,
                 ReportDescription = x.ReportDescription,
-                ReportOn = x.CreatedOn
+                ReportOn = x.CreatedOn,
+                ImageUrl = x.ImageUrl,
+                Title = x.Title
             }).ToList();
     }
 
@@ -73,9 +85,9 @@ public class BikeReportBusinessLogic : IBikeReportBusinessLogic
         var bikeReport = await _unitOfWork.BikeReportRepository.GetById(markReportAsResolveDto.BikeReportId);
         if (bikeReport is null) return;
         
-        bikeReport.CompletedOn = DateTime.UtcNow;
         bikeReport.Status = markReportAsResolveDto.Status;
         bikeReport.UpdatedOn = DateTime.UtcNow;
+        bikeReport.CompletedOn = markReportAsResolveDto.Status == BikeReportStatus.Fixed ? DateTime.UtcNow : null;
         await _unitOfWork.SaveChangesAsync();
     }
 }

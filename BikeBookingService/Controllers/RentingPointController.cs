@@ -46,13 +46,14 @@ public class RentingPointController : ControllerBase
 
         await _unitOfWork.RentingPointRepository.Add(new RentingPoint
         {
-            PointPerHour = rentingPointUpdateDto.Point,
+            PointPerHour = rentingPointUpdateDto.UpdatePoint,
             CreatedOn = DateTime.UtcNow
         });
         
-        await _unitOfWork.RentingPointHistoryRepository.Add(new RentingPointHistory()
+        await _unitOfWork.RentingPointHistoryRepository.Add(new RentingPointHistory
         {
-            PointChange = rentingPointUpdateDto.Point,
+            PreviousPoint = rentingPointUpdateDto.CurrentPoint,
+            PointChange = rentingPointUpdateDto.UpdatePoint,
             CreatedOn = DateTime.UtcNow,
             ChangeReason = rentingPointUpdateDto.ChangeReason,
             ChangeBy = email

@@ -2,6 +2,7 @@
 using System.Net.Http.Headers;
 using BikeService.Sonic.DAL;
 using BikeService.Sonic.Dtos;
+using BikeService.Sonic.Models;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
@@ -159,6 +160,26 @@ public class BikeGrpcService : BikeServiceGrpc.BikeServiceGrpcBase
         return new GetManagersByAccountEmailResponse
         {
             Emails = {directors.Select(x => x.Email).ToList()}
+        };
+    }
+
+    public override async Task<GetBikeStationByCodeOrIdResponse> GetBikeStationByCodeOrId(GetBikeStationByCodeOrIdRequest request, ServerCallContext context)
+    {
+        BikeStation? bikeStation;
+        if (request.Id != 0)
+        {
+            bikeStation = await _unitOfWork.BikeStationRepository.GetById(request.Id);
+        }
+        else
+        {
+            bikeStation = (await _unitOfWork.BikeStationRepository.Find(x => x.Code == request.Code)).FirstOrDefault();
+        }
+
+        return new GetBikeStationByCodeOrIdResponse
+        {
+            Code = bikeStation!.Code,
+            Id = bikeStation.Id,
+            Name = bikeStation.Name
         };
     }
 }

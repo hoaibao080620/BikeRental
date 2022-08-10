@@ -21,4 +21,5 @@ public class MessageType
     public const string AccountDebtHasBeenPaid = "AccountDebtHasBeenPaid";
     public const string AccountDeactivated = "AccountDeactivated";
     public const string AccountReactivated = "AccountReactivated";
+    public const string UserAlmostRunOutPoint = "UserAlmostRunOutPoint";
 }

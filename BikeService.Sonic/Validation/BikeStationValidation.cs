@@ -22,12 +22,13 @@ public class BikeStationValidation : IBikeStationValidation
         var isBikesStatusInvalid = await _unitOfWork.BikeRepository
             .Exists(x => bikeIds.Contains(x.Id) && x.Status == BikeStatus.InUsed);
 
-        if (isBikesStatusInvalid) return "Bike assign have to have available status!";
+        if (isBikesStatusInvalid) return "Xe bạn chọn phải đang có trạng thái sẵn sàng và chưa được thuê!";
 
         var bikeStation = await _unitOfWork.BikeStationRepository.GetById(bikeStationId);
+        var bikesInBikeStation = (await _unitOfWork.BikeRepository.Find(x => x.BikeStationId == bikeStationId)).Count();
         ArgumentNullException.ThrowIfNull(bikeStation);
 
-        var isBikeStationEnoughSpace = bikeStation.ParkingSpace - bikeStation.UsedParkingSpace > bikeIds.Count;
-        return isBikeStationEnoughSpace ? null : "Bike Station doesn't have enough space!";
+        var isBikeStationEnoughSpace = bikeStation.ParkingSpace - bikesInBikeStation > bikeIds.Count;
+        return isBikeStationEnoughSpace ? null : "Trạm không đủ chỗ để xe!";
     }
 }

@@ -2,6 +2,7 @@
 
 public class RentingPointUpdateDto
 {
-    public double Point { get; set; }
+    public double CurrentPoint { get; set; }
+    public double UpdatePoint { get; set; }
     public string? ChangeReason { get; set; }
 }

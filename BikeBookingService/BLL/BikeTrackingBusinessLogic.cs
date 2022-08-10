@@ -180,7 +180,7 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
             {
                 ManagerEmails = managerEmails,
                 BikeId = bike.Id,
-                BikeStationId = bikeCheckout.BikeStationId,
+                BikeCode = bikeCheckout.Code,
                 AccountEmail = accountEmail,
                 LicensePlate = bike.BikeCode,
                 CheckoutOn = bikeCheckout.CheckoutOn,
@@ -376,7 +376,6 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
     
     private async Task<BikeRentalBooking> FinishBikeRentalBooking(BikeCheckoutDto bikeCheckoutDto, string accountEmail, double rentingPoint)
     {
-        
         var bikeRentalBooking = (await _unitOfWork.BikeRentalTrackingRepository.Find(b =>
                 !b.CheckoutOn.HasValue && b.Account.Email == accountEmail))
             .OrderByDescending(b => b.CreatedOn).
@@ -390,11 +389,11 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
         bikeRentalBooking.TotalPoint = rentingPoint;
         bikeRentalBooking.PaymentStatus = PaymentStatus.PENDING;
 
-        if (bikeCheckoutDto.BikeStationId != bike.BikeStationId)
+        if (bikeCheckoutDto.Code != bike.BikeCode)
         {
-            var bikeStationName = (await _bikeServiceGrpc.GetBikeStationNameByIdAsync(new GetBikeStationNameByIdRequest
+            var bikeStationName = (await _bikeServiceGrpc.GetBikeStationByCodeOrIdAsync(new GetBikeStationByCodeOrIdRequest
             {
-                Id = bikeCheckoutDto.BikeStationId
+                Code = bikeCheckoutDto.Code
             })).Name;
 
             bikeRentalBooking.CheckoutBikeStation = bikeStationName;
@@ -439,4 +438,5 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
             DistanceFromPreviousLocation = bikeLocationDto.Distance
         });
     }
+    
 }

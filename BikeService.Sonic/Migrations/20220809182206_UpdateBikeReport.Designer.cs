@@ -3,6 +3,7 @@ using System;
 using BikeService.Sonic.BikeDbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BikeService.Sonic.Migrations
 {
     [DbContext(typeof(BikeServiceDbContext))]
-    partial class BikeServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220809182206_UpdateBikeReport")]
+    partial class UpdateBikeReport
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -93,7 +95,7 @@ namespace BikeService.Sonic.Migrations
                         .HasColumnType("text")
                         .HasColumnName("account_phone_number");
 
-                    b.Property<int?>("AssignToId")
+                    b.Property<int>("AssignToId")
                         .HasColumnType("integer")
                         .HasColumnName("assign_to_id");
 
@@ -162,10 +164,6 @@ namespace BikeService.Sonic.Migrations
                         .HasColumnType("text")
                         .HasColumnName("address");
 
-                    b.Property<string>("Code")
-                        .HasColumnType("text")
-                        .HasColumnName("code");
-
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("timestamp without time zone")
                         .HasColumnName("created_on");
@@ -198,6 +196,10 @@ namespace BikeService.Sonic.Migrations
                     b.Property<DateTime?>("UpdatedOn")
                         .HasColumnType("timestamp without time zone")
                         .HasColumnName("updated_on");
+
+                    b.Property<int>("UsedParkingSpace")
+                        .HasColumnType("integer")
+                        .HasColumnName("used_parking_space");
 
                     b.HasKey("Id")
                         .HasName("pk_bike_station");
@@ -347,6 +349,8 @@ namespace BikeService.Sonic.Migrations
                     b.HasOne("BikeService.Sonic.Models.Manager", "AssignTo")
                         .WithMany()
                         .HasForeignKey("AssignToId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("fk_bike_report_manager_assign_to_id");
 
                     b.HasOne("BikeService.Sonic.Models.Bike", "Bike")

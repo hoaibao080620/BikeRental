@@ -9,6 +9,7 @@ service BikeServiceGrpc {
   rpc GetBikeStationNameById(GetBikeStationNameByIdRequest) returns (GetBikeStationNameByIdResponse);
   rpc GetCallManagersByAccountPhone(GetManagersByAccountEmailRequest) returns (GetManagersByAccountEmailResponse);
   rpc GetDirectors(google.protobuf.Empty) returns (GetManagersByAccountEmailResponse);
+  rpc GetBikeStationByCodeOrId(GetBikeStationByCodeOrIdRequest) returns (GetBikeStationByCodeOrIdResponse);
 }
 
 message GetBikeIdsRequest {
@@ -50,4 +51,15 @@ message GetManagersByAccountEmailRequest{
 
 message GetManagersByAccountEmailResponse{
   repeated string emails = 1;
+}
+
+message GetBikeStationByCodeOrIdRequest {
+  string code = 1;
+  int32 id = 2;
+}
+
+message GetBikeStationByCodeOrIdResponse {
+  int32 id = 1;
+  string code = 2;
+  string name = 3;
 }

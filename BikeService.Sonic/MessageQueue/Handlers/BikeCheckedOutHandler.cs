@@ -24,27 +24,24 @@ public class BikeCheckedOutHandler : IMessageQueueHandler
         if (payload is null) return;
 
         var bike = await _unitOfWork.BikeRepository.GetById(payload.BikeId);
-        if(bike is null) return;
+        var checkOutBikeStation = (await _unitOfWork.BikeStationRepository
+            .Find(x => x.Code == payload.BikeCode)).FirstOrDefault();
+        if(bike is null || checkOutBikeStation is null) return;
 
         bike.Status = BikeStatus.Available;
         bike.UpdatedOn = DateTime.UtcNow;
-        if (bike.BikeStationId != payload.BikeStationId)
+        if (bike.BikeStationId != checkOutBikeStation.Id)
         {
-            var oldBikeStation = await _unitOfWork.BikeStationRepository.GetById(bike.BikeStationId!.Value);
-            var newBikeStation = await _unitOfWork.BikeStationRepository.GetById(payload.BikeStationId);
-
-            oldBikeStation!.UsedParkingSpace--;
-            newBikeStation!.UsedParkingSpace++;
-            
-            bike.BikeStationId = payload.BikeStationId;
+            bike.BikeStationId = checkOutBikeStation.Id;
             var bikeStationColor = (await _unitOfWork.BikeStationColorRepository
-                .Find(x => x.BikeStationId == payload.BikeStationId)).FirstOrDefault();
+                .Find(x => x.BikeStationId == checkOutBikeStation.Id)).FirstOrDefault();
             await _messageQueuePublisher.PublishBikeUpdatedEvent(new BikeUpdated
             {
                 Id = bike.Id,
-                BikeStationId = newBikeStation.Id,
-                BikeStationName = newBikeStation.Name,
-                Color = bikeStationColor?.Color
+                BikeStationId = checkOutBikeStation.Id,
+                BikeStationName = checkOutBikeStation.Name,
+                Color = bikeStationColor?.Color,
+                BikeStationCode = checkOutBikeStation.Code
             });
         }
         await _unitOfWork.SaveChangesAsync();

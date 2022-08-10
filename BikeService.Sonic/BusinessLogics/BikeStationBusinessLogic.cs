@@ -55,7 +55,7 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
             Latitude = x.Latitude,
             Longitude = x.Longitude,
             Name = x.Name,
-            UsedParkingSpace = x.UsedParkingSpace,
+            UsedParkingSpace = x.Bikes.Count,
             Managers = x.BikeStationManagers.Select(xx => xx.Manager.Email).ToList()
         }).ToList();
 
@@ -72,6 +72,10 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
         bikeStation.Longitude = longitude;
         
         await _unitOfWork.BikeStationRepository.Add(bikeStation);
+        await _unitOfWork.SaveChangesAsync();
+
+        var bikeStationCode = bikeStation.Id.ToString().PadLeft(6);
+        bikeStation.Code = bikeStationCode;
         await _unitOfWork.SaveChangesAsync();
     }
 
@@ -248,7 +252,8 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
             x.BikeStationId,
             BikeStationName = x.BikeStation!.Name,
             Color = x.BikeStation.BikeStationColors.Any() ?
-                x.BikeStation.BikeStationColors.First().Color : null
+                x.BikeStation.BikeStationColors.First().Color : null,
+            BikeStationCode = x.BikeStation.Code
         }).ToList();
         
         foreach (var bikeUpdated in bikesUpdated)
@@ -259,6 +264,7 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
                 Color = bikeUpdated.Color,
                 BikeStationId = bikeUpdated.BikeStationId,
                 BikeStationName = bikeUpdated.BikeStationName,
+                BikeStationCode = bikeUpdated.BikeStationCode,
                 MessageType = MessageType.BikeUpdated
             }); 
         }
@@ -267,14 +273,14 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
     public async Task<List<BikeStationAssignDto>> GetAssignableBikeStations(int totalBikeAssign)
     {
         var bikeStations = (await _unitOfWork.BikeStationRepository
-                .Find(x => (x.ParkingSpace - x.UsedParkingSpace) >= totalBikeAssign))
+                .Find(x => (x.ParkingSpace - x.Bikes.Count) >= totalBikeAssign))
             .AsNoTracking()
             .Select(x => new BikeStationAssignDto
             {
                 Id = x.Id,
                 Name = x.Name,
                 ParkingSpace = x.ParkingSpace,
-                UsedParkingSpace = x.UsedParkingSpace
+                UsedParkingSpace = x.Bikes.Count
             });
 
         return bikeStations.ToList();

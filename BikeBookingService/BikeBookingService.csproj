@@ -7,8 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="BikeRental.MessageQueue" Version="1.4.5-alpha" />
-        <PackageReference Include="BikeRental.Shared" Version="1.2.3-alpha" />
+        <PackageReference Include="BikeRental.MessageQueue" Version="1.4.6-alpha" />
+        <PackageReference Include="BikeRental.Shared" Version="1.2.4-alpha" />
         <PackageReference Include="Bogus" Version="34.0.2" />
         <PackageReference Include="EFCore.NamingConventions" Version="6.0.0" />
         <PackageReference Include="Google.Protobuf" Version="3.21.2" />
@@ -21,6 +21,9 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="Hangfire.AspNetCore" Version="1.8.0-rc1" />
+        <PackageReference Include="Hangfire.Core" Version="1.8.0-rc1" />
+        <PackageReference Include="Hangfire.PostgreSql" Version="1.9.8" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.6">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -41,6 +44,7 @@
     <ItemGroup>
         <Protobuf Include="Grpc\bike_service.proto" GrpcServices="Client" Link="Grpc\bike_service.proto" />
         <Protobuf Include="Grpc\bike_booking.proto" GrpcServices="Server" Link="Grpc\bike_booking.proto" />
+        <Protobuf Include="Grpc\account_service.proto" GrpcServices="Client" Link="Grpc\account_service.proto" />
     </ItemGroup>
 
 </Project>

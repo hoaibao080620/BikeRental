@@ -95,7 +95,8 @@ public class BikeBusinessLogic : IBikeBusinessLogic
             LicensePlate = bike.BikeCode,
             Status = bike.Status,
             MessageType = MessageType.BikeCreated,
-            Color = bikeStationColor?.Color
+            Color = bikeStationColor?.Color,
+            BikeStationCode = bikeStation?.Code
         });
     }
 
@@ -119,6 +120,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
             Description = bike.Description,
             LicensePlate = bike.BikeCode,
             MessageType = MessageType.BikeUpdated,
+            BikeStationCode = bikeStation?.Code,
             Color = bikeStationColor?.Color
         });
     }
