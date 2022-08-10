@@ -63,7 +63,8 @@ public class BikeBusinessLogic : IBikeBusinessLogic
                     Description = b.Description,
                     LicensePlate = b.BikeCode,
                     Status = b.Status,
-                    UpdatedOn = b.UpdatedOn
+                    UpdatedOn = b.UpdatedOn,
+                    CreatedOn = b.CreatedOn
                 }).OrderByDescending(x => x.UpdatedOn).ToList();
         
         return bikes;
