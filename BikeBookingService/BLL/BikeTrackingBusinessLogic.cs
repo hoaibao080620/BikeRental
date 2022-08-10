@@ -267,6 +267,11 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
         return bikeBookings.ToList();
     }
 
+    public async Task CheckBikeRentingHasUserAlmostRunOutPoint()
+    {
+        Console.WriteLine("Hello");
+    }
+
     private async Task<Bike> GetBikeById(int bikeId)
     {
         var bike = await _unitOfWork.BikeRepository.GetById(bikeId) ?? throw new InvalidOperationException();

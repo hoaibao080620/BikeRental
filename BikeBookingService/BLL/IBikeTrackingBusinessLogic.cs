@@ -13,4 +13,5 @@ public interface IBikeTrackingBusinessLogic
     Task UpdateBikeLocation(BikeLocationDto bikeLocationDto);
     Task<BikeRentingStatus> GetBikeRentingStatus(string accountEmail);
     Task<List<BikeBookingHistoryDto>> GetBikeBookingHistories(string accountEmail);
+    Task CheckBikeRentingHasUserAlmostRunOutPoint();
 }

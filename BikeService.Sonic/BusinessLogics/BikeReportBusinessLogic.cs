@@ -4,8 +4,8 @@ using BikeService.Sonic.DAL;
 using BikeService.Sonic.Dtos;
 using BikeService.Sonic.Dtos.Bike;
 using BikeService.Sonic.Models;
+using BikeService.Sonic.Services;
 using Microsoft.EntityFrameworkCore;
-using Shared.Service;
 
 namespace BikeService.Sonic.BusinessLogics;
 
@@ -26,8 +26,8 @@ public class BikeReportBusinessLogic : IBikeReportBusinessLogic
         string? imageUrl = null;
         if (!string.IsNullOrEmpty(bikeReportInsertDto.ImageBase64))
         {
-            imageUrl = $"report-{new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds()}";
-            await FileUploadService.UploadBase64Image(bikeReportInsertDto.ImageBase64, imageUrl);
+            var fileName = $"report-{new DateTimeOffset(DateTime.UtcNow).ToUnixTimeMilliseconds()}";
+            imageUrl = await FileUploadService.UploadBase64Image(bikeReportInsertDto.ImageBase64, fileName);
         }
 
         await _unitOfWork.BikeReportRepository.Add(new BikeReport
