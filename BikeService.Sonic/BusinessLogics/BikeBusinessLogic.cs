@@ -65,7 +65,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
                     Status = b.Status == BikeStatus.Available ? "Sẵn sàng" : "Đang thuê",
                     UpdatedOn = b.UpdatedOn,
                     CreatedOn = b.CreatedOn
-                }).OrderByDescending(x => x.UpdatedOn).ToList();
+                }).OrderByDescending(x => x.UpdatedOn).ThenByDescending(x => x.CreatedOn).ToList();
         
         return bikes;
     }
