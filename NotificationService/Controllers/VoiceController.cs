@@ -112,7 +112,7 @@ public class VoiceController : ControllerBase
         dial.RecordingStatusCallback =
             new Uri("HandleCompletedRecording", UriKind.Relative);
         dial.RecordingStatusCallbackMethod = HttpMethod.Get;
-
+        dial.AnswerOnBridge = true;
         response.Append(dial);
         
         return Content(response.ToString(), "application/xml");
