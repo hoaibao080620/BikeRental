@@ -27,7 +27,8 @@ public class MessageQueuePublisher : IMessageQueuePublisher
             FirstName = user.FirstName,
             LastName = user.LastName,
             MessageType = MessageType.UserAdded,
-            Role = user.RoleName
+            Role = user.RoleName,
+            DateOfBirth = user.DateOfBirth
         };
         
         await _publisher.SendMessage(JsonConvert.SerializeObject(message), _configuration["Topic:UserTopic"]);
@@ -42,7 +43,8 @@ public class MessageQueuePublisher : IMessageQueuePublisher
             FirstName = user.FirstName,
             LastName = user.LastName,
             MessageType = MessageType.UserUpdated,
-            Role = user.RoleName
+            Role = user.RoleName,
+            DateOfBirth = user.DateOfBirth
         };
         
         await _publisher.SendMessage(

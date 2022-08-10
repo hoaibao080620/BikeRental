@@ -131,7 +131,7 @@ public class UserBusinessLogic : IUserBusinessLogic
                 MessageType = MessageType.UserRoleUpdated,
                 FirstName = newUserUpdated.FirstName,
                 LastName = newUserUpdated.LastName,
-                PhoneNumber = newUserUpdated.PhoneNumber
+                PhoneNumber = newUserUpdated.PhoneNumber,
             });
         }
     }
