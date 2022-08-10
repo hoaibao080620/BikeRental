@@ -55,6 +55,7 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
             Latitude = x.Latitude,
             Longitude = x.Longitude,
             Name = x.Name,
+            ParkingSpace = x.ParkingSpace,
             UsedParkingSpace = x.Bikes.Count,
             Managers = x.BikeStationManagers.Select(xx => xx.Manager.Email).ToList()
         }).ToList();
