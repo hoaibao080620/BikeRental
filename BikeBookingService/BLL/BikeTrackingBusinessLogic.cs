@@ -57,7 +57,9 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
                 TotalTime = x.CheckoutOn.HasValue ? x.CheckoutOn.Value.Subtract(x.CheckinOn).TotalMinutes : null,
                 TotalPoint = x.TotalPoint,
                 PaymentStatus = x.PaymentStatus,
-                Status = x.CheckoutOn.HasValue ? "Done" : "InProgress"
+                Status = x.CheckoutOn.HasValue ? "Done" : "InProgress",
+                CheckInStation = x.CheckinBikeStation,
+                CheckOutStation = x.CheckoutBikeStation
             }).ToList();
 
         return bikeRentingHistories;

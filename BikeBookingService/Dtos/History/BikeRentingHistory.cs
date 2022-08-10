@@ -13,4 +13,6 @@ public class BikeRentingHistory
     public double TotalPoint { get; set; }
     public string? PaymentStatus { get; set; }
     public string Status { get; set; } = null!;
+    public string CheckInStation { get; set; } = null!;
+    public string? CheckOutStation { get; set; }
 }

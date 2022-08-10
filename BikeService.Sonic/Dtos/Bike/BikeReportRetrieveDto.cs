@@ -10,6 +10,6 @@ public class BikeReportRetriveDto
     public string Status { get; set; } = null!;
     public string AccountPhoneNumber { get; set; } = null!;
     public DateTime? CompletedOn { get; set; }
-    public string? CompletedBy { get; set; }
+    public string? AssignTo { get; set; }
     public string? ImageUrl { get; set; }
 }

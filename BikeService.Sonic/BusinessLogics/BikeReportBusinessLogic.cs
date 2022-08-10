@@ -70,7 +70,7 @@ public class BikeReportBusinessLogic : IBikeReportBusinessLogic
                 Id = x.Id,
                 AccountPhoneNumber = phoneNumber,
                 BikeCode = x.Bike.BikeCode,
-                CompletedBy = x.AssignTo.Email,
+                AssignTo = x.AssignTo == null ? null : x.AssignTo.Email,
                 CompletedOn = x.CompletedOn,
                 Status = x.Status,
                 ReportDescription = x.ReportDescription,
