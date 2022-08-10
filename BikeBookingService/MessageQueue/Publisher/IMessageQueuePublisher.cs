@@ -7,4 +7,5 @@ public interface IMessageQueuePublisher
     Task PublishBikeLocationChangeCommand(List<string> managerEmails);
     Task PublishBikeCheckedInEvent(BikeCheckedIn bikeCheckedIn);
     Task PublishBikeCheckedOutEvent(BikeCheckedOut bikeCheckedOut);
+    Task PublishUserPointRunOutEvent(UserAlmostRunOutPoint userAlmostRunOutPoint);
 }

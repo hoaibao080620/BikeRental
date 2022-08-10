@@ -31,10 +31,18 @@ builder.WebHost.UseSentry(o =>
     o.AttachStacktrace = true;
     o.DiagnosticLevel = SentryLevel.Error;
 });
-builder.Services.AddHangfire(config =>
-    config.UsePostgreSqlStorage(builder.Configuration.GetConnectionString("Hangfire")));
 
-builder.Services.AddHangfireServer();
+
+builder.Services.AddHangfire(config =>
+    {
+        config.UsePostgreSqlStorage(builder.Configuration.GetConnectionString("Hangfire"));
+    }
+    
+);
+builder.Services.AddHangfireServer(option =>
+{
+    option.WorkerCount = 1;
+});
 
 var app = builder.Build();
 
@@ -51,4 +59,5 @@ app.MapHangfireDashboard();
 app.MapGrpcService<BikeBookingGrpcService>().EnableGrpcWeb();
 app.UseSentryTracing();
 app.RegisterMessageHandler();
+// app.RegisterBackgroundJobs();
 app.Run();

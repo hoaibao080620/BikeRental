@@ -42,4 +42,11 @@ public class MessageQueuePublisher : IMessageQueuePublisher
         var topic = _configuration["MessageQueue:BikeTrackingTopic"];
         await _publisher.SendMessage(payload, topic);
     }
+
+    public async Task PublishUserPointRunOutEvent(UserAlmostRunOutPoint userAlmostRunOutPoint)
+    {
+        var payload = JsonConvert.SerializeObject(userAlmostRunOutPoint);
+        var topic = _configuration["MessageQueue:BikeTrackingTopic"];
+        await _publisher.SendMessage(payload, topic);
+    }
 }

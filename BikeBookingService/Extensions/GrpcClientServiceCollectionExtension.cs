@@ -13,5 +13,13 @@ public static class GrpcClientServiceCollectionExtension
         {
             o.HttpHandler = new GrpcWebHandler(new HttpClientHandler());
         });
+        
+        serviceCollection.AddGrpcClient<AccountServiceGrpc.AccountServiceGrpcClient>("AccountService", c =>
+        {
+            c.Address = new Uri("https://bike-rental-account-service.herokuapp.com");
+        }).ConfigureChannel(o =>
+        {
+            o.HttpHandler = new GrpcWebHandler(new HttpClientHandler());
+        });
     }
 }

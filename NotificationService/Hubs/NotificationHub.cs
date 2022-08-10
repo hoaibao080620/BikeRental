@@ -32,7 +32,7 @@ public class NotificationHub : Hub, INotificationHub
     public async Task PushPointRunOutNotification(string? email, string message)
     {
         if (string.IsNullOrEmpty(email)) return;
-        await _hubContext.Clients.Group(email).SendAsync(SignalRChannel.NotificationChannel, message);
+        await _hubContext.Clients.Group(email).SendAsync(SignalRChannel.WarningUserChannel, message);
     }
 
     public override async Task OnConnectedAsync()
