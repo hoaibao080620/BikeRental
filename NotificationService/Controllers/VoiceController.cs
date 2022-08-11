@@ -5,6 +5,7 @@ using Grpc.Net.ClientFactory;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NotificationService.DAL;
+using NotificationService.Hubs;
 using NotificationService.Models;
 using Twilio.AspNet.Common;
 using Twilio.Jwt.AccessToken;
@@ -20,12 +21,15 @@ namespace NotificationService.Controllers;
 public class VoiceController : ControllerBase
 {
     private readonly INotificationRepository _notificationRepository;
+    private readonly INotificationHub _notificationHub;
     private readonly BikeServiceGrpc.BikeServiceGrpcClient _client;
 
     public VoiceController(INotificationRepository notificationRepository,
-        GrpcClientFactory grpcClientFactory)
+        GrpcClientFactory grpcClientFactory,
+        INotificationHub notificationHub)
     {
         _notificationRepository = notificationRepository;
+        _notificationHub = notificationHub;
         _client = grpcClientFactory.CreateClient<BikeServiceGrpc.BikeServiceGrpcClient>("BikeService");
     }
     
@@ -101,18 +105,24 @@ public class VoiceController : ControllerBase
     [Route("[action]")]
     public IActionResult ForwardPhone()
     {
+        var client = HttpUtility.ParseQueryString(HttpContext.Request.QueryString.Value!)["from"];
         var phoneNumber = HttpUtility.ParseQueryString(HttpContext.Request.QueryString.Value!)["to"]?
             .Replace(",", "");
         var response = new VoiceResponse();
         var dial = new Dial(callerId: "+19379091267");
         dial.Number(phoneNumber,
-            statusCallback: new Uri("HandleCompletedOutgoingCall", UriKind.Relative),
-            statusCallbackMethod: HttpMethod.Get);
+            statusCallback: new Uri($"HandleCompletedOutgoingCall?client={client}", UriKind.Relative),
+            statusCallbackMethod: HttpMethod.Post,
+            statusCallbackEvent: new List<Number.EventEnum>
+            {
+                Number.EventEnum.Answered,
+                Number.EventEnum.Completed
+            });
+        
         dial.Record = Dial.RecordEnum.RecordFromAnswerDual;
         dial.RecordingStatusCallback =
             new Uri("HandleCompletedRecording", UriKind.Relative);
         dial.RecordingStatusCallbackMethod = HttpMethod.Get;
-        dial.AnswerOnBridge = true;
         response.Append(dial);
         
         return Content(response.ToString(), "application/xml");
@@ -144,32 +154,34 @@ public class VoiceController : ControllerBase
         return Content(response.ToString(), "application/xml");
     }
     
-    [HttpGet]
+    [HttpPost]
     [Route("[action]")]
-    public async Task<IActionResult> HandleCompletedOutgoingCall()
+    [Consumes("application/x-www-form-urlencoded")]
+    public async Task<IActionResult> HandleCompletedOutgoingCall([FromForm] VoiceRequest voiceRequest, [FromQuery] string client)
     {
-        var queryString = HttpUtility.ParseQueryString(HttpContext.Request.QueryString.Value!);
-        foreach (string? query in queryString)
-        {
-            Console.WriteLine($"Key: {query}, Value: {queryString[query]}");
-        }
-        await _notificationRepository.AddCall(new Call
-        {
-            CallSid = queryString.Get("CallSid")!,
-            CalledOn = DateTime.UtcNow,
-            Duration = Convert.ToDouble(queryString["CallDuration"]),
-            From = queryString.Get("From")!,
-            To = queryString.Get("To")!,
-            AnsweredBy = "Test@gmail.com",
-            Status = queryString.Get("CallStatus")!,
-            Direction = "outbound",
-            RecordingUrl = queryString.Get("RecordingUrl"),
-            CallerCountry = queryString.Get("FromCountry")!,
-            CalledCountry =queryString.Get("ToCountry")!
-        });
-        
         var response = new VoiceResponse();
-        response.Hangup();
+        switch (voiceRequest.CallStatus)
+        {
+            case "in-progress":
+                await _notificationHub.PushUserAnswerPhoneCall(client.Replace("client:", string.Empty));
+                break;
+            default:
+                await _notificationRepository.AddCall(new Call
+                {
+                    CallSid = voiceRequest.CallSid,
+                    CalledOn = DateTime.UtcNow,
+                    Duration = Convert.ToDouble(voiceRequest.DialCallDuration),
+                    From = voiceRequest.From,
+                    To = voiceRequest.To,
+                    Status = voiceRequest.CallStatus,
+                    Direction = "outbound",
+                    RecordingUrl = voiceRequest.RecordingUrl,
+                    CallerCountry = voiceRequest.FromCountry,
+                    CalledCountry = voiceRequest.ToCountry
+                });
+                response.Hangup();
+                break;
+        }
         
         return Content(response.ToString(), "application/xml");
     }
