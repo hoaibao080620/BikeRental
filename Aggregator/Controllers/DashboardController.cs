@@ -4,8 +4,6 @@ using Aggregator.Services;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Net.ClientFactory;
 using Microsoft.AspNetCore.Mvc;
-using Syncfusion.HtmlConverter;
-using Syncfusion.Pdf;
 
 namespace Aggregator.Controllers;
 
