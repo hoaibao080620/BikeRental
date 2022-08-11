@@ -19,7 +19,7 @@ public class NotificationGrpcService : NotificationServiceGrpc.NotificationServi
         var callIncoming = calls.Count(x => x.Direction == "inbound");
         var callCount = calls.Count;
 
-        var callIncomingRate = callIncoming / callCount;
+        var callIncomingRate = Math.Round(callIncoming * 1.0 / callCount * 100);
         return new GetCallStatisticResponse
         {
             IncomingCallRate = callIncomingRate,
