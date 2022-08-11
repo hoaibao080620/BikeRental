@@ -37,7 +37,7 @@ public class NotificationHub : Hub, INotificationHub
     public async Task PushUserAnswerPhoneCall(string email)
     {
         if (string.IsNullOrEmpty(email)) return;
-        await _hubContext.Clients.Group(email).SendAsync(SignalRChannel.WarningUserChannel);
+        await _hubContext.Clients.Group(email).SendAsync(SignalRChannel.UserAnswerPhoneCall);
     }
 
     public override async Task OnConnectedAsync()

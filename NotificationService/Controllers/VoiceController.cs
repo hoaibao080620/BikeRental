@@ -200,7 +200,7 @@ public class VoiceController : ControllerBase
         var calls = await _notificationRepository.GetCalls(_ => true);
         return Ok(calls);
     }
-    
+
     [HttpGet]
     [Route("[action]")]
     [Authorize]
