@@ -87,6 +87,31 @@ public class UserController : ControllerBase
     
     [HttpPut]
     [Route("[action]")]
+    public async Task<IActionResult> DeactivateMultipleUser([FromBody] List<string> ids)
+    {
+        foreach (var id in ids)
+        {
+            await _userBusinessLogic.DeactivateUser(new ActivateUserDto
+            {
+                UserId = id
+            });
+        }
+        return Ok();
+    }
+    
+    [HttpPut]
+    [Route("[action]")]
+    public async Task<IActionResult> DeleteMultipleUser([FromBody] List<string> ids)
+    {
+        foreach (var id in ids)
+        {
+            await _userBusinessLogic.DeleteUser(id);
+        }
+        return Ok();
+    }
+    
+    [HttpPut]
+    [Route("[action]")]
     public async Task<IActionResult> ActivateUser([FromBody] ActivateUserDto activateUserDto)
     {
         await _userBusinessLogic.ActivateUser(activateUserDto);
