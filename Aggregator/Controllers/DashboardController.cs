@@ -226,37 +226,21 @@ public class DashboardController : ControllerBase
             ChartData = chartData.ResponseAsync.Result.ChartData.ToList(),
             ChartColumns = chartColumnDict[filterType!]
         });
-        // IronPdf.License.LicenseKey = Environment.GetEnvironmentVariable("IRON_PDF_KEY");
-        //     
-        // var renderer = new IronPdf.ChromePdfRenderer
-        // {
-        //     RenderingOptions =
-        //     {
-        //         EnableJavaScript = true,
-        //         RenderDelay = 1000,
-        //         CssMediaType = IronPdf.Rendering.PdfCssMediaType.Print
-        //     }
-        // };
-        //
-        // var pdfDoc = renderer.RenderHtmlAsPdf(htmlContent);
-        // pdfDoc.RemovePage(1);
-        
-        var htmlConverter = new HtmlToPdfConverter(HtmlRenderingEngine.Blink);
-
-        var blinkConverterSettings = new BlinkConverterSettings
+        IronPdf.License.LicenseKey = Environment.GetEnvironmentVariable("IRON_PDF_KEY");
+            
+        var renderer = new IronPdf.ChromePdfRenderer
         {
-            //Set the BlinkBinaries folder path.
-            BlinkPath = $@"{_env.ContentRootPath}BlinkBinariesLinux\"
+            RenderingOptions =
+            {
+                EnableJavaScript = true,
+                RenderDelay = 1000,
+                CssMediaType = IronPdf.Rendering.PdfCssMediaType.Print
+            }
         };
-
-        //Assign Blink converter settings to HTML converter.
-        htmlConverter.ConverterSettings = blinkConverterSettings;
-
-        //Convert HTML string to PDF.
-        var document = htmlConverter.Convert(htmlContent,"");
-        await using var memoryStream = new MemoryStream();
-        document.Save(memoryStream);
-        return File(memoryStream.ToArray(), 
+        
+        var pdfDoc = renderer.RenderHtmlAsPdf(htmlContent);
+        pdfDoc.RemovePage(1);
+        return File(pdfDoc.BinaryData, 
             System.Net.Mime.MediaTypeNames.Application.Pdf, 
             $"report_{DateTime.Now.ToShortDateString()}.pdf");
     }
