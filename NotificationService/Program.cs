@@ -46,6 +46,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.UseGrpcWeb();
 app.MapGrpcService<NotificationGrpcService>().EnableGrpcWeb();
 app.MapHub<NotificationHub>("/hub");
 app.RegisterMessageHandler();
