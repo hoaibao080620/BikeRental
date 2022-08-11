@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using System.Net.Http.Headers;
 using BikeService.Sonic.DAL;
 using BikeService.Sonic.Dtos;
 using BikeService.Sonic.Models;
@@ -180,6 +179,30 @@ public class BikeGrpcService : BikeServiceGrpc.BikeServiceGrpcBase
             Code = bikeStation!.Code,
             Id = bikeStation.Id,
             Name = bikeStation.Name
+        };
+    }
+
+    public override async Task<GetManagerDashboardStatisticResponse> GetManagerDashboardStatistic(GetManagerDashboardStatisticRequest request, ServerCallContext context)
+    {
+        var bikes = (await _unitOfWork.BikeRepository
+            .Find(x => x.BikeStation != null &&
+                       x.BikeStation.BikeStationManagers
+                           .Any(xx => xx.Manager.Email == request.ManagerEmail)))
+            .Select(x => x.Id)
+            .ToList();
+
+        var totalBikeStations = (await _unitOfWork.BikeStationManagerRepository
+            .Find(x => x.Manager.Email == request.ManagerEmail)).Count();
+
+        var totalBikeReport = await _unitOfWork.BikeReportRepository
+            .Find(x => bikes.Contains(x.BikeId));
+
+        return new GetManagerDashboardStatisticResponse
+        {
+            BikeIds = { bikes },
+            TotalBike = bikes.Count,
+            TotalBikeReport = totalBikeReport.Count(),
+            TotalBikeStation = totalBikeStations
         };
     }
 }

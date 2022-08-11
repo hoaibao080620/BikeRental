@@ -1,8 +1,10 @@
 using System.Globalization;
+using System.Security.Claims;
 using Aggregator.Dto;
 using Aggregator.Services;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Net.ClientFactory;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Aggregator.Controllers;
@@ -17,6 +19,7 @@ public class DashboardController : ControllerBase
     private readonly BikeServiceGrpc.BikeServiceGrpcClient _bikeServiceGrpc;
     private readonly AccountServiceGrpc.AccountServiceGrpcClient _accountServiceGrpc;
     private readonly BikeBookingServiceGrpc.BikeBookingServiceGrpcClient _bikeBookingServiceGrpc;
+    private readonly NotificationServiceGrpc.NotificationServiceGrpcClient _notificationService;
 
     public DashboardController(GrpcClientFactory grpcClientFactory, IViewRender viewRender, IWebHostEnvironment env)
     {
@@ -26,6 +29,8 @@ public class DashboardController : ControllerBase
         _accountServiceGrpc = grpcClientFactory.CreateClient<AccountServiceGrpc.AccountServiceGrpcClient>("AccountService");
         _bikeBookingServiceGrpc = grpcClientFactory.CreateClient<BikeBookingServiceGrpc.BikeBookingServiceGrpcClient>(
             "BikeBookingService");
+        _notificationService = grpcClientFactory.CreateClient<NotificationServiceGrpc.NotificationServiceGrpcClient>(
+            "NotificationService");
     }
 
     [HttpGet]
@@ -97,29 +102,22 @@ public class DashboardController : ControllerBase
     }
     
     [HttpGet]
-    public async Task<IActionResult> GetTotalRentByBikeStation()
+    public async Task<IActionResult> GetCallRating()
     {
-        var data = await _bikeBookingServiceGrpc.GetTotalTimesRentingByBikeStationAsync(new Empty());
-        foreach (var val in data.Result.ToList())
+        var list = new List<CallChart>();
+        var callRating = await _notificationService.GetCallStatisticAsync(new Empty());
+        list.Add(new CallChart
         {
-            val.Percentage = Math.Round(val.Percentage, 2, MidpointRounding.ToZero);
-        }
-
-        double currentPercent = 0.0;
-        for (var i = 0; i < data.Result.Count; i++)
-        {
-            if (i == data.Result.Count - 1)
-            {
-                data.Result[i].Percentage = 100 - currentPercent;
-            }
-            else
-            {
-                data.Result[i].Percentage = Math.Round(data.Result[i].Percentage, 2, MidpointRounding.ToZero);
-                currentPercent += data.Result[i].Percentage;
-            }
-        }
+            CallType = "Incoming",
+            Percentage = callRating.IncomingCallRate
+        });
         
-        return Ok(data.Result);
+        list.Add(new CallChart
+        {
+            CallType = "Outgoing",
+            Percentage = callRating.OutgoingCallRate
+        });
+        return Ok(list);
     }
     
     [HttpGet]
@@ -241,6 +239,32 @@ public class DashboardController : ControllerBase
         return File(pdfDoc.BinaryData, 
             System.Net.Mime.MediaTypeNames.Application.Pdf, 
             $"report_{DateTime.Now.ToShortDateString()}.pdf");
+    }
+    
+    [Authorize]
+    [HttpGet]
+    public async Task<IActionResult> GetManagerDashboard()
+    {
+        var email = HttpContext.User.Claims.FirstOrDefault(x => 
+            x.Type == ClaimTypes.NameIdentifier)!.Value;
+        var bikeStatistic = await _bikeServiceGrpc.GetManagerDashboardStatisticAsync(
+            new GetManagerDashboardStatisticRequest
+            {
+                ManagerEmail = email
+            });
+
+        var rentingCount = await _bikeBookingServiceGrpc.GetBikeRentingCountAsync(new GetBikeRentingCountRequest
+        {
+            BikeIds = {bikeStatistic.BikeIds}
+        });
+
+        return Ok(new ManagerDashboard
+        {
+            BikeCount = bikeStatistic.TotalBike,
+            BikeReportCount = bikeStatistic.TotalBikeReport,
+            StationCount = bikeStatistic.TotalBikeStation,
+            TotalRenting = rentingCount.TotalRenting
+        });
     }
 
     private (DateTime StartDate, DateTime EndDate) GetFilterDate(string filterType)

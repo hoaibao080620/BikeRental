@@ -3,7 +3,20 @@
 service BikeServiceGrpc {
   rpc GetBikeReportStatistics(BikeGetStatisticsRequest) returns (BikeGetStatisticsResponse);
   rpc GetBikeStationNameById(GetBikeStationNameByIdRequest) returns (GetBikeStationNameByIdResponse);
+  rpc GetManagerDashboardStatistic(GetManagerDashboardStatisticRequest) returns (GetManagerDashboardStatisticResponse);
 }
+
+message GetManagerDashboardStatisticRequest {
+  string managerEmail = 1;
+}
+
+message GetManagerDashboardStatisticResponse {
+  repeated int32 bikeIds = 1;
+  int32 totalBike = 2;
+  int32 totalBikeStation = 3;
+  int32 totalBikeReport = 4;
+}
+
 
 message BikeGetStatisticsRequest {
   string filterType = 1;

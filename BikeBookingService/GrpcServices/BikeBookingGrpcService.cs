@@ -234,5 +234,16 @@ public class BikeBookingGrpcService : BikeBookingServiceGrpc.BikeBookingServiceG
             TotalRentingTime = totalRentingTime
         };
     }
-    
+
+    public override async Task<GetBikeRentingCountResponse> GetBikeRentingCount(GetBikeRentingCountRequest request, ServerCallContext context)
+    {
+        var bikeIds = request.BikeIds.ToList();
+        var rentingCount = await _unitOfWork.BikeRentalTrackingRepository
+            .Find(x => bikeIds.Contains(x.BikeId));
+
+        return new GetBikeRentingCountResponse
+        {
+            TotalRenting = rentingCount.Count()
+        };
+    }
 }

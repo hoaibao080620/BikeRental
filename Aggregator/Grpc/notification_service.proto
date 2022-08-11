@@ -1,0 +1,12 @@
+﻿syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+service NotificationServiceGrpc {
+  rpc GetCallStatistic(google.protobuf.Empty) returns (GetCallStatisticResponse);
+}
+
+message GetCallStatisticResponse{
+  double incomingCallRate = 1;
+  double outgoingCallRate = 2;
+}

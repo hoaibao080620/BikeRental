@@ -9,6 +9,15 @@ service BikeBookingServiceGrpc {
   rpc GetTopThreeAccountRenting (google.protobuf.Empty) returns (GetTopThreeAccountRentingResponse);
   rpc GetTotalTimesRentingByBikeStation (google.protobuf.Empty) returns (GetTotalTimesRentingByBikeStationResponse);
   rpc GetRentingInfo(GetRentingInfoRequest) returns (GetRentingInfoResponse);
+  rpc GetBikeRentingCount(GetBikeRentingCountRequest) returns (GetBikeRentingCountResponse);
+}
+
+message GetBikeRentingCountRequest {
+  repeated int32 bikeIds = 1;
+}
+
+message GetBikeRentingCountResponse {
+  int32 totalRenting = 1;
 }
 
 message GetStatisticsRequest {

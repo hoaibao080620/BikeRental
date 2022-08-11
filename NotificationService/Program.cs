@@ -1,5 +1,6 @@
 using Grpc.Net.Client.Web;
 using NotificationService.Extensions;
+using NotificationService.GrpcService;
 using NotificationService.Hubs;
 using NotificationService.MessageQueue.BackgroundJob;
 
@@ -8,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddGrpc();
 builder.Services.AddOktaAuthenticationService(builder.Configuration);
 builder.Services.AddHostedService<MessageQueueConsumer>();
 builder.Services.AddScopedServices();
@@ -44,6 +46,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapGrpcService<NotificationGrpcService>().EnableGrpcWeb();
 app.MapHub<NotificationHub>("/hub");
 app.RegisterMessageHandler();
 

@@ -23,6 +23,7 @@
         <Protobuf Include="Grpc\bike_service.proto" GrpcServices="Client" Link="Grpc\bike_service.proto" />
         <Protobuf Include="Grpc\bike_booking.proto" GrpcServices="Client" Link="Grpc\bike_booking.proto" />
         <Protobuf Include="Grpc\account_service.proto" GrpcServices="Client" Link="Grpc\account_service.proto" />
+        <Protobuf Include="Grpc\notification_service.proto" GrpcServices="Client" Link="Grpc\notification_service.proto" />
     </ItemGroup>
 
 </Project>
