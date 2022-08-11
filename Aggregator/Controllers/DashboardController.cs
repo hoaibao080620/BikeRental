@@ -136,112 +136,112 @@ public class DashboardController : ControllerBase
             .ThenByDescending(x => x.TotalRentingTimes));
     }
     
-    // [HttpGet]
-    // public async Task<IActionResult> DownloadReport(string? filterType = "week")
-    // {
-    //     var (startDate, endDate) = GetFilterDate(filterType!);
-    //     var reportDisplayDict = new Dictionary<string, string>
-    //     {
-    //         {"week", "tuần"},
-    //         {"month", "tháng"},
-    //         {"year", "năm"}
-    //     };
-    //     
-    //     var chartColumnDict = new Dictionary<string, List<string>>
-    //     {
-    //         {"week", new List<string>
-    //         {
-    //             "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ nhật"
-    //         }},
-    //         {"month", new List<string>
-    //         {
-    //             "Tuần 1", "Tuần 2", "Tuần 3", "Tuần 4"
-    //         }},
-    //         {"year", new List<string>
-    //         {
-    //             "Tháng 1", 
-    //             "Tháng 2",
-    //             "Tháng 3",
-    //             "Tháng 4",
-    //             "Tháng 5",
-    //             "Tháng 6",
-    //             "Tháng 7",
-    //             "Tháng 8",
-    //             "Tháng 9",
-    //             "Tháng 10",
-    //             "Tháng 11",
-    //             "Tháng 12",
-    //         }}
-    //     };
-    //
-    //     var chartData = _accountServiceGrpc.GetPaymentChartAsync(new GetPaymentChartRequest
-    //     {
-    //         FilterType = filterType,
-    //         StartDate = startDate.ToTimestamp(),
-    //         EndDate = endDate.ToTimestamp()
-    //     });
-    //
-    //     var paymentStatistic = _accountServiceGrpc.GetPaymentStatisticsAsync(new AccountGetStatisticsRequest
-    //     {
-    //         FilterType = filterType
-    //     });
-    //     
-    //     var accountStatistics = _accountServiceGrpc.GetAccountStatisticsAsync(new AccountGetStatisticsRequest
-    //     {
-    //         FilterType = filterType
-    //     });
-    //     
-    //     var bikeBookingStatistics = _bikeBookingServiceGrpc.GetBikeRentingStatisticsAsync(
-    //         new BikeBookingGetStatisticsRequest
-    //         {
-    //             FilterType = filterType
-    //         });
-    //
-    //     var bikeReportStatistics = _bikeServiceGrpc.GetBikeReportStatisticsAsync(new BikeGetStatisticsRequest
-    //     {
-    //         FilterType = filterType
-    //     });
-    //
-    //     await Task.WhenAll(
-    //         paymentStatistic.ResponseAsync,
-    //         accountStatistics.ResponseAsync,
-    //         bikeBookingStatistics.ResponseAsync,
-    //         bikeReportStatistics.ResponseAsync,
-    //         chartData.ResponseAsync);
-    //
-    //     var htmlContent = await _viewRender.RenderPartialViewToString("report", new ReportExportDto
-    //     {
-    //         StartDate = startDate,
-    //         EndDate = endDate,
-    //         ReportType = reportDisplayDict[filterType!],
-    //         TotalTransaction = (int) paymentStatistic.ResponseAsync.Result.TotalCount,
-    //         Revenue = paymentStatistic.ResponseAsync.Result.Total,
-    //         TotalAccount = (int) accountStatistics.ResponseAsync.Result.Total,
-    //         TotalBooking = (int) bikeBookingStatistics.ResponseAsync.Result.Total,
-    //         TotalBikeReport = (int) bikeReportStatistics.ResponseAsync.Result.Total,
-    //         ChartData = chartData.ResponseAsync.Result.ChartData.ToList(),
-    //         ChartColumns = chartColumnDict[filterType!]
-    //     });
-    //     IronPdf.License.LicenseKey = Environment.GetEnvironmentVariable("IRON_PDF_KEY");
-    //         
-    //     var renderer = new IronPdf.ChromePdfRenderer
-    //     {
-    //         RenderingOptions =
-    //         {
-    //             EnableJavaScript = true,
-    //             RenderDelay = 1000,
-    //             CssMediaType = IronPdf.Rendering.PdfCssMediaType.Print
-    //         }
-    //     };
-    //     
-    //     var pdfDoc = renderer.RenderHtmlAsPdf(htmlContent);
-    //     pdfDoc.RemovePage(1);
-    //
-    //     return File(pdfDoc.BinaryData, 
-    //         System.Net.Mime.MediaTypeNames.Application.Pdf, 
-    //         $"report_{DateTime.Now.ToShortDateString()}.pdf");
-    //
-    // }
+    [HttpGet]
+    public async Task<IActionResult> DownloadReport(string? filterType = "week")
+    {
+        var (startDate, endDate) = GetFilterDate(filterType!);
+        var reportDisplayDict = new Dictionary<string, string>
+        {
+            {"week", "tuần"},
+            {"month", "tháng"},
+            {"year", "năm"}
+        };
+        
+        var chartColumnDict = new Dictionary<string, List<string>>
+        {
+            {"week", new List<string>
+            {
+                "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ nhật"
+            }},
+            {"month", new List<string>
+            {
+                "Tuần 1", "Tuần 2", "Tuần 3", "Tuần 4"
+            }},
+            {"year", new List<string>
+            {
+                "Tháng 1", 
+                "Tháng 2",
+                "Tháng 3",
+                "Tháng 4",
+                "Tháng 5",
+                "Tháng 6",
+                "Tháng 7",
+                "Tháng 8",
+                "Tháng 9",
+                "Tháng 10",
+                "Tháng 11",
+                "Tháng 12",
+            }}
+        };
+    
+        var chartData = _accountServiceGrpc.GetPaymentChartAsync(new GetPaymentChartRequest
+        {
+            FilterType = filterType,
+            StartDate = startDate.ToTimestamp(),
+            EndDate = endDate.ToTimestamp()
+        });
+    
+        var paymentStatistic = _accountServiceGrpc.GetPaymentStatisticsAsync(new AccountGetStatisticsRequest
+        {
+            FilterType = filterType
+        });
+        
+        var accountStatistics = _accountServiceGrpc.GetAccountStatisticsAsync(new AccountGetStatisticsRequest
+        {
+            FilterType = filterType
+        });
+        
+        var bikeBookingStatistics = _bikeBookingServiceGrpc.GetBikeRentingStatisticsAsync(
+            new BikeBookingGetStatisticsRequest
+            {
+                FilterType = filterType
+            });
+    
+        var bikeReportStatistics = _bikeServiceGrpc.GetBikeReportStatisticsAsync(new BikeGetStatisticsRequest
+        {
+            FilterType = filterType
+        });
+    
+        await Task.WhenAll(
+            paymentStatistic.ResponseAsync,
+            accountStatistics.ResponseAsync,
+            bikeBookingStatistics.ResponseAsync,
+            bikeReportStatistics.ResponseAsync,
+            chartData.ResponseAsync);
+    
+        var htmlContent = await _viewRender.RenderPartialViewToString("report", new ReportExportDto
+        {
+            StartDate = startDate,
+            EndDate = endDate,
+            ReportType = reportDisplayDict[filterType!],
+            TotalTransaction = (int) paymentStatistic.ResponseAsync.Result.TotalCount,
+            Revenue = paymentStatistic.ResponseAsync.Result.Total,
+            TotalAccount = (int) accountStatistics.ResponseAsync.Result.Total,
+            TotalBooking = (int) bikeBookingStatistics.ResponseAsync.Result.Total,
+            TotalBikeReport = (int) bikeReportStatistics.ResponseAsync.Result.Total,
+            ChartData = chartData.ResponseAsync.Result.ChartData.ToList(),
+            ChartColumns = chartColumnDict[filterType!]
+        });
+        IronPdf.License.LicenseKey = Environment.GetEnvironmentVariable("IRON_PDF_KEY");
+            
+        var renderer = new IronPdf.ChromePdfRenderer
+        {
+            RenderingOptions =
+            {
+                EnableJavaScript = true,
+                RenderDelay = 1000,
+                CssMediaType = IronPdf.Rendering.PdfCssMediaType.Print
+            }
+        };
+        
+        var pdfDoc = renderer.RenderHtmlAsPdf(htmlContent);
+        pdfDoc.RemovePage(1);
+    
+        return File(pdfDoc.BinaryData, 
+            System.Net.Mime.MediaTypeNames.Application.Pdf, 
+            $"report_{DateTime.Now.ToShortDateString()}.pdf");
+    
+    }
 
     private (DateTime StartDate, DateTime EndDate) GetFilterDate(string filterType)
     {
