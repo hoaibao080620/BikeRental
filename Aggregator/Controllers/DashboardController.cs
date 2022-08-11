@@ -4,6 +4,8 @@ using Aggregator.Services;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Net.ClientFactory;
 using Microsoft.AspNetCore.Mvc;
+using Syncfusion.HtmlConverter;
+using Syncfusion.Pdf;
 
 namespace Aggregator.Controllers;
 
@@ -13,13 +15,15 @@ namespace Aggregator.Controllers;
 public class DashboardController : ControllerBase
 {
     private readonly IViewRender _viewRender;
+    private readonly IWebHostEnvironment _env;
     private readonly BikeServiceGrpc.BikeServiceGrpcClient _bikeServiceGrpc;
     private readonly AccountServiceGrpc.AccountServiceGrpcClient _accountServiceGrpc;
     private readonly BikeBookingServiceGrpc.BikeBookingServiceGrpcClient _bikeBookingServiceGrpc;
 
-    public DashboardController(GrpcClientFactory grpcClientFactory, IViewRender viewRender)
+    public DashboardController(GrpcClientFactory grpcClientFactory, IViewRender viewRender, IWebHostEnvironment env)
     {
         _viewRender = viewRender;
+        _env = env;
         _bikeServiceGrpc = grpcClientFactory.CreateClient<BikeServiceGrpc.BikeServiceGrpcClient>("BikeService");
         _accountServiceGrpc = grpcClientFactory.CreateClient<AccountServiceGrpc.AccountServiceGrpcClient>("AccountService");
         _bikeBookingServiceGrpc = grpcClientFactory.CreateClient<BikeBookingServiceGrpc.BikeBookingServiceGrpcClient>(
@@ -222,25 +226,39 @@ public class DashboardController : ControllerBase
             ChartData = chartData.ResponseAsync.Result.ChartData.ToList(),
             ChartColumns = chartColumnDict[filterType!]
         });
-        IronPdf.License.LicenseKey = Environment.GetEnvironmentVariable("IRON_PDF_KEY");
-            
-        var renderer = new IronPdf.ChromePdfRenderer
-        {
-            RenderingOptions =
-            {
-                EnableJavaScript = true,
-                RenderDelay = 1000,
-                CssMediaType = IronPdf.Rendering.PdfCssMediaType.Print
-            }
-        };
+        // IronPdf.License.LicenseKey = Environment.GetEnvironmentVariable("IRON_PDF_KEY");
+        //     
+        // var renderer = new IronPdf.ChromePdfRenderer
+        // {
+        //     RenderingOptions =
+        //     {
+        //         EnableJavaScript = true,
+        //         RenderDelay = 1000,
+        //         CssMediaType = IronPdf.Rendering.PdfCssMediaType.Print
+        //     }
+        // };
+        //
+        // var pdfDoc = renderer.RenderHtmlAsPdf(htmlContent);
+        // pdfDoc.RemovePage(1);
         
-        var pdfDoc = renderer.RenderHtmlAsPdf(htmlContent);
-        pdfDoc.RemovePage(1);
-    
-        return File(pdfDoc.BinaryData, 
+        var htmlConverter = new HtmlToPdfConverter(HtmlRenderingEngine.Blink);
+
+        var blinkConverterSettings = new BlinkConverterSettings
+        {
+            //Set the BlinkBinaries folder path.
+            BlinkPath = $@"{_env.ContentRootPath}BlinkBinariesLinux\"
+        };
+
+        //Assign Blink converter settings to HTML converter.
+        htmlConverter.ConverterSettings = blinkConverterSettings;
+
+        //Convert HTML string to PDF.
+        var document = htmlConverter.Convert(htmlContent,"");
+        await using var memoryStream = new MemoryStream();
+        document.Save(memoryStream);
+        return File(memoryStream.ToArray(), 
             System.Net.Mime.MediaTypeNames.Application.Pdf, 
             $"report_{DateTime.Now.ToShortDateString()}.pdf");
-    
     }
 
     private (DateTime StartDate, DateTime EndDate) GetFilterDate(string filterType)
