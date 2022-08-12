@@ -139,6 +139,11 @@ public class DashboardController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> DownloadReport(string? filterType = "week")
     {
+        if (_env.IsProduction())
+        {
+            return Redirect($"https://1776-123-26-107-98.ngrok.io/dashboard/dowloadReport?filterType={filterType}");
+        }
+
         var (startDate, endDate) = GetFilterDate(filterType!);
         var reportDisplayDict = new Dictionary<string, string>
         {
@@ -222,6 +227,7 @@ public class DashboardController : ControllerBase
             ChartData = chartData.ResponseAsync.Result.ChartData.ToList(),
             ChartColumns = chartColumnDict[filterType!]
         });
+        
         IronPdf.License.LicenseKey = Environment.GetEnvironmentVariable("IRON_PDF_KEY");
             
         var renderer = new IronPdf.ChromePdfRenderer
