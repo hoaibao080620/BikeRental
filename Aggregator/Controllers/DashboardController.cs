@@ -139,9 +139,10 @@ public class DashboardController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> DownloadReport(string? filterType = "week")
     {
+        var url = Environment.GetEnvironmentVariable("NGROK_URL");
         if (_env.IsProduction())
         {
-            return Redirect($"https://1776-123-26-107-98.ngrok.io/dashboard/dowloadReport?filterType={filterType}");
+            return Redirect($"{url}/dashboard/dowloadReport?filterType={filterType}");
         }
 
         var (startDate, endDate) = GetFilterDate(filterType!);
@@ -228,7 +229,7 @@ public class DashboardController : ControllerBase
             ChartColumns = chartColumnDict[filterType!]
         });
         
-        IronPdf.License.LicenseKey = Environment.GetEnvironmentVariable("IRON_PDF_KEY");
+        IronPdf.License.LicenseKey = "IRONPDF.LÊBÃO.5806-FD613F2C1E-FK7DYDE4MMNRQ-XGVM3KMPOVIG-7CRNBPBNWYUX-MIDUKVKQKIWE-WGJZGKYYTBA7-T4BFKB-TWFDEUF6DT2HEA-DEPLOYMENT.TRIAL-6TOQKN.TRIAL.EXPIRES.06.SEP.2022";
             
         var renderer = new IronPdf.ChromePdfRenderer
         {
