@@ -105,7 +105,6 @@ public class UserBusinessLogic : IUserBusinessLogic
             .Set(x => x.LastName, user.LastName)
             .Set(x => x.RoleName, string.IsNullOrEmpty(user.RoleName) ? userUpdated.RoleName : user.RoleName)
             .Set(x => x.Address, user.Address)
-            .Set(x => x.PhoneNumber, user.PhoneNumber)
             .Set(x => x.DateOfBirth, user.DateOfBirth)
             .Set(x => x.UpdatedOn, DateTime.UtcNow);
         
