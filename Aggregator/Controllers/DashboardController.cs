@@ -142,7 +142,7 @@ public class DashboardController : ControllerBase
         var url = Environment.GetEnvironmentVariable("NGROK_URL");
         if (_env.IsProduction())
         {
-            return Redirect($"{url}/dashboard/dowloadReport?filterType={filterType}");
+            return Redirect($"{url}/dashboard/downloadReport?filterType={filterType}");
         }
 
         var (startDate, endDate) = GetFilterDate(filterType!);
