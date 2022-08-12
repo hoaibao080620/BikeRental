@@ -179,10 +179,12 @@ public class AccountGrpcService : AccountServiceGrpc.AccountServiceGrpcBase
     {
         var recentTransactions = (await _mongoService
                 .FindAccountTransactions(_ => true, request.NumberOfItem))
+            .OrderByDescending(x => x.CreatedOn)
             .Select(x => new RecentTransaction
             {
                 Content = $"Tài khoản với số điện thoại {x.AccountPhoneNumber} nạp {x.Amount} vnd!",
-                Status = x.Status
+                Status = x.Status,
+                TransactionDate = x.CreatedOn.ToTimestamp()
             }).ToList();
 
         return new GetRecentTransactionsResponse

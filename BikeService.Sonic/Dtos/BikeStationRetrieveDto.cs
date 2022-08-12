@@ -15,5 +15,5 @@ public class BikeStationRetrieveDto
     public List<BikeRetrieveDto>? Bikes { get; set; }
     public string? Color { get; set; }
     public double Distance { get; set; }
-    public List<string> Managers { get; set; } = null!;
+    public List<int> ManagerIds { get; set; } = null!;
 }

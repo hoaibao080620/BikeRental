@@ -57,7 +57,7 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
             Name = x.Name,
             ParkingSpace = x.ParkingSpace,
             UsedParkingSpace = x.Bikes.Count,
-            Managers = x.BikeStationManagers.Select(xx => xx.Manager.Email).ToList()
+            ManagerIds = x.BikeStationManagers.Select(xx => xx.ManagerId).ToList()
         }).ToList();
 
         return bikeStations;
@@ -98,6 +98,27 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
             var (latitude, longitude) = await _googleMapService.GetLocationOfAddress(bikeInsertDto.PlaceId);
             bikeStation.Latitude = latitude;
             bikeStation.Longitude = longitude;
+        }
+
+        if (bikeInsertDto.ManagerIds.Any())
+        {
+            foreach (var managerId in bikeInsertDto.ManagerIds)
+            {
+                var isAlreadySave = await _unitOfWork.BikeStationManagerRepository
+                    .Exists(x => x.ManagerId == managerId && x.BikeStationId == bikeStation.Id);
+
+                if (!isAlreadySave)
+                {
+                    await _unitOfWork.BikeStationManagerRepository.Add(new BikeStationManager
+                    {
+                        ManagerId = managerId,
+                        BikeStationId = bikeStation.Id,
+                        IsActive = true,
+                        CreatedOn = DateTime.UtcNow,
+                        UpdatedOn = DateTime.UtcNow
+                    });
+                }
+            }
         }
         
         await _unitOfWork.BikeStationRepository.Update(bikeStation);

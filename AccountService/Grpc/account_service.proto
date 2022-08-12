@@ -30,6 +30,7 @@ message GetRecentTransactionsResponse {
 message RecentTransaction {
   string status = 1;
   string content = 2;
+  google.protobuf.Timestamp transactionDate = 3;
 }
 
 message GetAccountInfoRequest {
