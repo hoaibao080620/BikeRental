@@ -14,6 +14,8 @@
       <PackageReference Include="CsvHelper" Version="27.2.1" />
       <PackageReference Include="EFCore.NamingConventions" Version="6.0.0" />
       <PackageReference Include="Grpc.AspNetCore.Web" Version="2.47.0" />
+      <PackageReference Include="Grpc.Net.Client.Web" Version="2.47.0" />
+      <PackageReference Include="Grpc.Net.ClientFactory" Version="2.47.0" />
       <PackageReference Include="Grpc.Tools" Version="2.47.0">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -35,6 +37,7 @@
 
     <ItemGroup>
         <Protobuf Include="Grpc\bike_service.proto" GrpcServices="Server" Link="Grpc\bike_service.proto" />
+        <Protobuf Include="Grpc\bike_booking.proto" GrpcServices="Client" Link="Grpc\bike_booking.proto" />
         <PackageReference Include="Grpc.AspNetCore" Version="2.47.0" />
     </ItemGroup>
 

@@ -8,6 +8,7 @@ using BikeService.Sonic.Exceptions;
 using BikeService.Sonic.MessageQueue.Publisher;
 using BikeService.Sonic.Models;
 using BikeService.Sonic.Services.Interfaces;
+using Grpc.Net.ClientFactory;
 using Microsoft.EntityFrameworkCore;
 
 namespace BikeService.Sonic.BusinessLogics;
@@ -18,17 +19,21 @@ public class BikeBusinessLogic : IBikeBusinessLogic
     private readonly ICacheService _cacheService;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMessageQueuePublisher _messageQueuePublisher;
+    private readonly BikeBookingServiceGrpc.BikeBookingServiceGrpcClient _bookingClient;
 
     public BikeBusinessLogic(
         IMapper mapper,
         ICacheService cacheService,
         IUnitOfWork unitOfWork,
-        IMessageQueuePublisher messageQueuePublisher)
+        IMessageQueuePublisher messageQueuePublisher,
+        GrpcClientFactory grpcClientFactory)
     {
         _mapper = mapper;
         _cacheService = cacheService;
         _unitOfWork = unitOfWork;
         _messageQueuePublisher = messageQueuePublisher;
+        _bookingClient =
+            grpcClientFactory.CreateClient<BikeBookingServiceGrpc.BikeBookingServiceGrpcClient>("BikeBooking");
     }
 
     public async Task<BikeRetrieveDto?> GetBike(int id)
@@ -66,6 +71,20 @@ public class BikeBusinessLogic : IBikeBusinessLogic
                     UpdatedOn = b.UpdatedOn,
                     CreatedOn = b.CreatedOn
                 }).OrderByDescending(x => x.UpdatedOn).ThenByDescending(x => x.CreatedOn).ToList();
+
+        var bikesRentingCount = await _bookingClient.GetBikesRentingCountAsync(new GetBikesRentingCountRequest
+        {
+            Ids = {bikes.Select(x => x.Id)}
+        });
+
+        var bikesRentingCountDict = bikesRentingCount.BikesRentingCount
+            .ToList()
+            .ToDictionary(x => x.BikeId, x => x.RentingCount);
+
+        foreach (var bike in bikes)
+        {
+            bike.RentingCount = bikesRentingCountDict.GetValueOrDefault(bike.Id);
+        }
         
         return bikes;
     }

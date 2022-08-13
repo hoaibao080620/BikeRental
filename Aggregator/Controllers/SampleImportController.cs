@@ -6,8 +6,13 @@ namespace Aggregator.Controllers;
 [Route("[controller]")]
 public class SampleImportController : ControllerBase
 {
-    public SampleImportController()
+    public IActionResult DownloadImportSample(string? importType = "user")
     {
-        
+        return importType switch
+        {
+            "user" => Redirect("https://bike-rental-fe.s3.amazonaws.com/import_user.csv"),
+            "bike" => Redirect("https://bike-rental-fe.s3.amazonaws.com/import_bike.csv"),
+            _ => BadRequest("Không tìm thấy bản sample!")
+        };
     }
 }

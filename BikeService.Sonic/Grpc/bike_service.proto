@@ -1,6 +1,7 @@
 ﻿syntax = "proto3";
 
 import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 
 service BikeServiceGrpc {
   rpc GetBikeIdsOfManager (GetBikeIdsRequest) returns (GetBikeIdsResponse);
@@ -74,4 +75,8 @@ message GetManagerDashboardStatisticResponse {
   int32 totalBike = 2;
   int32 totalBikeStation = 3;
   int32 totalBikeReport = 4;
+}
+
+message GetBikesResponse {
+  
 }

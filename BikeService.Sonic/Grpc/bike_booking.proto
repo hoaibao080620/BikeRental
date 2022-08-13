@@ -1,0 +1,20 @@
+﻿syntax = "proto3";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+service BikeBookingServiceGrpc {
+  rpc GetBikesRentingCount (GetBikesRentingCountRequest) returns (GetBikesRentingCountResponse);
+}
+
+message GetBikesRentingCountRequest {
+  repeated int32 ids = 1;
+}
+
+message GetBikesRentingCountResponse {
+  repeated BikeRentingCount bikesRentingCount = 1;
+}
+
+message BikeRentingCount {
+  int32 bikeId = 1;
+  int32 rentingCount = 2;
+}

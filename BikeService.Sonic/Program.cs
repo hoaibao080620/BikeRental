@@ -15,6 +15,7 @@ builder.Services.AddOktaAuthenticationService(builder.Configuration);
 builder.Services.AddDbContextService(builder.Configuration);
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddHttpClientToServices();
+builder.Services.RegisterGrpcClient();
 builder.Services.RunMigrations();
 builder.Services.RegisterMessageHandlers();
 builder.Services.AddHostedService<MessageQueueConsumer>();
