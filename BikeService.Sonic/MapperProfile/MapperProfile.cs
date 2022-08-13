@@ -11,9 +11,9 @@ public class MapperProfile : Profile
     {
         CreateMap<Bike, BikeRetrieveDto>().ReverseMap();
         CreateMap<Bike, BikeInsertDto>().ReverseMap();
-        CreateMap<Bike, BikeUpdateDto>().ReverseMap();
-        CreateMap<BikeStation, BikeStationInsertDto>().ReverseMap();
-        CreateMap<BikeStation, BikeStationUpdateDto>().ReverseMap();
+        CreateMap<BikeUpdateDto, Bike>().ForMember(dest => dest.CreatedOn, src => src.Ignore());
+        CreateMap<BikeStationInsertDto, BikeStation>().ReverseMap();
+        CreateMap<BikeStationUpdateDto, BikeStation>().ForMember(dest => dest.CreatedOn, src => src.Ignore());
         CreateMap<BikeStation, BikeStationRetrieveDto>().ReverseMap();
     }
 }
