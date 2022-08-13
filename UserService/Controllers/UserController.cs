@@ -69,6 +69,15 @@ public class UserController : ControllerBase
         return Ok();
     }
     
+    [Route("[action]")]
+    public async Task<IActionResult> SelfDelete()
+    {
+        var email = HttpContext.User.Claims.FirstOrDefault(x =>
+            x.Type == ClaimTypes.NameIdentifier)!.Value;
+        await _userBusinessLogic.SelfDelete(email);
+        return Ok();
+    }
+    
     [HttpGet]
     [Route("[action]")]
     public async Task<IActionResult> GetManagers()

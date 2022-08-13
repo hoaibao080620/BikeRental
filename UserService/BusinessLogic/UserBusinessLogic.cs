@@ -301,6 +301,17 @@ public class UserBusinessLogic : IUserBusinessLogic
         await _oktaClient.UpdateOktaUserPassword(user.OktaUserId!, changePasswordDto.NewPassword);
     }
 
+    public async Task SelfDelete(string email)
+    {
+        var user = (await _mongoService.FindUser(x => x.Email == email)).First();
+        await _mongoService.DeleteUser(user.Id);
+        await DeleteOktaUser(user.OktaUserId);
+        await _messageQueuePublisher.PublishUserDeletedEventToMessageQueue(new User
+        {
+            Id = user.Id
+        });
+    }
+
     private async Task<string?> AddUserToOkta(OktaUserInsertParam oktaInsertParam)
     {
         var group = (await _mongoService.GetRoles()).FirstOrDefault(x => x.Name == oktaInsertParam.RoleName)!;

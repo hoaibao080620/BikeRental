@@ -18,4 +18,5 @@ public interface IUserBusinessLogic
     public Task ActivateUser(ActivateUserDto dto);
     Task<List<UserRetrieveDto>> GetManagers();
     public Task ChangePassword(string email, ChangePasswordDto changePasswordDto);
+    public Task SelfDelete(string email);
 }
