@@ -16,4 +16,6 @@ public class BikeStationRetrieveDto
     public string? Color { get; set; }
     public double Distance { get; set; }
     public List<int> ManagerIds { get; set; } = null!;
+    public DateTime CreatedOn { get; set; }
+    public DateTime? UpdatedOn { get; set; }
 }
