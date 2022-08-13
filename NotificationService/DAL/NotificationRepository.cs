@@ -58,6 +58,6 @@ public class NotificationRepository : INotificationRepository
     public async Task<List<Call>> GetCalls(Expression<Func<Call, bool>> filter)
     {
         var calls = await _callCollection.FindAsync(filter);
-        return calls.ToList();
+        return calls.ToList().OrderByDescending(x => x.CalledOn).ToList();
     }
 }
