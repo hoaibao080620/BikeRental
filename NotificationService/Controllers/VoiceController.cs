@@ -1,6 +1,5 @@
 ﻿using System.Security.Claims;
 using System.Web;
-using Google.Protobuf.WellKnownTypes;
 using Grpc.Net.ClientFactory;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -49,6 +48,18 @@ public class VoiceController : ControllerBase
         return Content(response.ToString(), "application/xml");
     }
     
+    [HttpGet]
+    public IActionResult ReceiveSms()
+    {
+        var response = new MessagingResponse();
+        var phoneNumber = HttpUtility.ParseQueryString(HttpContext.Request.QueryString.Value!);
+        foreach (var test in phoneNumber)
+        {
+            Console.WriteLine(test);
+        }
+        return Content(response.ToString(), "application/xml");
+    }
+    
     [HttpPost]
     [Route("[action]")]
     [Consumes("application/x-www-form-urlencoded")]
@@ -57,7 +68,7 @@ public class VoiceController : ControllerBase
         var response = new VoiceResponse();
         var dial = new Dial
         {
-            Action = new Uri("HandleCompletedIncomingCall", UriKind.Relative),
+            Action = new Uri("HandleCompletedIncomingCall?email=testmanager@gmail.com", UriKind.Relative),
             Method = HttpMethod.Get,
             Record = Dial.RecordEnum.RecordFromAnswerDual,
             RecordingStatusCallback = new Uri("HandleCompletedRecording", UriKind.Relative),
@@ -130,7 +141,7 @@ public class VoiceController : ControllerBase
 
     [HttpGet]
     [Route("[action]")]
-    public async Task<IActionResult> HandleCompletedIncomingCall()
+    public async Task<IActionResult> HandleCompletedIncomingCall([FromQuery] string email)
     {
         var queryString = HttpUtility.ParseQueryString(HttpContext.Request.QueryString.Value!);
         await _notificationRepository.AddCall(new Call
@@ -145,7 +156,8 @@ public class VoiceController : ControllerBase
             Direction = queryString.Get("Direction")!,
             RecordingUrl = queryString.Get("RecordingUrl"),
             CallerCountry = queryString.Get("FromCountry")!,
-            CalledCountry =queryString.Get("ToCountry")!
+            CalledCountry =queryString.Get("ToCountry")!,
+            ManagerReceiver = email
         });
         
         var response = new VoiceResponse();
@@ -177,7 +189,8 @@ public class VoiceController : ControllerBase
                     Direction = "outbound",
                     RecordingUrl = voiceRequest.RecordingUrl,
                     CallerCountry = voiceRequest.FromCountry,
-                    CalledCountry = voiceRequest.ToCountry
+                    CalledCountry = voiceRequest.ToCountry,
+                    ManagerCaller = client
                 });
                 response.Hangup();
                 break;
@@ -198,6 +211,15 @@ public class VoiceController : ControllerBase
     public async Task<IActionResult> GetCalls()
     {
         var calls = await _notificationRepository.GetCalls(_ => true);
+        return Ok(calls);
+    }
+    
+    [HttpGet]
+    [Route("[action]")]
+    public async Task<IActionResult> GetManagerCalls()
+    {
+        var email = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
+        var calls = await _notificationRepository.GetCalls(c => c.ManagerCaller == email || c.ManagerReceiver == email);
         return Ok(calls);
     }
 

@@ -19,4 +19,5 @@ public class BikeRentalBooking : BaseEntity
 
     public string? PaymentStatus { get; set; }
     public List<BikeLocationTrackingHistory> BikeLocationTrackingHistories { get; set; } = null!;
+    public bool IsWarningNotificationSend { get; set; }
 }

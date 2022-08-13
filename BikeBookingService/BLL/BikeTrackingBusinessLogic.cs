@@ -274,30 +274,41 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
     public async Task CheckBikeRentingHasUserAlmostRunOutPoint()
     {
         var bikeRentalBookings = (await _unitOfWork.BikeRentalTrackingRepository
-            .Find(x => x.CheckoutOn == null))
-            .Select(x => new
-            {
-                x.Account.Email, x.CheckinOn
-            });
+                .Find(x => x.CheckoutOn == null))
+            .Include(x => x.Account);
+        var rentingPoint = (await _unitOfWork.RentingPointRepository.Find(_ => true)).First();
+        var rentingPointWarning = rentingPoint.PointPerHour / 2;
 
         foreach (var bikeRentalBooking in bikeRentalBookings)
         {
+            var email = bikeRentalBooking.Account.Email;
             var currentRentingPoint = GetRentingPoint(bikeRentalBooking.CheckinOn, DateTime.UtcNow);
             var accountPoint = (await _accountServiceGrpc.GetAccountInfoAsync(new GetAccountInfoRequest
             {
-                Email = bikeRentalBooking.Email
+                Email = email
             })).Point;
 
-            if (accountPoint - currentRentingPoint <= 5)
+            if (accountPoint - currentRentingPoint <= rentingPointWarning)
             {
                 await _messageQueuePublisher.PublishUserPointRunOutEvent(new UserAlmostRunOutPoint
                 {
-                    Email = bikeRentalBooking.Email,
+                    Email = email,
                     Message = "Tài khoản của bạn sắp hết điểm, vui lòng trả xe hoặc nạp thêm điểm!",
                     MessageType = MessageType.UserAlmostRunOutPoint
                 });
+                bikeRentalBooking.IsWarningNotificationSend = true;
             }
         }
+    }
+
+    public async Task TestNotification(string email)
+    {
+        await _messageQueuePublisher.PublishUserPointRunOutEvent(new UserAlmostRunOutPoint
+        {
+            Email = email,
+            Message = "Tài khoản của bạn sắp hết điểm, vui lòng trả xe hoặc nạp thêm điểm!",
+            MessageType = MessageType.UserAlmostRunOutPoint
+        });
     }
 
     private async Task<Bike> GetBikeById(int bikeId)

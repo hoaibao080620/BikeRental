@@ -1,6 +1,8 @@
-﻿using BikeBookingService.MessageQueue.Handlers;
+﻿using BikeBookingService.BLL;
+using BikeBookingService.MessageQueue.Handlers;
 using BikeRental.MessageQueue.MessageType;
 using BikeRental.MessageQueue.SubscriptionManager;
+using Hangfire;
 
 namespace BikeBookingService.Extensions;
 
@@ -40,5 +42,13 @@ public static class WebApplicationExtension
         
         messageQueueSubscriptionManager.RegisterEventHandlerSubscription<AccountDebtHasBeenPaidHandler>(
             MessageType.AccountDebtHasBeenPaid);
+    }
+
+    public static void RegisterBackgroundJobs(this WebApplication webApplication)
+    {
+        var serviceProvider = webApplication.Services.CreateScope();
+        RecurringJob.AddOrUpdate("JobId", () => 
+            serviceProvider.ServiceProvider.GetRequiredService<IBikeTrackingBusinessLogic>()
+                .CheckBikeRentingHasUserAlmostRunOutPoint(), Cron.Minutely);
     }
 }

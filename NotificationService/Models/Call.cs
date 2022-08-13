@@ -18,4 +18,6 @@ public class Call
     public string? RecordingUrl { get; set; }
     public string CallSid { get; set; } = null!;
     public string? AnsweredBy { get; set; }
+    public string? ManagerCaller { get; set; }
+    public string? ManagerReceiver { get; set; }
 }

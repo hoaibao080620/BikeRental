@@ -27,7 +27,7 @@ public class BikeTrackingController : ControllerBase
         IBikeTrackingValidation bikeTrackingValidation,
         IUnitOfWork unitOfWork,
         GrpcClientFactory grpcClientFactory
-        )
+    )
     {
         _bikeServiceGrpc = grpcClientFactory.CreateClient<BikeServiceGrpc.BikeServiceGrpcClient>("BikeService");
         _bikeTrackingBusinessLogic = bikeTrackingBusinessLogic;
@@ -185,6 +185,16 @@ public class BikeTrackingController : ControllerBase
         }
 
         await _unitOfWork.SaveChangesAsync();
+        return Ok();
+    }
+    
+    [HttpGet]
+    public async Task<IActionResult> TestMobileNotification()
+    {
+        var email = HttpContext.User.Claims.FirstOrDefault(x => 
+            x.Type == ClaimTypes.NameIdentifier)!.Value;
+
+        await _bikeTrackingBusinessLogic.TestNotification(email);
         return Ok();
     }
 }
