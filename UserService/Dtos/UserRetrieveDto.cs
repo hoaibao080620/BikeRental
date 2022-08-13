@@ -12,4 +12,6 @@ public class UserRetrieveDto
     public string? PhoneNumber { get; set; }
     public DateTime? DateOfBirth { get; set; }
     public bool IsActive { get; set; }
+    public DateTime CreatedOn { get; set; }
+    public DateTime? UpdatedOn { get; set; }
 }

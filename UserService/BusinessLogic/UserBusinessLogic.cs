@@ -41,7 +41,9 @@ public class UserBusinessLogic : IUserBusinessLogic
             LastName = u.LastName,
             PhoneNumber = u.PhoneNumber,
             DateOfBirth = u.DateOfBirth,
-            IsActive = u.IsActive
+            IsActive = u.IsActive,
+            CreatedOn = u.CreatedOn,
+            UpdatedOn = u.UpdatedOn
         }).ToList();
     }
 
@@ -284,7 +286,9 @@ public class UserBusinessLogic : IUserBusinessLogic
             LastName = u.LastName,
             PhoneNumber = u.PhoneNumber,
             DateOfBirth = u.DateOfBirth,
-            IsActive = u.IsActive
+            IsActive = u.IsActive,
+            CreatedOn = u.CreatedOn,
+            UpdatedOn = u.UpdatedOn
         }).ToList();
     }
 
