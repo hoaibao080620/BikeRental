@@ -7,3 +7,5 @@ BikeRental.Shared
 BikeRental.MessageQueue
 BikeRental.MessageQueue/Publisher/SnsPublisher.cs
 BikeRental.MessageQueue/Consumer/SqsConsumer.cs
+/Consumer
+/Publisher
