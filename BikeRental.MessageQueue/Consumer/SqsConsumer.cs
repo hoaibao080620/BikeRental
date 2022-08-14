@@ -12,7 +12,9 @@ public class SqsConsumer : IConsumer
 
     public SqsConsumer()
     {
-        _amazonSqs = new AmazonSQSClient(RegionEndpoint.USEast1);
+        var basicCredentials = new BasicAWSCredentials("AKIA2JUZUHJX2ACUJK7R", 
+            "QLWvm1G1dJ0DCNPcet6DelFMmqbKVcz2WTq4Qw8x");
+        _amazonSqs = new AmazonSQSClient(basicCredentials, RegionEndpoint.USEast1);
     }
     
     public async Task<List<Message>> ReceiveMessages(string queue)
