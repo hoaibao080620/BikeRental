@@ -25,7 +25,7 @@ builder.Services.AddCors(options =>
 });
 builder.Services.AddGrpcClient<BikeServiceGrpc.BikeServiceGrpcClient>("BikeService", c =>
 {
-    c.Address = new Uri("https://bike-service-13062022.herokuapp.com");
+    c.Address = new Uri("https://bike-service-13062022-1.herokuapp.com");
 }).ConfigureChannel(o =>
 {
     o.HttpHandler = new GrpcWebHandler(new HttpClientHandler());
