@@ -60,7 +60,7 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
                 Status = x.CheckoutOn.HasValue ? "Done" : "InProgress",
                 CheckInStation = x.CheckinBikeStation,
                 CheckOutStation = x.CheckoutBikeStation
-            }).ToList();
+            }).OrderByDescending(x => x.CheckedInOn).ToList();
 
         return bikeRentingHistories;
     }
