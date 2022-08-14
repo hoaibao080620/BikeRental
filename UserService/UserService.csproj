@@ -27,9 +27,4 @@
         <PackageReference Include="Twilio" Version="5.76.0" />
     </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\BikeRental.MessageQueue\BikeRental.MessageQueue.csproj" />
-      <ProjectReference Include="..\BikeRental.Shared\BikeRental.Shared.csproj" />
-    </ItemGroup>
-
 </Project>

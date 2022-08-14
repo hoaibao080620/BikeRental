@@ -37,11 +37,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\BikeRental.MessageQueue\BikeRental.MessageQueue.csproj" />
-      <ProjectReference Include="..\BikeRental.Shared\BikeRental.Shared.csproj" />
-    </ItemGroup>
-    
-    <ItemGroup>
         <Protobuf Include="Grpc\bike_service.proto" GrpcServices="Client" Link="Grpc\bike_service.proto" />
         <Protobuf Include="Grpc\bike_booking.proto" GrpcServices="Server" Link="Grpc\bike_booking.proto" />
         <Protobuf Include="Grpc\account_service.proto" GrpcServices="Client" Link="Grpc\account_service.proto" />

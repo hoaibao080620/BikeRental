@@ -33,8 +33,4 @@
         <Protobuf Include="Grpc\notification_service.proto" GrpcServices="Server" Link="Grpc\notification_service.proto" />
     </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\BikeRental.MessageQueue\BikeRental.MessageQueue.csproj" />
-    </ItemGroup>
-
 </Project>
