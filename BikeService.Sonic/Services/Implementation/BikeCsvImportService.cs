@@ -1,6 +1,8 @@
 ﻿using System.Globalization;
+using BikeService.Sonic.BusinessLogics;
 using BikeService.Sonic.Const;
 using BikeService.Sonic.DAL;
+using BikeService.Sonic.Dtos.Bike;
 using BikeService.Sonic.Models;
 using CsvHelper;
 using CsvHelper.Configuration;
@@ -11,10 +13,12 @@ namespace BikeService.Sonic.Services.Implementation;
 public class BikeCsvImportService : IImportService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IBikeBusinessLogic _bikeBusinessLogic;
 
-    public BikeCsvImportService(IUnitOfWork unitOfWork)
+    public BikeCsvImportService(IUnitOfWork unitOfWork, IBikeBusinessLogic bikeBusinessLogic)
     {
         _unitOfWork = unitOfWork;
+        _bikeBusinessLogic = bikeBusinessLogic;
     }
     
     public async Task Import(IFormFile formFile)
@@ -40,9 +44,8 @@ public class BikeCsvImportService : IImportService
             row++;
             if(row == 1) continue;
             
-            var licensePlate = csvReader.GetField(0);
-            var description = csvReader.GetField(1);
-            var bikeStationName = csvReader.GetField(2);
+            var description = csvReader.GetField(0);
+            var bikeStationName = csvReader.GetField(1);
 
             var isBikeStationHasNeverBeenRetrieved = !bikeStationDict.ContainsKey(bikeStationName);
 
@@ -52,17 +55,11 @@ public class BikeCsvImportService : IImportService
                 bikeStationDict.Add(bikeStationName, bikeStation);
             }
 
-            await _unitOfWork.BikeRepository.Add(new Bike
+            await _bikeBusinessLogic.AddBike(new BikeInsertDto
             {
-                BikeCode = licensePlate,
                 Description = string.IsNullOrEmpty(description) ? null : description,
-                BikeStationId = bikeStationDict[bikeStationName]?.Id,
-                IsActive = true,
-                CreatedOn = DateTime.UtcNow,
-                Status = BikeStatus.Available
+                BikeStationId = bikeStationDict[bikeStationName]?.Id
             });
         }
-        
-        await _unitOfWork.SaveChangesAsync();
     }
 }

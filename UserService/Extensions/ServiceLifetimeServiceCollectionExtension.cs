@@ -1,10 +1,12 @@
 ﻿using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
+using Shared.Service;
 using UserService.BusinessLogic;
 using UserService.Clients;
 using UserService.DataAccess;
 using UserService.ExternalServices;
+using UserService.Services;
 
 namespace UserService.Extensions;
 
@@ -17,6 +19,7 @@ public static class ServiceLifetimeServiceCollectionExtension
         serviceCollection.AddScoped<IOktaClient, OktaClient>();
         serviceCollection.AddScoped<IMessageQueuePublisher, MessageQueuePublisher>();
         serviceCollection.AddScoped<IMongoService, MongoService>();
+        serviceCollection.AddScoped<IImportService, ImportUser>();
     }
     
     public static void AddMongoDb(this IServiceCollection serviceCollection, IConfiguration configuration)

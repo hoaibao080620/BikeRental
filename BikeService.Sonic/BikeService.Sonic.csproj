@@ -8,7 +8,7 @@
 
     <ItemGroup>
       <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
-      <PackageReference Include="BikeRental.MessageQueue" Version="1.4.8-alpha" />
+      <PackageReference Include="BikeRental.MessageQueue" Version="1.4.9-alpha" />
       <PackageReference Include="BikeRental.Shared" Version="1.2.5-alpha" />
       <PackageReference Include="Bogus" Version="34.0.2" />
       <PackageReference Include="CsvHelper" Version="27.2.1" />

@@ -85,7 +85,8 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         {
             bike.RentingCount = bikesRentingCountDict.GetValueOrDefault(bike.Id);
         }
-        
+
+        var bikesss = bikes.Where(x => x.Id == 87);
         return bikes;
     }
 

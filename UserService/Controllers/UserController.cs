@@ -3,6 +3,7 @@ using Bogus;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Consts;
+using Shared.Service;
 using UserService.BusinessLogic;
 using UserService.Dtos;
 
@@ -14,10 +15,12 @@ namespace UserService.Controllers;
 public class UserController : ControllerBase
 {
     private readonly IUserBusinessLogic _userBusinessLogic;
+    private readonly IImportService _importService;
 
-    public UserController(IUserBusinessLogic userBusinessLogic)
+    public UserController(IUserBusinessLogic userBusinessLogic, IImportService importService)
     {
         _userBusinessLogic = userBusinessLogic;
+        _importService = importService;
     }
 
     [HttpGet]
@@ -178,5 +181,15 @@ public class UserController : ControllerBase
         }
         
         return Ok(users);
+    }
+
+    [HttpPost]
+    [Route("[action]")]
+    public async Task<IActionResult> ImportUser()
+    {
+        if (!Request.Form.Files.Any()) return BadRequest("No files upload");
+        
+        await _importService.Import(Request.Form.Files[0]);
+        return Ok();
     }
 }

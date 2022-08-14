@@ -7,7 +7,6 @@ public class User
 {
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; set; } = null!;
-
     public string FirstName { get; set; } = null!;
     public string LastName { get; set; } = null!;
     public string? Address { get; set; }
