@@ -10,10 +10,7 @@ public class SnsPublisher : IPublisher
     private readonly IAmazonSimpleNotificationService _amazonSns; 
     public SnsPublisher()
     {
-        var basicCredentials = new BasicAWSCredentials("AKIA2JUZUHJXQBX37EUR", 
-            "bP0ROTQSIv8nJr1P+OZ91duCzOhElC9ud2qG2db0");
-        
-        _amazonSns = new AmazonSimpleNotificationServiceClient(basicCredentials, RegionEndpoint.USEast1);
+        _amazonSns = new AmazonSimpleNotificationServiceClient(RegionEndpoint.USEast1);
     }
     
     public async Task SendMessage(string message, string topicArn, Dictionary<string, MessageAttributeValue>? messageAttributes = null)

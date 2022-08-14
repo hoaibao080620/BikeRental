@@ -11,6 +11,5 @@ public class BikeStationUpdateDto
     public int ParkingSpace { get; set; }
     public int UsedParkingSpace { get; set; }
     public List<int> ManagerIds { get; set; } = null!;
-
     public string? PlaceId { get; set; }
 }
