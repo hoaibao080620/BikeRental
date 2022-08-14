@@ -3,9 +3,5 @@ obj/
 /packages/
 riderModule.iml
 /_ReSharper.Caches/
-BikeRental.Shared
-BikeRental.MessageQueue
-BikeRental.MessageQueue/Publisher/SnsPublisher.cs
-BikeRental.MessageQueue/Consumer/SqsConsumer.cs
 /Consumer
 /Publisher
