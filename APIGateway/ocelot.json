@@ -60,7 +60,7 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "api-gateway-agg.herokuapp-1.com",
+          "Host": "api-gateway-agg-1.herokuapp-1.com",
           "Port": 443
         }
       ],
