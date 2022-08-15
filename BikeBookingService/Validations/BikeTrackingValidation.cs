@@ -25,7 +25,7 @@ public class BikeTrackingValidation : IBikeTrackingValidation
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", 
             token.Replace("Bearer", string.Empty));
         var result = await httpClient.GetStringAsync(
-            "https://bike-rental-account-service.herokuapp.com/account/" +
+            "https://bike-rental-account-service-1.herokuapp.com/account/" +
             $"isAccountHasEnoughPoint?accountEmail={accountEmail}");
 
         return result == "true";
