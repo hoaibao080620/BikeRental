@@ -64,6 +64,8 @@ message GetBikeStationByCodeOrIdResponse {
   int32 id = 1;
   string code = 2;
   string name = 3;
+  double longitude = 4;
+  double latitude = 5;
 }
 
 message GetManagerDashboardStatisticRequest {

@@ -112,23 +112,30 @@ public class BikeTrackingController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Checkout(BikeCheckoutDto bikeCheckoutDto)
     {
-        var email = HttpContext.User.Claims.FirstOrDefault(x => 
-            x.Type == ClaimTypes.NameIdentifier)!.Value;
+        try
+        {
+            var email = HttpContext.User.Claims.FirstOrDefault(x =>
+                x.Type == ClaimTypes.NameIdentifier)!.Value;
 
-        var isRenting = await _bikeTrackingValidation.IsAccountIsRentingBike(email);
+            var isRenting = await _bikeTrackingValidation.IsAccountIsRentingBike(email);
 
-        if (!isRenting) return BadRequest("Tài khoản của bạn đang không thuê xe nên không thể trả xe!");
-        
-        await _bikeTrackingBusinessLogic.BikeCheckout(bikeCheckoutDto, email);
-        
-        // var isBikeCheckoutWrongTime = await _bikeTrackingValidation.IsBikeCheckinOrCheckoutWrongTime(bikeCheckoutDto.CheckoutOn);
-        // if (!isBikeCheckoutWrongTime) return Ok();
-        //
-        // await LockAccount(email, Request.Headers[HeaderNames.Authorization]);
-        // return BadRequest("Tài khoản của bạn đã bị khóa và không thể thuê xe ở lần tới vì đã trả xe muộn (sau 22h), " +
-        //                   "liên hệ với chúng tôi qua hotline để mở tải khoản. Xin cảm ơn!");
+            if (!isRenting) return BadRequest("Tài khoản của bạn đang không thuê xe nên không thể trả xe!");
 
-        return Ok();
+            await _bikeTrackingBusinessLogic.BikeCheckout(bikeCheckoutDto, email);
+
+            var isBikeCheckoutWrongTime = await _bikeTrackingValidation.IsBikeCheckinOrCheckoutWrongTime(bikeCheckoutDto.CheckoutOn);
+            if (!isBikeCheckoutWrongTime) return Ok();
+            
+            await LockAccount(email, Request.Headers[HeaderNames.Authorization]);
+            return BadRequest("Tài khoản của bạn đã bị khóa và không thể thuê xe ở lần tới vì đã trả xe muộn (sau 22h), " +
+                              "liên hệ với chúng tôi qua hotline để mở tải khoản. Xin cảm ơn!");
+
+            return Ok();
+        }
+        catch (InvalidOperationException exception)
+        {
+            return BadRequest(exception.Message);
+        }
     }
     
     [HttpGet]
@@ -157,7 +164,7 @@ public class BikeTrackingController : ControllerBase
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", 
             token.Replace("Bearer", string.Empty));
         await httpClient.PutAsync(
-            "https://bike-rental-account-service.herokuapp.com/account/" +
+            "https://bike-rental-account-service-1.herokuapp.com/account/" +
             $"lockAccount?accountEmail={accountEmail}", null);
     }
     

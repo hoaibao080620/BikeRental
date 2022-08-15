@@ -182,7 +182,7 @@ public class AccountGrpcService : AccountServiceGrpc.AccountServiceGrpcBase
             .OrderByDescending(x => x.CreatedOn)
             .Select(x => new RecentTransaction
             {
-                Content = $"Tài khoản với số điện thoại {x.AccountPhoneNumber} nạp {x.Amount} vnd!",
+                Content = $"{x.AccountPhoneNumber} nạp {x.Amount} VNĐ!",
                 Status = x.Status,
                 TransactionDate = x.CreatedOn.ToTimestamp()
             }).ToList();

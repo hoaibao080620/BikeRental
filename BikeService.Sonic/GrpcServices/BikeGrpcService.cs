@@ -178,7 +178,9 @@ public class BikeGrpcService : BikeServiceGrpc.BikeServiceGrpcBase
         {
             Code = bikeStation!.Code,
             Id = bikeStation.Id,
-            Name = bikeStation.Name
+            Name = bikeStation.Name,
+            Longitude = bikeStation.Longitude,
+            Latitude = bikeStation.Latitude
         };
     }
 

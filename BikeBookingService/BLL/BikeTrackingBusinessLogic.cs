@@ -8,6 +8,7 @@ using BikeBookingService.Models;
 using BikeBookingService.Services;
 using BikeRental.MessageQueue.Events;
 using BikeRental.MessageQueue.MessageType;
+using Geolocation;
 using Grpc.Net.ClientFactory;
 using Microsoft.EntityFrameworkCore;
 
@@ -152,6 +153,24 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
         {
             BikeId = bikeRenting.BikeId
         })).ManagerEmails.ToList();
+        var bikeStation = await _bikeServiceGrpc.GetBikeStationByCodeOrIdAsync(new GetBikeStationByCodeOrIdRequest
+        {
+            Code = bikeCheckout.Code
+        });
+
+        var distanceFromCheckoutLocationToBikeStation = GetDistanceBetweenCheckoutAndStation(new Coordinate
+        {
+            Latitude = bikeCheckout.Latitude,
+            Longitude = bikeCheckout.Longitude
+        }, new Coordinate
+        {
+            Latitude = bikeStation.Latitude,
+            Longitude = bikeStation.Longitude
+        });
+
+        if (distanceFromCheckoutLocationToBikeStation >= 20)
+            throw new InvalidOperationException($"Vị trí của bạn và trạm hiện tại cách nhau" +
+                                                $" {Math.Round(distanceFromCheckoutLocationToBikeStation)}m, Vui lòng di chuyển gần trạm hơn!");
         
         var bike = await GetBikeById(bikeRenting.BikeId);
         var address = await _googleMapService.GetAddressOfLocation(
@@ -482,5 +501,9 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
             DistanceFromPreviousLocation = bikeLocationDto.Distance
         });
     }
-    
+
+    private double GetDistanceBetweenCheckoutAndStation(Coordinate origin, Coordinate destination)
+    {
+        return GeoCalculator.GetDistance(origin, destination);
+    }
 }
