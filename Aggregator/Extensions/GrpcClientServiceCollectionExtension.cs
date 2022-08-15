@@ -8,7 +8,7 @@ public static class GrpcClientServiceCollectionExtension
     {
         serviceCollection.AddGrpcClient<BikeServiceGrpc.BikeServiceGrpcClient>("BikeService", c =>
         {
-            c.Address = new Uri("https://bike-service-13062022.herokuapp.com");
+            c.Address = new Uri("https://bike-service-13062022-1.herokuapp.com");
         }).ConfigureChannel(o =>
         {
             o.HttpHandler = new GrpcWebHandler(new HttpClientHandler());
@@ -16,7 +16,7 @@ public static class GrpcClientServiceCollectionExtension
         
         serviceCollection.AddGrpcClient<AccountServiceGrpc.AccountServiceGrpcClient>("AccountService", c =>
         {
-            c.Address = new Uri("https://bike-rental-account-service.herokuapp.com");
+            c.Address = new Uri("https://bike-rental-account-service-1.herokuapp.com");
         }).ConfigureChannel(o =>
         {
             o.HttpHandler = new GrpcWebHandler(new HttpClientHandler());
@@ -24,7 +24,7 @@ public static class GrpcClientServiceCollectionExtension
         
         serviceCollection.AddGrpcClient<BikeBookingServiceGrpc.BikeBookingServiceGrpcClient>("BikeBookingService", c =>
         {
-            c.Address = new Uri("https://bike-rental-booking-service.herokuapp.com");
+            c.Address = new Uri("https://bike-rental-booking-service-1.herokuapp.com");
         }).ConfigureChannel(o =>
         {
             o.HttpHandler = new GrpcWebHandler(new HttpClientHandler());
@@ -32,7 +32,7 @@ public static class GrpcClientServiceCollectionExtension
         
         serviceCollection.AddGrpcClient<NotificationServiceGrpc.NotificationServiceGrpcClient>("NotificationService", c =>
         {
-            c.Address = new Uri("https://bike-rental-notification.herokuapp.com");
+            c.Address = new Uri("https://bike-rental-notification-1.herokuapp.com");
         }).ConfigureChannel(o =>
         {
             o.HttpHandler = new GrpcWebHandler(new HttpClientHandler());

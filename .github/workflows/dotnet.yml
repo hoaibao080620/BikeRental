@@ -70,16 +70,16 @@ jobs:
 #          heroku_app_name: "bike-rental-payment-service-1"
 #          heroku_email: ${{secrets.HEROKU_API_KEY}}
 #
-#      - name: Deploy Aggregator
-#        uses: akhileshns/heroku-deploy@v3.0.4
-#        with:
-#          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-#          heroku_app_name: "api-gateway-agg-1"
-#          heroku_email: ${{secrets.HEROKU_API_KEY}}
-#
-      - name: Deploy API Gateway
+      - name: Deploy Aggregator
         uses: akhileshns/heroku-deploy@v3.0.4
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: "bike-rental-api-gateway-1"
+          heroku_app_name: "api-gateway-agg-1"
           heroku_email: ${{secrets.HEROKU_API_KEY}}
+
+#      - name: Deploy API Gateway
+#        uses: akhileshns/heroku-deploy@v3.0.4
+#        with:
+#          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+#          heroku_app_name: "bike-rental-api-gateway-1"
+#          heroku_email: ${{secrets.HEROKU_API_KEY}}
