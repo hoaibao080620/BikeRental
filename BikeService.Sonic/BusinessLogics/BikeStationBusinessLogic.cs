@@ -283,7 +283,7 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
         var bikeStationsNearMe = bikeStations.OrderBy(x => x.Distance).ToList();
         await _distributedCache.SetStringAsync(key, JsonSerializer.Serialize(bikeStationsNearMe), new DistributedCacheEntryOptions
         {
-            SlidingExpiration = TimeSpan.FromMinutes(5)
+            AbsoluteExpiration = new DateTimeOffset(DateTime.UtcNow, TimeSpan.FromMinutes(1))
         });
         return bikeStationsNearMe;
     }
