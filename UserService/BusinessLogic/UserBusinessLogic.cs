@@ -113,7 +113,7 @@ public class UserBusinessLogic : IUserBusinessLogic
         await _mongoService.UpdateUser(userId, builder);
         
         var newUserUpdated = (await _mongoService.FindUser(x => x.Id == userId)).First();
-        await _messageQueuePublisher.PublishUserUpdatedEventToMessageQueue(newUserUpdated);
+        await _messageQueuePublisher.PublishUserUpdatedEventToMessageQueue(newUserUpdated, user.ImageBase64);
 
         if (!string.IsNullOrEmpty(user.Password))
         {

@@ -34,6 +34,18 @@ public class UserUpdatedEventHandler : IMessageQueueHandler
             .Set(x => x.DateOfBirth, userUpdatedMessage.DateOfBirth)
             .Set(x => x.Address, userUpdatedMessage.Address);
 
+        var imageUrl = await GetImageUrl(userUpdatedMessage.ImageBase64, userUpdatedMessage.Id);
+
+        if (!string.IsNullOrEmpty(imageUrl))
+        {
+            builder.Set(x => x.ImageUrl, imageUrl);
+        }
+
         await _mongoService.UpdateAccount(account.Id, builder);
+    }
+
+    private static async Task<string?> GetImageUrl(string? image64, string userId)
+    {
+        return string.IsNullOrEmpty(image64) ? null : await FileUploadService.UploadBase64Image(image64, userId);
     }
 }

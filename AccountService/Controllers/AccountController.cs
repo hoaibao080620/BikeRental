@@ -40,6 +40,7 @@ public class AccountController : ControllerBase
             IsActive = account.IsActive,
             Email = account.Email,
             PhoneNumber = account.PhoneNumber,
+            Image = account.ImageUrl
         };
 
         return Ok(accountProfile);

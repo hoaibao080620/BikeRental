@@ -10,4 +10,5 @@ public class UserCreated : BaseMessage
     public DateTime? DateOfBirth { get; set; }
     public string? PhoneNumber { get; set; }
     public string? Role { get; set; }
+    public string? ImageBase64 { get; set; }
 }

@@ -35,7 +35,7 @@ public class MessageQueuePublisher : IMessageQueuePublisher
         await _publisher.SendMessage(JsonConvert.SerializeObject(message), _configuration["Topic:UserTopic"]);
     }
     
-    public async Task PublishUserUpdatedEventToMessageQueue(User user)
+    public async Task PublishUserUpdatedEventToMessageQueue(User user, string? imageBase64)
     {
         var message = new UserUpdated
         {
@@ -46,7 +46,8 @@ public class MessageQueuePublisher : IMessageQueuePublisher
             MessageType = MessageType.UserUpdated,
             Role = user.RoleName,
             DateOfBirth = user.DateOfBirth,
-            Address = user.Address
+            Address = user.Address,
+            ImageBase64 = imageBase64
         };
         
         await _publisher.SendMessage(

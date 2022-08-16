@@ -18,4 +18,5 @@ public class Account
     public DateTime? DateOfBirth { get; set; }
     public string? Address { get; set; }
     public bool IsActive { get; set; }
+    public string? ImageUrl { get; set; }
 }

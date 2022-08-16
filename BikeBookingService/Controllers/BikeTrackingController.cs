@@ -129,8 +129,6 @@ public class BikeTrackingController : ControllerBase
             await LockAccount(email, Request.Headers[HeaderNames.Authorization]);
             return BadRequest("Tài khoản của bạn đã bị khóa và không thể thuê xe ở lần tới vì đã trả xe muộn (sau 22h), " +
                               "liên hệ với chúng tôi qua hotline để mở tải khoản. Xin cảm ơn!");
-
-            return Ok();
         }
         catch (InvalidOperationException exception)
         {
