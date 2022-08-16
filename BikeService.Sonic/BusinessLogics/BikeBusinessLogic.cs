@@ -38,7 +38,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
 
     public async Task<BikeRetrieveDto?> GetBike(string bikeCode)
     {
-        var bike = await (await _unitOfWork.BikeRepository.Find(x => x.BikeCode == bikeCode))
+        var bike = await (await _unitOfWork.BikeRepository.Find(x => x.BikeCode.ToLower() == bikeCode.ToLower()))
             .AsNoTracking().Select(b => new BikeRetrieveDto
             {
                 BikeStationId = b.BikeStationId,
