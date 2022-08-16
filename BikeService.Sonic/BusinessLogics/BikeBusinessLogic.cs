@@ -49,6 +49,13 @@ public class BikeBusinessLogic : IBikeBusinessLogic
                 Status = b.Status,
                 UpdatedOn = b.UpdatedOn
             }).FirstOrDefaultAsync() ?? throw new BikeNotFoundException(bikeCode);
+
+        var bikeRenting = await _bookingClient.GetBikesRentingCountAsync(new GetBikesRentingCountRequest
+        {
+            Ids = {bike.Id}
+        });
+
+        bike.RentingCount = bikeRenting.BikesRentingCount.Any() ? bikeRenting.BikesRentingCount.First().RentingCount : default;
         
         return bike;
     }
