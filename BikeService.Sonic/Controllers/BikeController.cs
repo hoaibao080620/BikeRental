@@ -34,10 +34,10 @@ public class BikeController : ControllerBase
     }
     
     [HttpGet]
-    [Route("{id:int}")]
-    public async Task<IActionResult> GetBike(int id)
+    [Route("{bikeCode}")]
+    public async Task<IActionResult> GetBike(string bikeCode)
     {
-        var bike = await _bikeBusinessLogic.GetBike(id);
+        var bike = await _bikeBusinessLogic.GetBike(bikeCode);
         if (bike is null) return NotFound();
         return Ok(bike);
     }

@@ -14,6 +14,7 @@ using BikeService.Sonic.Models;
 using BikeService.Sonic.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
+using MongoDB.Driver.Linq;
 using BikeStationColor = BikeRental.MessageQueue.Events.BikeStationColor;
 
 namespace BikeService.Sonic.BusinessLogics;
@@ -107,9 +108,9 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
             bikeStation.Longitude = longitude;
         }
 
-        if (bikeInsertDto.ManagerIds.Any())
+        if (bikeInsertDto.ManagerIds.Any(x => x != 0))
         {
-            foreach (var managerId in bikeInsertDto.ManagerIds)
+            foreach (var managerId in bikeInsertDto.ManagerIds.Where(x => x != 0))
             {
                 var isAlreadySave = await _unitOfWork.BikeStationManagerRepository
                     .Exists(x => x.ManagerId == managerId && x.BikeStationId == bikeStation.Id);

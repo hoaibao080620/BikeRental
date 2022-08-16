@@ -13,6 +13,6 @@ public class SampleImportController : ControllerBase
             "user" => Redirect("https://bike-rental-fe.s3.amazonaws.com/import_user.csv"),
             "bike" => Redirect("https://bike-rental-fe.s3.amazonaws.com/import_bike.csv"),
             _ => BadRequest("Không tìm thấy bản sample!")
-        };
+        }; 
     }
 }

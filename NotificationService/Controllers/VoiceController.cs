@@ -33,7 +33,9 @@ public class VoiceController : ControllerBase
     }
     
     [HttpPost]
-    public IActionResult ReceivePhoneCall()
+    [Route("[action]")]
+    [Consumes("application/x-www-form-urlencoded")]
+    public IActionResult ReceivePhoneCall(VoiceRequest voiceRequest)
     {
         var response = new VoiceResponse();
         var gather = new Gather(
@@ -121,15 +123,23 @@ public class VoiceController : ControllerBase
             .Replace(",", "");
         var response = new VoiceResponse();
         var dial = new Dial(callerId: "+19379091267");
+        if (string.IsNullOrEmpty(phoneNumber))
+        {
+            
+        }
+        else
+        {
+            
+        }
         dial.Number(phoneNumber,
             statusCallback: new Uri($"HandleCompletedOutgoingCall?client={client}", UriKind.Relative),
             statusCallbackMethod: HttpMethod.Post,
             statusCallbackEvent: new List<Number.EventEnum>
             {
-                Number.EventEnum.Answered,
-                Number.EventEnum.Completed
+                Number.EventEnum.Answered, 
+                Number.EventEnum.Completed,
             });
-        
+
         dial.Record = Dial.RecordEnum.RecordFromAnswerDual;
         dial.RecordingStatusCallback =
             new Uri("HandleCompletedRecording", UriKind.Relative);
@@ -171,6 +181,7 @@ public class VoiceController : ControllerBase
     [Consumes("application/x-www-form-urlencoded")]
     public async Task<IActionResult> HandleCompletedOutgoingCall([FromForm] VoiceRequest voiceRequest, [FromQuery] string client)
     {
+        Console.WriteLine(voiceRequest.CallStatus);
         var response = new VoiceResponse();
         switch (voiceRequest.CallStatus)
         {

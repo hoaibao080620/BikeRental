@@ -36,9 +36,9 @@ public class BikeBusinessLogic : IBikeBusinessLogic
             grpcClientFactory.CreateClient<BikeBookingServiceGrpc.BikeBookingServiceGrpcClient>("BikeBooking");
     }
 
-    public async Task<BikeRetrieveDto?> GetBike(int id)
+    public async Task<BikeRetrieveDto?> GetBike(string bikeCode)
     {
-        var bike = await (await _unitOfWork.BikeRepository.Find(x => x.Id == id))
+        var bike = await (await _unitOfWork.BikeRepository.Find(x => x.BikeCode == bikeCode))
             .AsNoTracking().Select(b => new BikeRetrieveDto
             {
                 BikeStationId = b.BikeStationId,
@@ -48,7 +48,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
                 LicensePlate = b.BikeCode,
                 Status = b.Status,
                 UpdatedOn = b.UpdatedOn
-            }).FirstOrDefaultAsync() ?? throw new BikeNotFoundException(id);
+            }).FirstOrDefaultAsync() ?? throw new BikeNotFoundException(bikeCode);
         
         return bike;
     }
@@ -180,11 +180,5 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         if (bike is null) return;
         bike.IsLock = true;
         await _unitOfWork.SaveChangesAsync();
-    }
-
-    private async Task<Bike> GetBikeById(int bikeId)
-    {
-        var bike = await _unitOfWork.BikeRepository.GetById(bikeId) ?? throw new BikeNotFoundException(bikeId);
-        return bike ?? throw new BikeNotFoundException(bikeId);
     }
 }

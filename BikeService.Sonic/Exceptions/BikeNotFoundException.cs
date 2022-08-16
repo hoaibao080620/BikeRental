@@ -2,8 +2,8 @@
 
 public class BikeNotFoundException : Exception
 {
-    public BikeNotFoundException(int id)
-        : base($"Bike with id {id} not found!")
+    public BikeNotFoundException(string id)
+        : base($"Bike with code {id} not found!")
     {
     }
 }

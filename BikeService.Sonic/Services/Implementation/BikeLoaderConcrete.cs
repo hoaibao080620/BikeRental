@@ -29,7 +29,7 @@ public class BikeLoaderConcrete : IBikeLoaderAdapter
                 LicensePlate = b.BikeCode,
                 Status = b.Status,
                 UpdatedOn = b.UpdatedOn
-            }).FirstOrDefaultAsync() ?? throw new BikeNotFoundException(bikeId);
+            }).FirstOrDefaultAsync() ?? throw new BikeNotFoundException("test");
     }
 
     public async Task<List<int>> GetBikeIdsOfManager(string managerEmail)
