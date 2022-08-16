@@ -100,7 +100,10 @@ public class BikeStationController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetBikeStationsNearMe([FromQuery] BikeStationRetrieveParameter bikeStationRetrieveParameter)
     {
-        var bikeStations = await _bikeStationBusinessLogic.GetBikeStationsNearMe(bikeStationRetrieveParameter);
+        var email = HttpContext.User.Claims.FirstOrDefault(x => 
+            x.Type == ClaimTypes.NameIdentifier)!.Value;
+        var bikeStations = await _bikeStationBusinessLogic
+            .GetBikeStationsNearMe(bikeStationRetrieveParameter, email);
         return Ok(bikeStations);
     }
 

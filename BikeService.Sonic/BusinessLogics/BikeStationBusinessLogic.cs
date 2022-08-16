@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using System.Text.Json;
 using AutoMapper;
 using BikeRental.MessageQueue.Events;
 using BikeRental.MessageQueue.MessageType;
@@ -12,6 +13,7 @@ using BikeService.Sonic.MessageQueue.Publisher;
 using BikeService.Sonic.Models;
 using BikeService.Sonic.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 using BikeStationColor = BikeRental.MessageQueue.Events.BikeStationColor;
 
 namespace BikeService.Sonic.BusinessLogics;
@@ -20,18 +22,21 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
 {
     private readonly IGoogleMapService _googleMapService;
     private readonly IMessageQueuePublisher _messageQueuePublisher;
+    private readonly IDistributedCache _distributedCache;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     public BikeStationBusinessLogic(
         IUnitOfWork unitOfWork,
         IMapper mapper,
         IGoogleMapService googleMapService,
-        IMessageQueuePublisher messageQueuePublisher)
+        IMessageQueuePublisher messageQueuePublisher,
+        IDistributedCache distributedCache)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _googleMapService = googleMapService;
         _messageQueuePublisher = messageQueuePublisher;
+        _distributedCache = distributedCache;
     }
     
     public async Task<BikeStationRetrieveDto> GetStationBike(int id)
@@ -225,8 +230,18 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
         }).ToList();
     }
 
-    public async Task<List<BikeStationNearMeDto>> GetBikeStationsNearMe(BikeStationRetrieveParameter bikeStationRetrieveParameter)
+    public async Task<List<BikeStationNearMeDto>> GetBikeStationsNearMe(
+        BikeStationRetrieveParameter bikeStationRetrieveParameter, 
+        string email)
     {
+        var key = string.Format(RedisCacheKey.BikeStationNearMeCache, email);
+        var cache = await _distributedCache.GetStringAsync(key);
+
+        if (!string.IsNullOrEmpty(cache))
+        {
+            return JsonSerializer.Deserialize<List<BikeStationNearMeDto>>(cache) ?? new List<BikeStationNearMeDto>();
+        }
+        
         var bikeStations = (await _unitOfWork.BikeStationRepository.All()).Select(x => new BikeStationNearMeDto
         {
             Description = x.Description,
@@ -247,16 +262,30 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
         
         foreach (var bikeStation in bikeStations)
         {
-            var destination = new GoogleMapLocation
+            try
             {
-                Latitude = bikeStation.Latitude,
-                Longitude = bikeStation.Longitude
-            };
+                var destination = new GoogleMapLocation
+                {
+                    Latitude = bikeStation.Latitude,
+                    Longitude = bikeStation.Longitude
+                };
 
-            bikeStation.Distance = await _googleMapService.GetDistanceBetweenTwoLocations(originLocation, destination);
+                bikeStation.Distance =
+                    await _googleMapService.GetDistanceBetweenTwoLocations(originLocation, destination);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine(bikeStation.Id);
+            }
         }
-
-        return bikeStations.OrderBy(x => x.Distance).ToList();
+        
+        var bikeStationsNearMe = bikeStations.OrderBy(x => x.Distance).ToList();
+        await _distributedCache.SetStringAsync(key, JsonSerializer.Serialize(bikeStationsNearMe), new DistributedCacheEntryOptions
+        {
+            SlidingExpiration = TimeSpan.FromMinutes(5)
+        });
+        return bikeStationsNearMe;
     }
 
     public async Task AssignBikesToBikeStation(BikeStationBikeAssignDto bikeAssignDto)

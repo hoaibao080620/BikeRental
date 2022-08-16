@@ -11,11 +11,10 @@ public interface IBikeStationBusinessLogic
     Task AddStationBike(BikeStationInsertDto bikeInsertDto);
     Task DeleteStationBike(int id);
     Task UpdateStationBike(BikeStationUpdateDto bikeInsertDto);
-    Task<BikeStationRetrieveDto> GetNearestBikeStationFromLocation(double longitude, double latitude);
     Task UpdateBikeStationColor(List<BikeStationColorDto> bikeStationColors, string email);
     Task<List<BikeStationColorRetrieveDto>> GetBikeStationColors(string email);
     Task<List<BikeRetrieveDto>> GetBikeStationBike(int bikeStationId);
-    Task<List<BikeStationNearMeDto>> GetBikeStationsNearMe(BikeStationRetrieveParameter bikeStationRetrieveParameter);
+    Task<List<BikeStationNearMeDto>> GetBikeStationsNearMe(BikeStationRetrieveParameter bikeStationRetrieveParameter, string email);
     Task AssignBikesToBikeStation(BikeStationBikeAssignDto bikeAssignDto);
     Task<List<BikeStationAssignDto>> GetAssignableBikeStations(int totalBikeAssign);
     Task<List<AssignableManager>> GetAssignableManagers();
