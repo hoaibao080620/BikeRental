@@ -99,8 +99,9 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
 
     public async Task UpdateStationBike(BikeStationUpdateDto bikeInsertDto)
     {
-        var bikeStation = _mapper.Map<BikeStation>(bikeInsertDto);
-        bikeStation.UpdatedOn = DateTime.UtcNow;
+        var bikeStationOrigin = await _unitOfWork.BikeStationRepository.GetById(bikeInsertDto.Id);
+        var bikeStation = _mapper.Map(bikeInsertDto, bikeStationOrigin);
+        bikeStation!.UpdatedOn = DateTime.UtcNow;
         if (!string.IsNullOrEmpty(bikeInsertDto.PlaceId))
         {
             var (latitude, longitude) = await _googleMapService.GetLocationOfAddress(bikeInsertDto.PlaceId);
