@@ -45,6 +45,7 @@ message GetAccountInfoResponse {
   optional google.protobuf.Timestamp dateOfBirth = 6;
   string firstName = 7;
   string lastName = 8;
+  string imageUrl = 9;
 }
 
 message GetPaymentChartRequest {

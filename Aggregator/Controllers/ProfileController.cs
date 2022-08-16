@@ -48,7 +48,8 @@ public class ProfileController : ControllerBase
             Point = accountInfo.Point,
             TotalDistance = accountRentingInfo.TotalDistance,
             TotalRenting = accountRentingInfo.TotalRenting,
-            TotalRentingTime = accountRentingInfo.TotalRentingTime
+            TotalRentingTime = accountRentingInfo.TotalRentingTime,
+            ImageUrl = accountInfo.ImageUrl
         });
     }
 }

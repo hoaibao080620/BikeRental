@@ -218,6 +218,11 @@ public class AccountGrpcService : AccountServiceGrpc.AccountServiceGrpcBase
         {
             response.DateOfBirth = Timestamp.FromDateTime(account.DateOfBirth.Value);
         }
+        
+        if (account.ImageUrl != null)
+        {
+            response.ImageUrl = account.ImageUrl;
+        }
 
         return response;
     }
