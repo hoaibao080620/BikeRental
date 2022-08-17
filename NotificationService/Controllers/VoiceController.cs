@@ -59,22 +59,20 @@ public class VoiceController : ControllerBase
 
         var managerEmails = manager.Managers.Select(x => x.Email);
         
-        var callCountInDay = await _notificationRepository
+        var callCountInDay = (await _notificationRepository
             .GetCalls(x => x.CalledOn >= DateTime.Now.Date && x.ManagerReceiver != null
-            && managerEmails.Contains(x.ManagerReceiver));
-
-        var managerCreatedDateDict = manager.Managers
-            .ToDictionary(x => x.Email, x => x.CreatedOn.ToDateTime());
+            && managerEmails.Contains(x.ManagerReceiver))).GroupBy(x => x.ManagerReceiver)
+            .ToDictionary(x => x.Key!, x=> x.Count());
 
         string? clientEmail;
         if (callCountInDay.Any())
         {
-            clientEmail = callCountInDay.GroupBy(x => x.ManagerReceiver)
+            clientEmail = manager.Managers
                 .Select(x => new
                 {
-                    Receiver = x.Key,
-                    Count = x.Count(),
-                    ManagerCreatedOn = managerCreatedDateDict!.GetValueOrDefault(x.Key)
+                    Receiver = x.Email,
+                    Count = callCountInDay.GetValueOrDefault(x.Email),
+                    ManagerCreatedOn = x.CreatedOn
                 }).OrderBy(x => x.Count).ThenBy(x => x.ManagerCreatedOn).First().Receiver;
         }
         else
@@ -101,19 +99,21 @@ public class VoiceController : ControllerBase
         {
             var directors = await _client.GetDirectorsAsync(new Empty());
             var directorEmails = directors.Managers.Select(x => x.Email);
-            var callCountInDay = await _notificationRepository
-                .GetCalls(x => x.CalledOn >= DateTime.Now.Date && x.ManagerReceiver != null
-                                            && directorEmails.Contains(x.ManagerReceiver));
+            var callCountInDay = (await _notificationRepository
+                    .GetCalls(x => x.CalledOn >= DateTime.Now.Date && x.ManagerReceiver != null
+                                    && directorEmails.Contains(x.ManagerReceiver))).GroupBy(x => x.ManagerReceiver)
+                .ToDictionary(x => x.Key!, x=> x.Count());
             
             string? clientEmail;
             if (callCountInDay.Any())
             {
-                clientEmail = callCountInDay.GroupBy(x => x.ManagerReceiver)
+                clientEmail = directors.Managers
                     .Select(x => new
                     {
-                        Receiver = x.Key,
-                        Count = x.Count()
-                    }).OrderBy(x => x.Count).First().Receiver;
+                        Receiver = x.Email,
+                        Count = callCountInDay.GetValueOrDefault(x.Email),
+                        ManagerCreatedOn = x.CreatedOn
+                    }).OrderBy(x => x.Count).ThenBy(x => x.ManagerCreatedOn).First().Receiver;
             }
             else
             {

@@ -148,7 +148,7 @@ public class BikeGrpcService : BikeServiceGrpc.BikeServiceGrpcBase
         {
             Managers = { directors.Select(x => new ManagerCall
             {
-                CreatedOn = x.CreatedOn.ToTimestamp(),
+                CreatedOn = Timestamp.FromDateTimeOffset(x.CreatedOn),
                 Email = x.Email
             })}
         };
@@ -207,14 +207,14 @@ public class BikeGrpcService : BikeServiceGrpc.BikeServiceGrpcBase
         var directors = currentBikeRentingId == 0 ? 
             (await _unitOfWork.ManagerRepository.All()).Select(x => new ManagerCall
             {
-                CreatedOn = x.CreatedOn.ToTimestamp(),
+                CreatedOn = Timestamp.FromDateTimeOffset(x.CreatedOn),
                 Email = x.Email
             }).ToList() :
             (await _unitOfWork.BikeStationManagerRepository
                 .Find(x => x.BikeStation.Bikes.Any(xx => xx.Id == currentBikeRentingId)))
             .Select(x => new ManagerCall
             {
-                CreatedOn = x.CreatedOn.ToTimestamp(),
+                CreatedOn = Timestamp.FromDateTimeOffset(x.CreatedOn),
                 Email = x.Manager.Email
             }).ToList();
         
