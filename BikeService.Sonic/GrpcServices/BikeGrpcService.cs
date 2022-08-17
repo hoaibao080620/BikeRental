@@ -199,18 +199,10 @@ public class BikeGrpcService : BikeServiceGrpc.BikeServiceGrpcBase
     public override async Task<GetManagersByAccountEmailResponse> GetManagerEmails(GetManagersByAccountEmailRequest request, ServerCallContext context)
     {
         var currentBikeRentingId = await _bikeBusinessLogic.GetCurrentRentingBike(request.AccountPhone);
-        List<string> managerEmails; 
 
-        if (currentBikeRentingId == 0)
-        {
-            managerEmails = (await _unitOfWork.ManagerRepository.All()).Take(5).Select(x => x.Email).ToList();
-        }
-        else
-        {
-            managerEmails =
-                (await _unitOfWork.BikeStationManagerRepository.GetManagerEmailsByBikeId(currentBikeRentingId))
-                .Take(5).ToList();
-        }
+        var managerEmails = currentBikeRentingId == 0 ? 
+            (await _unitOfWork.ManagerRepository.All()).Select(x => x.Email).ToList() :
+            (await _unitOfWork.BikeStationManagerRepository.GetManagerEmailsByBikeId(currentBikeRentingId)).ToList();
         
         return new GetManagersByAccountEmailResponse
         {

@@ -58,7 +58,8 @@ public class VoiceController : ControllerBase
         });
 
         var callCountInDay = await _notificationRepository
-            .GetCalls(x => x.CalledOn >= DateTime.Now.Date && x.ManagerReceiver != null);
+            .GetCalls(x => x.CalledOn >= DateTime.Now.Date && x.ManagerReceiver != null
+            && managerEmails.Emails.ToList().Contains(x.ManagerReceiver));
 
         string? clientEmail;
         if (callCountInDay.Any())
@@ -93,12 +94,27 @@ public class VoiceController : ControllerBase
         if (string.IsNullOrEmpty(phoneNumber))
         {
             var directorEmails = await _client.GetDirectorsAsync(new Empty());
-            foreach (var directorEmail in directorEmails.Emails.Take(5).ToList())
+
+            var callCountInDay = await _notificationRepository
+                .GetCalls(x => x.CalledOn >= DateTime.Now.Date && x.ManagerReceiver != null
+                        && directorEmails.Emails.ToList().Contains(x.ManagerReceiver));
+            string? clientEmail;
+            if (callCountInDay.Any())
             {
-                dial.Append(new Client(directorEmail));
+                clientEmail = callCountInDay.GroupBy(x => x.ManagerReceiver)
+                    .Select(x => new
+                    {
+                        Receiver = x.Key,
+                        Count = x.Count()
+                    }).OrderBy(x => x.Count).First().Receiver;
+            }
+            else
+            {
+                clientEmail = directorEmails.Emails.First();
             }
 
-            dial.Action = new Uri("HandleCompletedIncomingCall?email=testmanager@gmail.com", UriKind.Relative);
+            dial.Append(new Client().Identity(clientEmail));
+            dial.Action = new Uri($"HandleCompletedIncomingCall?email={clientEmail}", UriKind.Relative);
             dial.Method = HttpMethod.Get;
         }
         else
