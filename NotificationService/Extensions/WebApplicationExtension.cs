@@ -1,4 +1,5 @@
-﻿using BikeRental.MessageQueue.MessageType;
+﻿using BikeRental.MessageQueue.Events;
+using BikeRental.MessageQueue.MessageType;
 using BikeRental.MessageQueue.SubscriptionManager;
 using NotificationService.MessageQueue.MessageQueueHandlers;
 
@@ -22,5 +23,8 @@ public static class WebApplicationExtension
         
         messageQueueSubscriptionManager.RegisterEventHandlerSubscription<UserRunOutPointHandler>(
             MessageType.UserAlmostRunOutPoint);
+        
+        messageQueueSubscriptionManager.RegisterEventHandlerSubscription<PaymentSucceededEventHandler>(
+            MessageType.PaymentSucceeded);
     }
 }

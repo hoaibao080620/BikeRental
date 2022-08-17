@@ -1,7 +1,10 @@
 ﻿using System.Security.Claims;
+using BikeRental.MessageQueue.Events;
+using BikeRental.MessageQueue.MessageType;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PaymentService.DTO;
+using PaymentService.MessageQueue;
 using PaymentService.Services;
 
 namespace PaymentService.Controllers;
@@ -11,10 +14,12 @@ namespace PaymentService.Controllers;
 public class PaymentController : ControllerBase
 {
     private readonly IStripeService _stripeService;
+    private readonly IMessageQueuePublisher _messageQueuePublisher;
 
-    public PaymentController(IStripeService stripeService)
+    public PaymentController(IStripeService stripeService, IMessageQueuePublisher messageQueuePublisher)
     {
         _stripeService = stripeService;
+        _messageQueuePublisher = messageQueuePublisher;
     }
     
     [HttpPost]
@@ -34,6 +39,20 @@ public class PaymentController : ControllerBase
     {
         var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
         await _stripeService.ProcessPaymentEvent(json, Request.Headers["Stripe-Signature"]);
+        return Ok();
+    }
+    
+    [HttpGet]
+    public async Task<IActionResult> TestSendText(string email)
+    {
+        await _messageQueuePublisher.PublishPaymentSucceededEvent(new PaymentSucceeded
+        {
+            Amount = 50000,
+            Email = email,
+            PaymentOn = DateTime.UtcNow,
+            MessageType = MessageType.PaymentSucceeded
+        });
+
         return Ok();
     }
 }
