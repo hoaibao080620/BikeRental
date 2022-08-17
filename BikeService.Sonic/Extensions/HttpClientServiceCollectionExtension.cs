@@ -9,6 +9,5 @@ public static class HttpClientServiceCollectionExtension
     public static void AddHttpClientToServices(this IServiceCollection serviceCollection)
     {
         serviceCollection.AddHttpClient<IGoogleMapService, GoogleMapService>();
-        serviceCollection.AddHttpClient<BikeGrpcService>();
     }
 }

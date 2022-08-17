@@ -188,4 +188,14 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         bike.IsLock = true;
         await _unitOfWork.SaveChangesAsync();
     }
+
+    public async Task<int> GetCurrentRentingBike(string phoneNumber)
+    {
+        var currentBikeRenting = await _bookingClient.GetCurrentRentingBikeAsync(new GetCurrentRentingBikeRequest
+        {
+            PhoneNumber = phoneNumber
+        });
+
+        return currentBikeRenting.BikeId;
+    }
 }

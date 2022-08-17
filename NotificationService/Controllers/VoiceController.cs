@@ -79,19 +79,7 @@ public class VoiceController : ControllerBase
         
         return Content(response.ToString(), "application/xml");
     }
-    
-    [HttpGet]
-    public IActionResult ReceiveSms()
-    {
-        var response = new MessagingResponse();
-        var phoneNumber = HttpUtility.ParseQueryString(HttpContext.Request.QueryString.Value!);
-        foreach (var test in phoneNumber)
-        {
-            Console.WriteLine(test);
-        }
-        return Content(response.ToString(), "application/xml");
-    }
-    
+
     [HttpPost]
     [Route("[action]")]
     [Consumes("application/x-www-form-urlencoded")]
