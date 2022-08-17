@@ -6,13 +6,23 @@ namespace Aggregator.Controllers;
 [Route("[controller]")]
 public class SampleImportController : ControllerBase
 {
-    public IActionResult DownloadImportSample(string? importType = "user")
+    private readonly IHttpClientFactory _httpClientFactory;
+
+    public SampleImportController(IHttpClientFactory httpClientFactory)
     {
-        return importType switch
-        {
-            "user" => Redirect("https://bike-rental-fe.s3.amazonaws.com/import_user.csv"),
-            "bike" => Redirect("https://bike-rental-fe.s3.amazonaws.com/import_bike.csv"),
-            _ => BadRequest("Không tìm thấy bản sample!")
-        }; 
+        _httpClientFactory = httpClientFactory;
+    }
+    
+    public async Task<IActionResult> DownloadImportSample(string? importType = "user")
+    {
+        var client = _httpClientFactory.CreateClient("s3");
+        var url = importType == "user" ? "/import_user.csv" : "/import_bike.csv";
+        var response = await client.GetStreamAsync(url);
+        await using var memoryStream = new MemoryStream();
+        await response.CopyToAsync(memoryStream);
+        
+        return File(memoryStream.ToArray(), 
+            "text/csv", 
+            url.Replace("/", string.Empty));
     }
 }

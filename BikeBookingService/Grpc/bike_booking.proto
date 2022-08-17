@@ -11,6 +11,15 @@ service BikeBookingServiceGrpc {
   rpc GetRentingInfo(GetRentingInfoRequest) returns (GetRentingInfoResponse);
   rpc GetBikeRentingCount(GetBikeRentingCountRequest) returns (GetBikeRentingCountResponse);
   rpc GetBikesRentingCount (GetBikesRentingCountRequest) returns (GetBikesRentingCountResponse);
+  rpc GetCurrentRentingBike (GetCurrentRentingBikeRequest) returns (GetCurrentRentingBikeResponse);
+}
+
+message GetCurrentRentingBikeRequest {
+  string phoneNumber = 1;
+}
+
+message GetCurrentRentingBikeResponse {
+  int32 bikeId = 1;
 }
 
 message GetBikesRentingCountRequest {

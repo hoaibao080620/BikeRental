@@ -1,3 +1,4 @@
+using Aggregator.Controllers;
 using Aggregator.Extensions;
 using Aggregator.Services;
 
@@ -11,6 +12,10 @@ builder.Services.RegisterGrpcClient();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<IViewRender, ViewRender>();
+builder.Services.AddHttpClient<SampleImportController>("s3", option =>
+{
+    option.BaseAddress = new Uri("https://bike-rental-fe.s3.amazonaws.com");
+});
 
 var app = builder.Build();
 

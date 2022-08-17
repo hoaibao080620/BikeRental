@@ -264,4 +264,16 @@ public class BikeBookingGrpcService : BikeBookingServiceGrpc.BikeBookingServiceG
             BikesRentingCount = { rentingCount.ToList() }
         };
     }
+
+    public override async Task<GetCurrentRentingBikeResponse> GetCurrentRentingBike(GetCurrentRentingBikeRequest request, ServerCallContext context)
+    {
+        var currentBikeRenting = (await _unitOfWork.BikeRentalTrackingRepository
+                .Find(x => x.Account.PhoneNumber == request.PhoneNumber && !x.CheckoutOn.HasValue))
+            .FirstOrDefault();
+
+        return new GetCurrentRentingBikeResponse
+        {
+            BikeId = currentBikeRenting?.BikeId ?? 0
+        };
+    }
 }

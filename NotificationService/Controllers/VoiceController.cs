@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using System.Web;
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Net.ClientFactory;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -35,17 +36,46 @@ public class VoiceController : ControllerBase
     [HttpPost]
     [Route("[action]")]
     [Consumes("application/x-www-form-urlencoded")]
-    public IActionResult ReceivePhoneCall(VoiceRequest voiceRequest)
+    public async Task<IActionResult> ReceivePhoneCall([FromForm] VoiceRequest voiceRequest)
     {
         var response = new VoiceResponse();
-        var gather = new Gather(
-                new List<Gather.InputEnum> {Twilio.TwiML.Voice.Gather.InputEnum.Dtmf},
-                numDigits: 1,
-                action: new Uri("voice/gather", UriKind.Relative),
-                method: HttpMethods.Post)
-            .Play(new Uri("https://bike-rental-fe.s3.amazonaws.com/redirect_call.mp3"));
-        response.Append(gather);
-        response.Redirect(new Uri("voice", UriKind.Relative), HttpMethod.Post);
+        // var gather = new Gather(
+        //         new List<Gather.InputEnum> {Twilio.TwiML.Voice.Gather.InputEnum.Dtmf},
+        //         numDigits: 1,
+        //         action: new Uri("voice/gather", UriKind.Relative),
+        //         method: HttpMethods.Post)
+        //     .Play(new Uri("https://bike-rental-fe.s3.amazonaws.com/redirect_call.mp3"));
+        // response.Append(gather);
+        // response.Redirect(new Uri("voice", UriKind.Relative), HttpMethod.Post);
+        var dial = new Dial
+        {
+            // Action = new Uri("HandleCompletedIncomingCall?email=testmanager@gmail.com", UriKind.Relative),
+            // Method = HttpMethod.Get,
+            Record = Dial.RecordEnum.RecordFromAnswerDual,
+            RecordingStatusCallback = new Uri("HandleCompletedRecording", UriKind.Relative),
+            RecordingStatusCallbackMethod = HttpMethod.Get,
+            RecordingStatusCallbackEvent = new List<Dial.RecordingEventEnum>
+            {
+                Dial.RecordingEventEnum.Completed
+            }
+        };
+
+        var managerEmails = await _client.GetManagerEmailsAsync(new GetManagersByAccountEmailRequest
+        {
+            AccountPhone = voiceRequest.From
+        });
+
+        var emails = managerEmails.Emails.Take(4).ToList();
+        emails.Add("token@gmail.com");
+
+        foreach (var managerEmail in emails)
+        {
+            var client = new Client();
+            client.Identity(managerEmail);
+            client.Url = new Uri($"HandleCompletedIncomingCall?email={managerEmail}", UriKind.Relative);
+            client.Method = HttpMethod.Get;
+            dial.Append(client);
+        }
         
         return Content(response.ToString(), "application/xml");
     }
@@ -116,7 +146,7 @@ public class VoiceController : ControllerBase
     
     [HttpGet]
     [Route("[action]")]
-    public IActionResult ForwardPhone()
+    public async Task<IActionResult> ForwardPhone()
     {
         var client = HttpUtility.ParseQueryString(HttpContext.Request.QueryString.Value!)["from"];
         var phoneNumber = HttpUtility.ParseQueryString(HttpContext.Request.QueryString.Value!)["to"]?
@@ -125,21 +155,27 @@ public class VoiceController : ControllerBase
         var dial = new Dial(callerId: "+19379091267");
         if (string.IsNullOrEmpty(phoneNumber))
         {
-            
+            var directorEmails = await _client.GetDirectorsAsync(new Empty());
+            foreach (var directorEmail in directorEmails.Emails.Take(5).ToList())
+            {
+                dial.Append(new Client(directorEmail));
+            }
+
+            dial.Action = new Uri("HandleCompletedIncomingCall?email=testmanager@gmail.com", UriKind.Relative);
+            dial.Method = HttpMethod.Get;
         }
         else
         {
-            
+            dial.Number(phoneNumber,
+                statusCallback: new Uri($"HandleCompletedOutgoingCall?client={client}", UriKind.Relative),
+                statusCallbackMethod: HttpMethod.Post,
+                statusCallbackEvent: new List<Number.EventEnum>
+                {
+                    Number.EventEnum.Answered, 
+                    Number.EventEnum.Completed,
+                });
         }
-        dial.Number(phoneNumber,
-            statusCallback: new Uri($"HandleCompletedOutgoingCall?client={client}", UriKind.Relative),
-            statusCallbackMethod: HttpMethod.Post,
-            statusCallbackEvent: new List<Number.EventEnum>
-            {
-                Number.EventEnum.Answered, 
-                Number.EventEnum.Completed,
-            });
-
+        
         dial.Record = Dial.RecordEnum.RecordFromAnswerDual;
         dial.RecordingStatusCallback =
             new Uri("HandleCompletedRecording", UriKind.Relative);
@@ -161,7 +197,6 @@ public class VoiceController : ControllerBase
             Duration = Convert.ToDouble(queryString["DialCallDuration"]),
             From = queryString.Get("From")!,
             To = queryString.Get("To")!,
-            AnsweredBy = "Test@gmail.com",
             Status = queryString.Get("DialCallStatus")!,
             Direction = queryString.Get("Direction")!,
             RecordingUrl = queryString.Get("RecordingUrl"),

@@ -3,7 +3,7 @@
 import "google/protobuf/empty.proto";
 
 service BikeServiceGrpc {
-  rpc GetCallManagersByAccountPhone(GetManagersByAccountEmailRequest) returns (GetManagersByAccountEmailResponse);
+  rpc GetManagerEmails(GetManagersByAccountEmailRequest) returns (GetManagersByAccountEmailResponse);
   rpc GetDirectors(google.protobuf.Empty) returns (GetManagersByAccountEmailResponse);
 }
 
