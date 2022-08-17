@@ -106,7 +106,7 @@ public class BikeTrackingController : ControllerBase
                                                                   "xin vui lòng nạp điểm và thử lại!");
         
         await _bikeTrackingBusinessLogic.BikeChecking(bikeCheckinDto, email);
-        return Ok();
+        return Ok("Bạn đã thuê xe thành công, chúc bạn 1 có 1 chuyển đi vui vẻ!");
     }
     
     [HttpPost]
@@ -124,7 +124,10 @@ public class BikeTrackingController : ControllerBase
             await _bikeTrackingBusinessLogic.BikeCheckout(bikeCheckoutDto, email);
 
             var isBikeCheckoutWrongTime = await _bikeTrackingValidation.IsBikeCheckinOrCheckoutWrongTime(bikeCheckoutDto.CheckoutOn);
-            if (!isBikeCheckoutWrongTime) return Ok();
+            if (!isBikeCheckoutWrongTime)
+            {
+                return Ok("Bạn đã trả xe thành công, hẹn gặp lại bạn vào lần tới!");
+            }
             
             // await LockAccount(email, Request.Headers[HeaderNames.Authorization]);
             return BadRequest("Tài khoản của bạn đã bị khóa và không thể thuê xe ở lần tới vì đã trả xe muộn (sau 22h), " +
