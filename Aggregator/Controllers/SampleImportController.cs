@@ -21,7 +21,7 @@ public class SampleImportController : ControllerBase
         await using var memoryStream = new MemoryStream();
         await response.CopyToAsync(memoryStream);
         Response.Headers.Add("Content-Disposition", $"attachment;filename={url.Replace("/", string.Empty)}");
-        return File(memoryStream.ToArray(), 
+        return new FileStreamResult(memoryStream, 
             System.Net.Mime.MediaTypeNames.Application.Octet);
     }
 }
