@@ -106,7 +106,7 @@ public class BikeTrackingController : ControllerBase
                                                                   "xin vui lòng nạp điểm và thử lại!");
         
         await _bikeTrackingBusinessLogic.BikeChecking(bikeCheckinDto, email);
-        return Ok("Bạn đã thuê xe thành công, chúc bạn 1 có 1 chuyển đi vui vẻ!");
+        return Ok("Bạn đã thuê xe thành công, chúc bạn có 1 chuyển đi vui vẻ!");
     }
     
     [HttpPost]
