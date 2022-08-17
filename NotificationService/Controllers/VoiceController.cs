@@ -52,14 +52,19 @@ public class VoiceController : ControllerBase
             }
         };
 
-        var managerEmails = await _client.GetManagerEmailsAsync(new GetManagersByAccountEmailRequest
+        var manager = await _client.GetManagerEmailsAsync(new GetManagersByAccountEmailRequest
         {
             AccountPhone = voiceRequest.From
         });
 
+        var managerEmails = manager.Managers.Select(x => x.Email);
+        
         var callCountInDay = await _notificationRepository
             .GetCalls(x => x.CalledOn >= DateTime.Now.Date && x.ManagerReceiver != null
-            && managerEmails.Emails.ToList().Contains(x.ManagerReceiver));
+            && managerEmails.Contains(x.ManagerReceiver));
+
+        var managerCreatedDateDict = manager.Managers
+            .ToDictionary(x => x.Email, x => x.CreatedOn.ToDateTime());
 
         string? clientEmail;
         if (callCountInDay.Any())
@@ -68,12 +73,13 @@ public class VoiceController : ControllerBase
                 .Select(x => new
                 {
                     Receiver = x.Key,
-                    Count = x.Count()
-                }).OrderBy(x => x.Count).First().Receiver;
+                    Count = x.Count(),
+                    ManagerCreatedOn = managerCreatedDateDict!.GetValueOrDefault(x.Key)
+                }).OrderBy(x => x.Count).ThenBy(x => x.ManagerCreatedOn).First().Receiver;
         }
         else
         {
-            clientEmail = managerEmails.Emails.First();
+            clientEmail = manager.Managers.OrderBy(x => x.CreatedOn).Select(x => x.Email).First();
         }
 
         dial.Action = new Uri($"HandleCompletedIncomingCall?email={clientEmail}", UriKind.Relative);
@@ -93,11 +99,12 @@ public class VoiceController : ControllerBase
         var dial = new Dial(callerId: "+19379091267");
         if (string.IsNullOrEmpty(phoneNumber))
         {
-            var directorEmails = await _client.GetDirectorsAsync(new Empty());
-
+            var directors = await _client.GetDirectorsAsync(new Empty());
+            var directorEmails = directors.Managers.Select(x => x.Email);
             var callCountInDay = await _notificationRepository
                 .GetCalls(x => x.CalledOn >= DateTime.Now.Date && x.ManagerReceiver != null
-                        && directorEmails.Emails.ToList().Contains(x.ManagerReceiver));
+                                            && directorEmails.Contains(x.ManagerReceiver));
+            
             string? clientEmail;
             if (callCountInDay.Any())
             {
@@ -110,7 +117,7 @@ public class VoiceController : ControllerBase
             }
             else
             {
-                clientEmail = directorEmails.Emails.First();
+                clientEmail = directors.Managers.OrderBy(x => x.CreatedOn).Select(x => x.Email).First();
             }
 
             dial.Append(new Client().Identity(clientEmail));

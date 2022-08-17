@@ -1,6 +1,7 @@
 ﻿syntax = "proto3";
 
 import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 
 service BikeServiceGrpc {
   rpc GetManagerEmails(GetManagersByAccountEmailRequest) returns (GetManagersByAccountEmailResponse);
@@ -16,5 +17,10 @@ message GetManagersByAccountEmailRequest{
 }
 
 message GetManagersByAccountEmailResponse{
-  repeated string emails = 1;
+  repeated ManagerCall managers = 1;
+}
+
+message ManagerCall {
+  string email = 1;
+  google.protobuf.Timestamp createdOn = 2;
 }

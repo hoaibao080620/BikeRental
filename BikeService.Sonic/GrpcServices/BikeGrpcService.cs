@@ -146,7 +146,11 @@ public class BikeGrpcService : BikeServiceGrpc.BikeServiceGrpcBase
         var directors = await _unitOfWork.ManagerRepository.Find(x => x.IsSuperManager && x.IsActive);
         return new GetManagersByAccountEmailResponse
         {
-            Emails = {directors.Select(x => x.Email).ToList()}
+            Managers = { directors.Select(x => new ManagerCall
+            {
+                CreatedOn = x.CreatedOn.ToTimestamp(),
+                Email = x.Email
+            })}
         };
     }
 
@@ -200,13 +204,23 @@ public class BikeGrpcService : BikeServiceGrpc.BikeServiceGrpcBase
     {
         var currentBikeRentingId = await _bikeBusinessLogic.GetCurrentRentingBike(request.AccountPhone);
 
-        var managerEmails = currentBikeRentingId == 0 ? 
-            (await _unitOfWork.ManagerRepository.All()).Select(x => x.Email).ToList() :
-            (await _unitOfWork.BikeStationManagerRepository.GetManagerEmailsByBikeId(currentBikeRentingId)).ToList();
+        var directors = currentBikeRentingId == 0 ? 
+            (await _unitOfWork.ManagerRepository.All()).Select(x => new ManagerCall
+            {
+                CreatedOn = x.CreatedOn.ToTimestamp(),
+                Email = x.Email
+            }).ToList() :
+            (await _unitOfWork.BikeStationManagerRepository
+                .Find(x => x.BikeStation.Bikes.Any(xx => xx.Id == currentBikeRentingId)))
+            .Select(x => new ManagerCall
+            {
+                CreatedOn = x.CreatedOn.ToTimestamp(),
+                Email = x.Manager.Email
+            }).ToList();
         
         return new GetManagersByAccountEmailResponse
         {
-            Emails = { managerEmails }
+            Managers = { directors }
         };
     }
 }
