@@ -4,6 +4,7 @@ using Google.Protobuf.WellKnownTypes;
 using Grpc.Net.ClientFactory;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Driver.Linq;
 using NotificationService.DAL;
 using NotificationService.Hubs;
 using NotificationService.Models;
@@ -39,18 +40,9 @@ public class VoiceController : ControllerBase
     public async Task<IActionResult> ReceivePhoneCall([FromForm] VoiceRequest voiceRequest)
     {
         var response = new VoiceResponse();
-        // var gather = new Gather(
-        //         new List<Gather.InputEnum> {Twilio.TwiML.Voice.Gather.InputEnum.Dtmf},
-        //         numDigits: 1,
-        //         action: new Uri("voice/gather", UriKind.Relative),
-        //         method: HttpMethods.Post)
-        //     .Play(new Uri("https://bike-rental-fe.s3.amazonaws.com/redirect_call.mp3"));
-        // response.Append(gather);
-        // response.Redirect(new Uri("voice", UriKind.Relative), HttpMethod.Post);
         var dial = new Dial
         {
-            // Action = new Uri("HandleCompletedIncomingCall?email=testmanager@gmail.com", UriKind.Relative),
-            // Method = HttpMethod.Get,
+            Method = HttpMethod.Post,
             Record = Dial.RecordEnum.RecordFromAnswerDual,
             RecordingStatusCallback = new Uri("HandleCompletedRecording", UriKind.Relative),
             RecordingStatusCallbackMethod = HttpMethod.Get,
@@ -65,73 +57,30 @@ public class VoiceController : ControllerBase
             AccountPhone = voiceRequest.From
         });
 
-        var emails = managerEmails.Emails.Take(4).ToList();
-        emails.Add("token@gmail.com");
+        var callCountInDay = await _notificationRepository
+            .GetCalls(x => x.CalledOn >= DateTime.Now.Date && x.ManagerReceiver != null);
 
-        foreach (var managerEmail in emails)
+        string? clientEmail;
+        if (callCountInDay.Any())
         {
-            var client = new Client();
-            client.Identity(managerEmail);
-            client.Url = new Uri($"HandleCompletedIncomingCall?email={managerEmail}", UriKind.Relative);
-            client.Method = HttpMethod.Get;
-            dial.Append(client);
+            clientEmail = callCountInDay.GroupBy(x => x.ManagerReceiver)
+                .Select(x => new
+                {
+                    Receiver = x.Key,
+                    Count = x.Count()
+                }).OrderBy(x => x.Count).First().Receiver;
         }
-        
-        return Content(response.ToString(), "application/xml");
-    }
-
-    [HttpPost]
-    [Route("[action]")]
-    [Consumes("application/x-www-form-urlencoded")]
-    public async Task<IActionResult> Gather([FromForm] VoiceRequest voiceRequest)
-    {
-        var response = new VoiceResponse();
-        var dial = new Dial
+        else
         {
-            Action = new Uri("HandleCompletedIncomingCall?email=testmanager@gmail.com", UriKind.Relative),
-            Method = HttpMethod.Get,
-            Record = Dial.RecordEnum.RecordFromAnswerDual,
-            RecordingStatusCallback = new Uri("HandleCompletedRecording", UriKind.Relative),
-            RecordingStatusCallbackMethod = HttpMethod.Get,
-            RecordingStatusCallbackEvent = new List<Dial.RecordingEventEnum>
-            {
-                Dial.RecordingEventEnum.Completed
-            }
-        };
+            clientEmail = managerEmails.Emails.First();
+        }
 
-
-        // if (!string.IsNullOrEmpty(voiceRequest.Digits))
-        // {
-        //     switch (voiceRequest.Digits)
-        //     {
-        //         case "1":
-        //             response.Say("You need support. We will help!");
-        //             break;
-        //         case "2":
-        //             // var emails = (await _client.GetDirectorsAsync(new Empty())).Emails.Take(4).ToList();
-        //             // emails.ForEach(email =>
-        //             // {
-        //             //     dial.Append(new Client().Identity(email));
-        //             // });
-        //             dial.Append(new Client().Identity("testmanager@gmail.com"));
-        //             break;
-        //         default:
-        //             response.Say("Sorry, I don't understand that choice.").Pause();
-        //             response.Redirect(new Uri("voice", UriKind.Relative), HttpMethod.Post);
-        //             break;
-        //     }
-        // }
-        // else
-        // {
-        //     // If no input was sent, redirect to the /voice route
-        //     response.Redirect(new Uri("voice", UriKind.Relative), HttpMethod.Post);
-        // }
-        
-        dial.Append(new Client().Identity("testmanager@gmail.com"));
+        dial.Action = new Uri($"HandleCompletedIncomingCall?email={clientEmail}", UriKind.Relative);
+        dial.Append(new Client().Identity(clientEmail));
         response.Append(dial);
         return Content(response.ToString(), "application/xml");
     }
-    
+
     [HttpGet]
     [Route("[action]")]
     public async Task<IActionResult> ForwardPhone()
@@ -173,23 +122,23 @@ public class VoiceController : ControllerBase
         return Content(response.ToString(), "application/xml");
     }
 
-    [HttpGet]
+    [HttpPost]
     [Route("[action]")]
-    public async Task<IActionResult> HandleCompletedIncomingCall([FromQuery] string email)
+    [Consumes("application/x-www-form-urlencoded")]
+    public async Task<IActionResult> HandleCompletedIncomingCall([FromForm] VoiceRequest voiceRequest, [FromQuery] string email)
     {
-        var queryString = HttpUtility.ParseQueryString(HttpContext.Request.QueryString.Value!);
         await _notificationRepository.AddCall(new Call
         {
-            CallSid = queryString.Get("CallSid")!,
+            CallSid = voiceRequest.CallSid,
             CalledOn = DateTime.UtcNow,
-            Duration = Convert.ToDouble(queryString["DialCallDuration"]),
-            From = queryString.Get("From")!,
-            To = queryString.Get("To")!,
-            Status = queryString.Get("DialCallStatus")!,
-            Direction = queryString.Get("Direction")!,
-            RecordingUrl = queryString.Get("RecordingUrl"),
-            CallerCountry = queryString.Get("FromCountry")!,
-            CalledCountry =queryString.Get("ToCountry")!,
+            Duration = Convert.ToDouble(voiceRequest.DialCallDuration),
+            From = voiceRequest.From,
+            To = voiceRequest.To,
+            Status = voiceRequest.CallStatus,
+            Direction = voiceRequest.Direction,
+            RecordingUrl = voiceRequest.RecordingUrl,
+            CallerCountry = voiceRequest.FromCountry,
+            CalledCountry = voiceRequest.ToCountry,
             ManagerReceiver = email
         });
         

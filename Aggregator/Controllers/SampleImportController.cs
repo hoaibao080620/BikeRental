@@ -20,9 +20,8 @@ public class SampleImportController : ControllerBase
         var response = await client.GetStreamAsync(url);
         await using var memoryStream = new MemoryStream();
         await response.CopyToAsync(memoryStream);
-        
+        Response.Headers.Add("Content-Disposition", $"attachment;filename={url.Replace("/", string.Empty)}");
         return File(memoryStream.ToArray(), 
-            "text/csv", 
-            url.Replace("/", string.Empty));
+            System.Net.Mime.MediaTypeNames.Application.Octet);
     }
 }
