@@ -43,7 +43,7 @@ public class PaymentController : ControllerBase
     }
     
     [HttpGet]
-    public async Task<IActionResult> TestSendText(string email)
+    public async Task<IActionResult> TestSendText([FromQuery] string email)
     {
         await _messageQueuePublisher.PublishPaymentSucceededEvent(new PaymentSucceeded
         {
