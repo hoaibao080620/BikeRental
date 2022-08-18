@@ -1,16 +1,19 @@
 ﻿using System.Net.Http.Headers;
 using BikeBookingService.Const;
 using BikeBookingService.DAL;
+using Grpc.Net.ClientFactory;
 
 namespace BikeBookingService.Validations;
 
 public class BikeTrackingValidation : IBikeTrackingValidation
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly AccountServiceGrpc.AccountServiceGrpcClient _accountService;
 
-    public BikeTrackingValidation(IUnitOfWork unitOfWork)
+    public BikeTrackingValidation(IUnitOfWork unitOfWork, GrpcClientFactory grpcClientFactory)
     {
         _unitOfWork = unitOfWork;
+        _accountService = grpcClientFactory.CreateClient<AccountServiceGrpc.AccountServiceGrpcClient>("AccountService");
     }
     
     public ValueTask<bool> IsBikeCheckinOrCheckoutWrongTime(DateTime checkinTime)
@@ -19,16 +22,15 @@ public class BikeTrackingValidation : IBikeTrackingValidation
         return new ValueTask<bool>(localTime.Hour is >= 22 or < 6);
     }
 
-    public async ValueTask<bool> IsAccountHasEnoughPoint(string accountEmail, string token)
+    public async ValueTask<(bool, double)> IsAccountHasEnoughPoint(string accountEmail)
     {
-        using var httpClient = new HttpClient();
-        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", 
-            token.Replace("Bearer", string.Empty));
-        var result = await httpClient.GetStringAsync(
-            "https://bike-rental-account-service-1.herokuapp.com/account/" +
-            $"isAccountHasEnoughPoint?accountEmail={accountEmail}");
+        var currentRentingPoint = (await _unitOfWork.RentingPointRepository.All()).FirstOrDefault();
+        var accountInfo = await _accountService.GetAccountInfoAsync(new GetAccountInfoRequest
+        {
+            Email = accountEmail
+        });
 
-        return result == "true";
+        return (accountInfo.Point >= currentRentingPoint?.PointPerHour, currentRentingPoint.PointPerHour);
     }
 
     public async ValueTask<bool> IsAccountHasBikeRentingNotFullyPaid(string accountEmail)

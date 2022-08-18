@@ -87,11 +87,9 @@ public class BikeTrackingController : ControllerBase
         // var isBikeCheckinWrongTime = await _bikeTrackingValidation.IsBikeCheckinOrCheckoutWrongTime(bikeCheckinDto.CheckinTime);
         // if (isBikeCheckinWrongTime) return BadRequest("Bạn không thể checkin trong khoảng thời gian sau 10h tối và trước 6h sáng!");
 
-        var isBikeHasEnoughPoint = await _bikeTrackingValidation.IsAccountHasEnoughPoint(
-            email,
-            Request.Headers[HeaderNames.Authorization]);
+        var (isBikeHasEnoughPoint, rentingPoint) = await _bikeTrackingValidation.IsAccountHasEnoughPoint(email);
         
-        if (!isBikeHasEnoughPoint) return BadRequest("Bạn phải có ít nhất 50 điểm trong tài khoản!");
+        if (!isBikeHasEnoughPoint) return BadRequest($"Bạn phải có ít nhất {rentingPoint} điểm trong tài khoản!");
 
         var isAccountHasBikeRentingPending = await _bikeTrackingValidation
             .IsAccountHasBikeRentingPending(email);
@@ -131,7 +129,7 @@ public class BikeTrackingController : ControllerBase
             
             // await LockAccount(email, Request.Headers[HeaderNames.Authorization]);
             return BadRequest("Tài khoản của bạn đã bị khóa và không thể thuê xe ở lần tới vì đã trả xe muộn (sau 22h), " +
-                              "liên hệ với chúng tôi qua hotline để mở tải khoản. Xin cảm ơn! (Đang test chưa khóa thật đâu)");
+                              "liên hệ với chúng tôi qua hotline để được hỗ trợ. Xin cảm ơn!");
         }
         catch (InvalidOperationException exception)
         {
