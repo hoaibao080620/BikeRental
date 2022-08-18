@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Globalization;
+using System.Text.Json;
 using BikeRental.MessageQueue.Commands;
 using BikeRental.MessageQueue.Events;
 using BikeRental.MessageQueue.Handlers;
@@ -6,6 +7,8 @@ using NotificationService.Consts;
 using NotificationService.DAL;
 using NotificationService.Hubs;
 using NotificationService.Models;
+using Twilio;
+using Twilio.Rest.Api.V2010.Account;
 
 namespace NotificationService.MessageQueue.MessageQueueHandlers;
 
@@ -48,5 +51,24 @@ public class BikeCheckoutCommandHandler : IMessageQueueHandler
         }
 
         await Task.WhenAll(tasks);
+        
+        var accountSid = Environment.GetEnvironmentVariable("Account_Sid");
+        var authToken = Environment.GetEnvironmentVariable("Twilio_Account_Auth_Token");
+        TwilioClient.Init(accountSid, authToken);
+
+        var phoneNumber = notificationCommand.AccountEmail.Split("@")[0];
+        
+        var asiaTimezone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Bangkok");
+        var localDateTimeAtVietnam = TimeZoneInfo.ConvertTimeFromUtc(
+            notificationCommand.CheckoutOn, asiaTimezone);
+        
+        await MessageResource.CreateAsync(
+            body: $"Bạn vừa trả xe có mã {notificationCommand.BikeCode} thành công tại trạm " +
+                  $"{notificationCommand.BikeStationName} vào lúc {localDateTimeAtVietnam.ToString(CultureInfo.InvariantCulture)}." +
+                  $"Tổng chi phí của chuyến đi là {notificationCommand.RentingPoint} điểm," +
+                  " xin cảm ơn vì đã sử dụng dịch vụ của chúng tôi!",
+            from: new Twilio.Types.PhoneNumber("+19379091267"),
+            to: new Twilio.Types.PhoneNumber($"+{phoneNumber}")
+        );
     }
 }
