@@ -120,7 +120,7 @@ public class UserBusinessLogic : IUserBusinessLogic
             await _oktaClient.UpdateOktaUserPassword(userUpdated.OktaUserId!, user.Password);
         }
 
-        if (originalRole != user.RoleName)
+        if (originalRole != newUserUpdated.RoleName)
         {
             await UpdateOktaUserGroup(originalRole, newUserUpdated.RoleName, newUserUpdated.OktaUserId!);
             await _messageQueuePublisher.PublishUserRoleUpdatedEvent(new UserRoleUpdated
