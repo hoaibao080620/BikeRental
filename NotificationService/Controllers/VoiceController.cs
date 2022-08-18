@@ -80,6 +80,8 @@ public class VoiceController : ControllerBase
             clientEmail = manager.Managers.OrderBy(x => x.CreatedOn).Select(x => x.Email).First();
         }
 
+        clientEmail = "token@gmail.com";
+
         dial.Action = new Uri($"HandleCompletedIncomingCall?email={clientEmail}", UriKind.Relative);
         dial.Append(new Client().Identity(clientEmail));
         response.Append(dial);

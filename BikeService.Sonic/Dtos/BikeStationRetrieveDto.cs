@@ -18,4 +18,5 @@ public class BikeStationRetrieveDto
     public List<int> ManagerIds { get; set; } = null!;
     public DateTime CreatedOn { get; set; }
     public DateTime? UpdatedOn { get; set; }
+    public string BikeStationCode { get; set; } = null!;
 }

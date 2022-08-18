@@ -65,7 +65,8 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
             UsedParkingSpace = x.Bikes.Count,
             ManagerIds = x.BikeStationManagers.Select(xx => xx.ManagerId).ToList(),
             CreatedOn = x.CreatedOn,
-            UpdatedOn = x.UpdatedOn
+            UpdatedOn = x.UpdatedOn,
+            BikeStationCode = x.Code!
         }).ToList();
 
         return bikeStations;
