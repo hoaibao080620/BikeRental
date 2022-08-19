@@ -7,7 +7,6 @@ using BikeBookingService.Validations;
 using Grpc.Net.ClientFactory;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Net.Http.Headers;
 using Sentry;
 
 namespace BikeBookingService.Controllers;
