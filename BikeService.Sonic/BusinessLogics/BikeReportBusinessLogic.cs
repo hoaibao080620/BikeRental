@@ -41,7 +41,8 @@ public class BikeReportBusinessLogic : IBikeReportBusinessLogic
             AssignToId = manager?.ManagerId,
             ImageUrl = imageUrl,
             AccountEmail = accountEmail,
-            Title = bikeReportInsertDto.Title
+            Title = bikeReportInsertDto.Title,
+            UpdatedOn = DateTime.UtcNow
         });
 
         await _unitOfWork.SaveChangesAsync();

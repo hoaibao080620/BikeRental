@@ -29,7 +29,8 @@ public class RentingPointController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetRentingPointHistory()
     {
-        var rentingPointHistory = await _unitOfWork.RentingPointHistoryRepository.All();
+        var rentingPointHistory = (await _unitOfWork.RentingPointHistoryRepository.All())
+            .OrderByDescending(x => x.CreatedOn);
         return Ok(rentingPointHistory);
     }
     

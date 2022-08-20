@@ -32,7 +32,8 @@ public class UserCreatedEventHandler : IMessageQueueHandler
             Point = 0,
             ExternalUserId = userCreatedMessage.Id,
             DateOfBirth = userCreatedMessage.DateOfBirth,
-            Address = userCreatedMessage.Address
+            Address = userCreatedMessage.Address,
+            UpdatedOn = DateTime.UtcNow
         });
     }
 }

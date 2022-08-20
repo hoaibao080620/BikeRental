@@ -80,11 +80,12 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
         var (latitude, longitude) = await _googleMapService.GetLocationOfAddress(bikeInsertDto.PlaceId);
         bikeStation.Latitude = latitude;
         bikeStation.Longitude = longitude;
+        bikeStation.UpdatedOn = DateTime.UtcNow;
         
         await _unitOfWork.BikeStationRepository.Add(bikeStation);
         await _unitOfWork.SaveChangesAsync();
 
-        var bikeStationCode = bikeStation.Id.ToString().PadLeft(6);
+        var bikeStationCode = bikeStation.Id.ToString().PadLeft(6, '0');
         bikeStation.Code = bikeStationCode;
         await _unitOfWork.SaveChangesAsync();
     }

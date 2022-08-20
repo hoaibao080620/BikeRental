@@ -27,7 +27,8 @@ public class UserReactivatedEventHandler : IMessageQueueHandler
         if(account is null) return;
 
         var builder = Builders<Account>.Update
-            .Set(x => x.IsActive, true);
+            .Set(x => x.IsActive, true)
+            .Set(x => x.UpdatedOn, DateTime.UtcNow);
         
         await _mongoService.UpdateAccount(account.Id, builder);
     }

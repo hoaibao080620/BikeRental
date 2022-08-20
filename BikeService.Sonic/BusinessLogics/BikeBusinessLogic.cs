@@ -93,7 +93,6 @@ public class BikeBusinessLogic : IBikeBusinessLogic
             bike.RentingCount = bikesRentingCountDict.GetValueOrDefault(bike.Id);
         }
 
-        var bikesss = bikes.Where(x => x.Id == 87);
         return bikes;
     }
 
@@ -108,6 +107,7 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         bike.CreatedOn = DateTime.UtcNow;
         bike.IsActive = true;
         bike.BikeCode = "Temp";
+        bike.UpdatedOn = DateTime.UtcNow;
 
         await _unitOfWork.SaveChangesAsync();
         bike.BikeCode = $"BR-{bike.Id.ToString().PadLeft(6, '0')}";
@@ -130,23 +130,24 @@ public class BikeBusinessLogic : IBikeBusinessLogic
 
     public async Task UpdateBike(BikeUpdateDto bikeInsertDto)
     {
-        var bike = _mapper.Map<Bike>(bikeInsertDto);
-        bike.UpdatedOn = DateTime.UtcNow;
-        var bikeStation = bike.BikeStationId.HasValue ?
-            await _unitOfWork.BikeStationRepository.GetById(bike.BikeStationId.Value) : null;
-        await _cacheService.Remove(string.Format(RedisCacheKey.SingleBike, bike.Id));
-        await _unitOfWork.BikeRepository.Update(bike);
+        var bikeFromDb = await _unitOfWork.BikeRepository.GetById(bikeInsertDto.Id) ?? throw new ArgumentException();
+        _mapper.Map(bikeInsertDto, bikeFromDb);
+        bikeFromDb.UpdatedOn = DateTime.UtcNow;
+        var bikeStation = bikeFromDb.BikeStationId.HasValue ?
+            await _unitOfWork.BikeStationRepository.GetById(bikeFromDb.BikeStationId.Value) : null;
+        await _cacheService.Remove(string.Format(RedisCacheKey.SingleBike, bikeFromDb.Id));
+        await _unitOfWork.BikeRepository.Update(bikeFromDb);
         await _unitOfWork.SaveChangesAsync();
 
         var bikeStationColor = (await _unitOfWork.BikeStationColorRepository
-            .Find(x => x.BikeStationId == bike.BikeStationId)).FirstOrDefault();
+            .Find(x => x.BikeStationId == bikeFromDb.BikeStationId)).FirstOrDefault();
         await _messageQueuePublisher.PublishBikeUpdatedEvent(new BikeUpdated
         {
-            Id = bike.Id,
-            BikeStationId = bike.BikeStationId,
+            Id = bikeFromDb.Id,
+            BikeStationId = bikeFromDb.BikeStationId,
             BikeStationName = bikeStation?.Name,
-            Description = bike.Description,
-            LicensePlate = bike.BikeCode,
+            Description = bikeFromDb.Description,
+            LicensePlate = bikeFromDb.BikeCode,
             MessageType = MessageType.BikeUpdated,
             BikeStationCode = bikeStation?.Code,
             Color = bikeStationColor?.Color

@@ -32,7 +32,8 @@ public class UserUpdatedEventHandler : IMessageQueueHandler
             .Set(x => x.PhoneNumber, userUpdatedMessage.PhoneNumber)
             .Set(x => x.UpdatedOn, DateTime.UtcNow)
             .Set(x => x.DateOfBirth, userUpdatedMessage.DateOfBirth)
-            .Set(x => x.Address, userUpdatedMessage.Address);
+            .Set(x => x.Address, userUpdatedMessage.Address)
+            .Set(x => x.UpdatedOn, DateTime.UtcNow);
 
         var imageUrl = await GetImageUrl(userUpdatedMessage.ImageBase64, userUpdatedMessage.Id);
 

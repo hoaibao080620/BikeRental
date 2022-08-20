@@ -31,7 +31,8 @@ public class BikeCheckedOutEventHandler : IMessageQueueHandler
 
         var pointAfterMinus = account.Point - payload.RentingPoint;
         var updateBuilder = Builders<Account>.Update
-            .Set(x => x.Point, pointAfterMinus);
+            .Set(x => x.Point, pointAfterMinus)
+            .Set(x => x.UpdatedOn, DateTime.UtcNow);
         await _mongoService.UpdateAccount(account.Id, updateBuilder);
         
         if (pointAfterMinus < 0)

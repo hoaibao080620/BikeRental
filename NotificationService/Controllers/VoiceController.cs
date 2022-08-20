@@ -4,7 +4,6 @@ using Google.Protobuf.WellKnownTypes;
 using Grpc.Net.ClientFactory;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Driver.Linq;
 using NotificationService.DAL;
 using NotificationService.Hubs;
 using NotificationService.Models;
@@ -37,7 +36,25 @@ public class VoiceController : ControllerBase
     [HttpPost]
     [Route("[action]")]
     [Consumes("application/x-www-form-urlencoded")]
-    public async Task<IActionResult> ReceivePhoneCall([FromForm] VoiceRequest voiceRequest)
+    public IActionResult ReceivePhoneCall([FromForm] VoiceRequest voiceRequest)
+    {
+        var response = new VoiceResponse();
+
+        var gather = new Gather(
+                new List<Gather.InputEnum> {Twilio.TwiML.Voice.Gather.InputEnum.Dtmf},
+                numDigits: 1,
+                action: new Uri("voice/gather", UriKind.Relative),
+                method: HttpMethods.Post)
+            .Play(new Uri("https://bike-rental-fe.s3.amazonaws.com/redirect_call.mp3"));
+        response.Append(gather);
+        response.Redirect(new Uri("receivePhoneCall", UriKind.Relative), HttpMethod.Post);
+        return Content(response.ToString(), "application/xml");
+    }
+
+    [HttpPost]
+    [Route("[action]")]
+    [Consumes("application/x-www-form-urlencoded")]
+    public async Task<IActionResult> Gather([FromForm] VoiceRequest voiceRequest)
     {
         var response = new VoiceResponse();
         var dial = new Dial
@@ -52,22 +69,65 @@ public class VoiceController : ControllerBase
             }
         };
 
+        var email = string.Empty;
+        if (!string.IsNullOrEmpty(voiceRequest.Digits))
+        {
+            switch (voiceRequest.Digits)
+            {
+                case "1":
+                    email = await GetManagerEmailToCall(voiceRequest.From);
+                    break;
+                case "2":
+                    email = await GetDirectorEmailToCall();
+                    break;
+                default:
+                    response.Say("Sorry, I don't understand that choice.").Pause();
+                    response.Redirect(new Uri("ReceivePhoneCall", UriKind.Relative), HttpMethod.Post);
+                    break;
+            }
+        }
+        else
+        {
+            // If no input was sent, redirect to the /voice route
+            response.Redirect(new Uri("ReceivePhoneCall", UriKind.Relative), HttpMethod.Post);
+        }
+        
+        dial.Append(new Client().Identity(email));
+        dial.Action = new Uri($"HandleCompletedIncomingCall?email={email}", UriKind.Relative);
+        response.Append(dial);
+        return Content(response.ToString(), "application/xml");
+    }
+
+    private async Task<string> GetManagerEmailToCall(string from)
+    {
         var manager = await _client.GetManagerEmailsAsync(new GetManagersByAccountEmailRequest
         {
-            AccountPhone = voiceRequest.From
+            AccountPhone = from
         });
 
-        var managerEmails = manager.Managers.Select(x => x.Email);
-        
-        var callCountInDay = (await _notificationRepository
-            .GetCalls(x => x.CalledOn >= DateTime.Now.Date && x.ManagerReceiver != null
-            && managerEmails.Contains(x.ManagerReceiver))).GroupBy(x => x.ManagerReceiver)
-            .ToDictionary(x => x.Key!, x=> x.Count());
+        var clientEmail = await GetClientEmail(manager);
+        return clientEmail;
+    }
+    
+    private async Task<string> GetDirectorEmailToCall()
+    {
+        var directors = await _client.GetDirectorsAsync(new Empty());
+        var clientEmail = await GetClientEmail(directors);
+        return clientEmail;
+    }
 
+    private async Task<string> GetClientEmail(GetManagersByAccountEmailResponse response)
+    {
+        var directorEmails = response.Managers.Select(x => x.Email);
+        var callCountInDay = (await _notificationRepository
+                .GetCalls(x => x.CalledOn >= DateTime.Now.Date && x.ManagerReceiver != null
+                                                               && directorEmails.Contains(x.ManagerReceiver))).GroupBy(x => x.ManagerReceiver)
+            .ToDictionary(x => x.Key!, x=> x.Count());
+            
         string? clientEmail;
         if (callCountInDay.Any())
         {
-            clientEmail = manager.Managers
+            clientEmail = response.Managers
                 .Select(x => new
                 {
                     Receiver = x.Email,
@@ -77,16 +137,12 @@ public class VoiceController : ControllerBase
         }
         else
         {
-            clientEmail = manager.Managers.OrderBy(x => x.CreatedOn).Select(x => x.Email).First();
+            clientEmail = response.Managers.OrderBy(x => x.CreatedOn).Select(x => x.Email).First();
         }
 
-        clientEmail = "token@gmail.com";
+        return clientEmail;
+    } 
 
-        dial.Action = new Uri($"HandleCompletedIncomingCall?email={clientEmail}", UriKind.Relative);
-        dial.Append(new Client().Identity(clientEmail));
-        response.Append(dial);
-        return Content(response.ToString(), "application/xml");
-    }
 
     [HttpGet]
     [Route("[action]")]
@@ -96,7 +152,7 @@ public class VoiceController : ControllerBase
         var phoneNumber = HttpUtility.ParseQueryString(HttpContext.Request.QueryString.Value!)["to"]?
             .Replace(",", "");
         var response = new VoiceResponse();
-        var dial = new Dial(callerId: "+19379091267");
+        var dial = new Dial(callerId: "+19133983864");
         if (string.IsNullOrEmpty(phoneNumber))
         {
             var directors = await _client.GetDirectorsAsync(new Empty());

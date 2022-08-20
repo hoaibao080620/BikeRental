@@ -49,21 +49,25 @@ public class AccountController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAllAccounts()
     {
-        var accounts = await _mongoService.FindAccounts(_ => true);
+        var accounts = (await _mongoService.FindAccounts(_ => true))
+            .OrderByDescending(x => x.UpdatedOn)
+            .ThenByDescending(x => x.CreatedOn);
         return Ok(accounts);
     }
     
     [HttpGet]
     public async Task<IActionResult> GetAllAccountTransactions()
     {
-        var accounts = await _mongoService.FindAccountTransactions(_ => true);
+        var accounts = (await _mongoService.FindAccountTransactions(_ => true))
+            .OrderByDescending(x => x.CreatedOn);
         return Ok(accounts);
     }
     
     [HttpGet]
     public async Task<IActionResult> GetAllAccountPointHistories()
     {
-        var accounts = await _mongoService.FindAccountPointHistories(_ => true);
+        var accounts = (await _mongoService.FindAccountPointHistories(_ => true))
+            .OrderByDescending(x => x.CreatedOn);
         return Ok(accounts);
     }
 
@@ -72,8 +76,9 @@ public class AccountController : ControllerBase
     {
         var accountEmail = string.IsNullOrEmpty(email) ? HttpContext.User.Claims.FirstOrDefault(x => 
             x.Type == ClaimTypes.NameIdentifier)!.Value : email;
-        var paymentHistories = await _mongoService
-            .FindAccountTransactions(x => x.AccountEmail == accountEmail);
+        var paymentHistories = (await _mongoService
+            .FindAccountTransactions(x => x.AccountEmail == accountEmail))
+            .OrderByDescending(x => x.CreatedOn);
 
         return Ok(paymentHistories);
     }
@@ -84,8 +89,9 @@ public class AccountController : ControllerBase
         var accountEmail = string.IsNullOrEmpty(email) ? HttpContext.User.Claims.FirstOrDefault(x => 
             x.Type == ClaimTypes.NameIdentifier)!.Value : email;
         
-        var paymentHistories = await _mongoService
-            .FindAccountPointHistories(x => x.AccountEmail == accountEmail);
+        var paymentHistories = (await _mongoService
+            .FindAccountPointHistories(x => x.AccountEmail == accountEmail))
+            .OrderByDescending(x => x.CreatedOn);
 
         return Ok(paymentHistories);
     }

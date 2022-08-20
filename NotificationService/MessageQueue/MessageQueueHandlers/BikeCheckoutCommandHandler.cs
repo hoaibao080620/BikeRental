@@ -7,8 +7,10 @@ using NotificationService.Consts;
 using NotificationService.DAL;
 using NotificationService.Hubs;
 using NotificationService.Models;
+using NotificationService.Services;
 using Twilio;
 using Twilio.Rest.Api.V2010.Account;
+using Twilio.Types;
 
 namespace NotificationService.MessageQueue.MessageQueueHandlers;
 
@@ -16,11 +18,16 @@ public class BikeCheckoutCommandHandler : IMessageQueueHandler
 {
     private readonly INotificationRepository _notificationRepository;
     private readonly INotificationHub _notificationHub;
+    private readonly IMessageService _messageService;
 
-    public BikeCheckoutCommandHandler(INotificationRepository notificationRepository, INotificationHub notificationHub)
+    public BikeCheckoutCommandHandler(
+        INotificationRepository notificationRepository, 
+        INotificationHub notificationHub,
+        IMessageService messageService)
     {
         _notificationRepository = notificationRepository;
         _notificationHub = notificationHub;
+        _messageService = messageService;
     }
     
     public async Task Handle(string message)
@@ -52,23 +59,17 @@ public class BikeCheckoutCommandHandler : IMessageQueueHandler
 
         await Task.WhenAll(tasks);
         
-        // var accountSid = Environment.GetEnvironmentVariable("Account_Sid");
-        // var authToken = Environment.GetEnvironmentVariable("Twilio_Account_Auth_Token");
-        // TwilioClient.Init(accountSid, authToken);
-        //
-        // var phoneNumber = notificationCommand.AccountEmail.Split("@")[0];
-        //
-        // var asiaTimezone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Bangkok");
-        // var localDateTimeAtVietnam = TimeZoneInfo.ConvertTimeFromUtc(
-        //     notificationCommand.CheckoutOn, asiaTimezone);
-        //
-        // await MessageResource.CreateAsync(
-        //     body: $"Bạn vừa trả xe có mã {notificationCommand.BikeCode} thành công tại trạm " +
-        //           $"{notificationCommand.BikeStationName} vào lúc {localDateTimeAtVietnam.ToString(CultureInfo.InvariantCulture)}." +
-        //           $"Tổng chi phí của chuyến đi là {notificationCommand.RentingPoint} điểm," +
-        //           " xin cảm ơn vì đã sử dụng dịch vụ của chúng tôi!",
-        //     from: new Twilio.Types.PhoneNumber("+19379091267"),
-        //     to: new Twilio.Types.PhoneNumber($"+{phoneNumber}")
-        // );
+        var phoneNumber = notificationCommand.AccountEmail.Split("@")[0];
+        var asiaTimezone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Bangkok");
+        var localDateTimeAtVietnam = TimeZoneInfo.ConvertTimeFromUtc(
+            notificationCommand.CheckoutOn, asiaTimezone);
+
+        var body = $"Bạn vừa trả xe có mã {notificationCommand.BikeCode} thành công tại trạm " +
+                   $"{notificationCommand.BikeStationName} vào lúc {localDateTimeAtVietnam.ToString(CultureInfo.InvariantCulture)}." +
+                   $"Tổng chi phí của chuyến đi là {notificationCommand.RentingPoint} điểm," +
+                   " xin cảm ơn vì đã sử dụng dịch vụ của chúng tôi!";
+
+
+        await _messageService.SendMessage(phoneNumber, body);
     }
 }

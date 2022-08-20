@@ -5,6 +5,7 @@ using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using NotificationService.DAL;
 using NotificationService.Hubs;
+using NotificationService.Services;
 
 namespace NotificationService.Extensions;
 
@@ -15,6 +16,7 @@ public static class ServiceLifetimeServiceCollectionExtension
         serviceCollection.AddScoped<INotificationHub, NotificationHub>();
         serviceCollection.AddScoped<IConsumer, SqsConsumer>();
         serviceCollection.AddScoped<INotificationRepository, NotificationRepository>();
+        serviceCollection.AddScoped<IMessageService, MessageService>();
     }
     
     public static void AddSingletonServices(this IServiceCollection serviceCollection)
