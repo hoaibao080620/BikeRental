@@ -129,24 +129,27 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
             bikeStation.Longitude = longitude;
         }
 
+        var currentManagers = (await _unitOfWork.BikeStationManagerRepository
+            .Find(x => x.BikeStationId == bikeInsertDto.Id));
+
+        foreach (var currentManager in currentManagers)
+        {
+            await _unitOfWork.BikeStationManagerRepository.Delete(currentManager);
+
+        }
+        
         if (bikeInsertDto.ManagerIds.Any(x => x != 0))
         {
             foreach (var managerId in bikeInsertDto.ManagerIds.Where(x => x != 0))
             {
-                var isAlreadySave = await _unitOfWork.BikeStationManagerRepository
-                    .Exists(x => x.ManagerId == managerId && x.BikeStationId == bikeStation.Id);
-
-                if (!isAlreadySave)
+                await _unitOfWork.BikeStationManagerRepository.Add(new BikeStationManager
                 {
-                    await _unitOfWork.BikeStationManagerRepository.Add(new BikeStationManager
-                    {
-                        ManagerId = managerId,
-                        BikeStationId = bikeStation.Id,
-                        IsActive = true,
-                        CreatedOn = DateTime.UtcNow,
-                        UpdatedOn = DateTime.UtcNow
-                    });
-                }
+                    ManagerId = managerId,
+                    BikeStationId = bikeStation.Id,
+                    IsActive = true,
+                    CreatedOn = DateTime.UtcNow,
+                    UpdatedOn = DateTime.UtcNow
+                });
             }
         }
         
