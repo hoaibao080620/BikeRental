@@ -62,11 +62,13 @@ public class BikeBusinessLogic : IBikeBusinessLogic
 
     public async Task<List<BikeRetrieveDto>> GetBikes(string managerEmail)
     {
+        var manager = await _unitOfWork.ManagerRepository.Exists(x => x.Email == managerEmail);
+        
         var isSuperManager =
             await _unitOfWork.ManagerRepository.Exists(x => x.Email == managerEmail && x.IsSuperManager);
         var bikes = (await _unitOfWork.BikeRepository
                 .Find(x => isSuperManager || x.BikeStation != null && x.BikeStation.BikeStationManagers
-                    .Any(b => b.Manager.Email == managerEmail)))
+                    .Any(b => b.Manager.Email == managerEmail) || !manager))
                 .AsNoTracking().Select(b => new BikeRetrieveDto
                 {
                     BikeStationId = b.BikeStationId,

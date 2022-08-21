@@ -51,10 +51,12 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
 
     public async Task<List<BikeStationRetrieveDto>> GetAllStationBikes(string email)
     {
+        var manager = await _unitOfWork.ManagerRepository.Exists(x => x.Email == email);
+
         var isSuperManager =
             await _unitOfWork.ManagerRepository.Exists(x => x.Email == email && x.IsSuperManager);
         var stationBikes = await _unitOfWork.BikeStationRepository.Find(x => 
-            isSuperManager || x.BikeStationManagers.Any(xx => xx.Manager.Email == email));
+            isSuperManager || !manager || x.BikeStationManagers.Any(xx => xx.Manager.Email == email));
         var bikeStations = stationBikes.Select(x => new BikeStationRetrieveDto
         {
             Description = x.Description,
