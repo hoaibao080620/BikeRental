@@ -76,9 +76,11 @@ public class VoiceController : ControllerBase
             {
                 case "1":
                     email = await GetManagerEmailToCall(voiceRequest.From);
+                    email = "token@gmail.com";
                     break;
                 case "2":
                     email = await GetDirectorEmailToCall();
+                    email = "testmanager@gmail.com";
                     break;
                 default:
                     response.Say("Sorry, I don't understand that choice.").Pause();
@@ -207,9 +209,11 @@ public class VoiceController : ControllerBase
         switch (voiceRequest.CallStatus)
         {
             case "in-progress":
+                Console.WriteLine(client.Replace("client:", string.Empty));
                 await _notificationHub.PushUserAnswerPhoneCall(client.Replace("client:", string.Empty));
                 break;
             default:
+                Console.WriteLine("Delete");
                 await _notificationRepository.AddCall(new Call
                 {
                     CallSid = voiceRequest.CallSid,
