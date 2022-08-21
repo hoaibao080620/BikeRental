@@ -330,6 +330,31 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
         });
     }
 
+    public async Task<List<BikeTrackingRetrieveDto>> GetAllBikeTracking()
+    {
+        var bikesTracking = (await _unitOfWork.BikeRepository
+                .All())
+            .AsNoTracking()
+            .Select(x => new BikeTrackingRetrieveDto
+            {
+                BikeId = x.Id,
+                LicensePlate = x.BikeCode,
+                BikeStationColor = x.Color,
+                BikeStationId = x.BikeStationId,
+                BikeStationName = x.BikeStationName,
+                Description = x.Description,
+                IsRenting = x.BikeLocationTrackings.Any(b => b.IsActive && b.BikeId == x.Id),
+                LastAddress = x.BikeLocationTrackings.Any(b => b.IsActive && b.BikeId == x.Id) ?
+                    x.BikeLocationTrackings.First(b => b.IsActive && b.BikeId == x.Id).Address : null,
+                LastLatitude = x.BikeLocationTrackings.Any(b => b.IsActive && b.BikeId == x.Id) ?
+                    x.BikeLocationTrackings.First(b => b.IsActive && b.BikeId == x.Id).Latitude : null,
+                LastLongitude  = x.BikeLocationTrackings.Any(b => b.IsActive && b.BikeId == x.Id) ?
+                    x.BikeLocationTrackings.First(b => b.IsActive && b.BikeId == x.Id).Longitude : null,
+            }).ToList();
+
+        return bikesTracking;
+    }
+
     private async Task<Bike> GetBikeById(int bikeId)
     {
         var bike = await _unitOfWork.BikeRepository.GetById(bikeId) ?? throw new InvalidOperationException();

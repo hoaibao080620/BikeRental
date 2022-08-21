@@ -53,6 +53,13 @@ public class BikeTrackingController : ControllerBase
     }
     
     [HttpGet]
+    public async Task<IActionResult> GetAllBikesTracking()
+    {
+        var histories = await _bikeTrackingBusinessLogic.GetAllBikeTracking();
+        return Ok(histories);
+    }
+    
+    [HttpGet]
     public async Task<IActionResult> GetBikesTracking()
     {
         var email = HttpContext.User.Claims.FirstOrDefault(x => 

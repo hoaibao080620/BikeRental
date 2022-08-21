@@ -238,13 +238,13 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
         BikeStationRetrieveParameter bikeStationRetrieveParameter, 
         string email)
     {
-        var key = string.Format(RedisCacheKey.BikeStationNearMeCache, email);
-        var cache = await _distributedCache.GetStringAsync(key);
-
-        if (!string.IsNullOrEmpty(cache))
-        {
-            return JsonSerializer.Deserialize<List<BikeStationNearMeDto>>(cache) ?? new List<BikeStationNearMeDto>();
-        }
+        // var key = string.Format(RedisCacheKey.BikeStationNearMeCache, email);
+        // var cache = await _distributedCache.GetStringAsync(key);
+        //
+        // if (!string.IsNullOrEmpty(cache))
+        // {
+        //     return JsonSerializer.Deserialize<List<BikeStationNearMeDto>>(cache) ?? new List<BikeStationNearMeDto>();
+        // }
         
         var bikeStations = (await _unitOfWork.BikeStationRepository.All()).Select(x => new BikeStationNearMeDto
         {
@@ -285,10 +285,10 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
         }
         
         var bikeStationsNearMe = bikeStations.OrderBy(x => x.Distance).ToList();
-        await _distributedCache.SetStringAsync(key, JsonSerializer.Serialize(bikeStationsNearMe), new DistributedCacheEntryOptions
-        {
-            AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(1)
-        });
+        // await _distributedCache.SetStringAsync(key, JsonSerializer.Serialize(bikeStationsNearMe), new DistributedCacheEntryOptions
+        // {
+        //     AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(1)
+        // });
         return bikeStationsNearMe;
     }
 
