@@ -25,7 +25,7 @@ public class UserDeletedEventHandler : IMessageQueueHandler
         
         if(account is null) return;
 
-        await _unitOfWork.AccountRepository.Delete(account);
+        account.IsActive = false;
         await _unitOfWork.SaveChangesAsync();
     }
 }

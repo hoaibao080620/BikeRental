@@ -25,7 +25,10 @@ public class UserDeletedEventHandler : IMessageQueueHandler
         
         if(manager is null) return;
 
-        await _unitOfWork.ManagerRepository.Delete(manager);
+        var bikeStationManagers = 
+            await _unitOfWork.BikeStationManagerRepository.Find(x => x.Manager.ExternalId == userDeleted.UserId);
+        bikeStationManagers.ToList().ForEach(x => _unitOfWork.BikeStationManagerRepository.Delete(x));
+        manager.IsActive = false;
         await _unitOfWork.SaveChangesAsync();
     }
 }
