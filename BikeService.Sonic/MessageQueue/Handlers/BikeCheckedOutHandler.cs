@@ -25,7 +25,7 @@ public class BikeCheckedOutHandler : IMessageQueueHandler
 
         var bike = await _unitOfWork.BikeRepository.GetById(payload.BikeId);
         var checkOutBikeStation = (await _unitOfWork.BikeStationRepository
-            .Find(x => x.Code == payload.BikeCode)).FirstOrDefault();
+            .Find(x => x.Bikes.Any(xx => xx.BikeCode == payload.BikeCode))).FirstOrDefault();
         if(bike is null || checkOutBikeStation is null) return;
 
         bike.Status = BikeStatus.Available;
