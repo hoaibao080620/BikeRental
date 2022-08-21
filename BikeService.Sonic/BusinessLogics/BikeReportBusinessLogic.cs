@@ -66,6 +66,7 @@ public class BikeReportBusinessLogic : IBikeReportBusinessLogic
         return (await _unitOfWork.BikeReportRepository
                 .Find(expression))
             .AsNoTracking()
+            .OrderByDescending(x => x.UpdatedOn)
             .Select(x => new BikeReportRetriveDto
             {
                 Id = x.Id,
@@ -96,6 +97,7 @@ public class BikeReportBusinessLogic : IBikeReportBusinessLogic
     {
         return (await _unitOfWork.BikeReportRepository
                 .All())
+            .OrderByDescending(x => x.UpdatedOn)
             .AsNoTracking()
             .Select(x => new BikeReportRetriveDto
             {

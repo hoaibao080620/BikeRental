@@ -38,7 +38,7 @@ public class UserController : ControllerBase
     {
         var email = HttpContext.User.Claims.FirstOrDefault(x => 
             x.Type == ClaimTypes.NameIdentifier)!.Value;
-        var users = await _userBusinessLogic.GetUsers(email);
+        var users = (await _userBusinessLogic.GetUsers(email)).OrderByDescending(x => x.UpdatedOn);
         return Ok(users);
     }
     
@@ -46,7 +46,7 @@ public class UserController : ControllerBase
     [HttpGet("{userId}")]
     public async Task<IActionResult> GetUser(string userId)
     {
-        var users = await _userBusinessLogic.GetUserById(userId);
+        var users = (await _userBusinessLogic.GetUserById(userId));
         return Ok(users);
     }
     
@@ -85,7 +85,7 @@ public class UserController : ControllerBase
     [Route("[action]")]
     public async Task<IActionResult> GetManagers()
     {
-        var users = await _userBusinessLogic.GetManagers();
+        var users =( await _userBusinessLogic.GetManagers()).OrderByDescending(x => x.UpdatedOn);
         return Ok(users);
     }
     

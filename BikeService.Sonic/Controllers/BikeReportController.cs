@@ -25,7 +25,7 @@ public class BikeReportController : ControllerBase
         var email = HttpContext.User.Claims.FirstOrDefault(x => 
             x.Type == ClaimTypes.NameIdentifier)!.Value;
 
-        var reports = await _bikeReportBusinessLogic.GetBikeReports(email);
+        var reports = (await _bikeReportBusinessLogic.GetBikeReports(email));
         return Ok(reports);
     }
     

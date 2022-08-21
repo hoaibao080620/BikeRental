@@ -40,14 +40,16 @@ public class BikeStationController : ControllerBase
     {
         var email = HttpContext.User.Claims.FirstOrDefault(x => 
             x.Type == ClaimTypes.NameIdentifier)!.Value;
-        var bikeStations = await _bikeStationBusinessLogic.GetAllStationBikes(email);
+        var bikeStations = (await _bikeStationBusinessLogic.GetAllStationBikes(email))
+            .OrderByDescending(x => x.UpdatedOn);
         return Ok(bikeStations);
     }
     
     [HttpGet]
     public async Task<IActionResult> GetAllAdminBikeStations()
     {
-        var bikeStations = await _bikeStationBusinessLogic.GetAllAdminBikeStation();
+        var bikeStations = (await _bikeStationBusinessLogic.GetAllAdminBikeStation())
+            .OrderByDescending(x => x.UpdatedOn);
         return Ok(bikeStations);
     }
     
