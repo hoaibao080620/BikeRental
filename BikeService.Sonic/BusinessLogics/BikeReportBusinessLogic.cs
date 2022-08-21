@@ -20,9 +20,6 @@ public class BikeReportBusinessLogic : IBikeReportBusinessLogic
     
     public async Task CreateReport(BikeReportInsertDto bikeReportInsertDto, string accountEmail)
     {
-        var manager = (await _unitOfWork.BikeStationManagerRepository
-            .Find(x => x.BikeStation.Bikes.Any(b => x.Id == bikeReportInsertDto.BikeId))).FirstOrDefault();
-
         string? imageUrl = null;
         if (!string.IsNullOrEmpty(bikeReportInsertDto.ImageBase64))
         {
@@ -38,7 +35,6 @@ public class BikeReportBusinessLogic : IBikeReportBusinessLogic
             Status = BikeReportStatus.NoFix,
             ReportDescription = bikeReportInsertDto.ReportDescription,
             AccountPhoneNumber = $"+{accountEmail.Split("@")[0]}",
-            AssignToId = manager?.ManagerId,
             ImageUrl = imageUrl,
             AccountEmail = accountEmail,
             Title = bikeReportInsertDto.Title,
