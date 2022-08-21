@@ -90,6 +90,7 @@ public class BikeReportBusinessLogic : IBikeReportBusinessLogic
         bikeReport.Status = markReportAsResolveDto.Status;
         bikeReport.UpdatedOn = DateTime.UtcNow;
         bikeReport.CompletedOn = markReportAsResolveDto.Status == BikeReportStatus.Fixed ? DateTime.UtcNow : null;
+        bikeReport.AssignToId = markReportAsResolveDto.AssignToId;
         await _unitOfWork.SaveChangesAsync();
     }
 

@@ -43,7 +43,7 @@ public class VoiceController : ControllerBase
         var gather = new Gather(
                 new List<Gather.InputEnum> {Twilio.TwiML.Voice.Gather.InputEnum.Dtmf},
                 numDigits: 1,
-                action: new Uri("voice/gather", UriKind.Relative),
+                action: new Uri("gather", UriKind.Relative),
                 method: HttpMethods.Post)
             .Play(new Uri("https://bike-rental-fe.s3.amazonaws.com/redirect_call.mp3"));
         response.Append(gather);
@@ -75,7 +75,7 @@ public class VoiceController : ControllerBase
             switch (voiceRequest.Digits)
             {
                 case "1":
-                    email = await GetManagerEmailToCall(voiceRequest.From);
+                    email = "token@gmail.com";
                     break;
                 case "2":
                     email = await GetDirectorEmailToCall();
@@ -153,46 +153,15 @@ public class VoiceController : ControllerBase
             .Replace(",", "");
         var response = new VoiceResponse();
         var dial = new Dial(callerId: "+19133983864");
-        if (string.IsNullOrEmpty(phoneNumber))
-        {
-            var directors = await _client.GetDirectorsAsync(new Empty());
-            var directorEmails = directors.Managers.Select(x => x.Email);
-            var callCountInDay = (await _notificationRepository
-                    .GetCalls(x => x.CalledOn >= DateTime.Now.Date && x.ManagerReceiver != null
-                                    && directorEmails.Contains(x.ManagerReceiver))).GroupBy(x => x.ManagerReceiver)
-                .ToDictionary(x => x.Key!, x=> x.Count());
-            
-            string? clientEmail;
-            if (callCountInDay.Any())
+        dial.Number(phoneNumber,
+            statusCallback: new Uri($"HandleCompletedOutgoingCall?client={client}", UriKind.Relative),
+            statusCallbackMethod: HttpMethod.Post,
+            statusCallbackEvent: new List<Number.EventEnum>
             {
-                clientEmail = directors.Managers
-                    .Select(x => new
-                    {
-                        Receiver = x.Email,
-                        Count = callCountInDay.GetValueOrDefault(x.Email),
-                        ManagerCreatedOn = x.CreatedOn
-                    }).OrderBy(x => x.Count).ThenBy(x => x.ManagerCreatedOn).First().Receiver;
-            }
-            else
-            {
-                clientEmail = directors.Managers.OrderBy(x => x.CreatedOn).Select(x => x.Email).First();
-            }
-
-            dial.Append(new Client().Identity(clientEmail));
-            dial.Action = new Uri($"HandleCompletedIncomingCall?email={clientEmail}", UriKind.Relative);
-            dial.Method = HttpMethod.Get;
-        }
-        else
-        {
-            dial.Number(phoneNumber,
-                statusCallback: new Uri($"HandleCompletedOutgoingCall?client={client}", UriKind.Relative),
-                statusCallbackMethod: HttpMethod.Post,
-                statusCallbackEvent: new List<Number.EventEnum>
-                {
-                    Number.EventEnum.Answered, 
-                    Number.EventEnum.Completed,
-                });
-        }
+                Number.EventEnum.Answered, 
+                Number.EventEnum.Completed,
+            });
+        
         
         dial.Record = Dial.RecordEnum.RecordFromAnswerDual;
         dial.RecordingStatusCallback =

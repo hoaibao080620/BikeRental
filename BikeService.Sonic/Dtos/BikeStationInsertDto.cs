@@ -9,4 +9,5 @@ public class BikeStationInsertDto
     public int UsedParkingSpace { get; set; }
     public List<string>? Bikes { get; set; }
     public string PlaceId { get; set; } = null!;
+    public List<int> ManagerIds { get; set; } = null!;
 }

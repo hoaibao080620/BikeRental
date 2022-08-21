@@ -10,6 +10,7 @@ using BikeService.Sonic.Dtos.GoogleMapAPI;
 using BikeService.Sonic.MessageQueue.Publisher;
 using BikeService.Sonic.Models;
 using BikeService.Sonic.Services.Interfaces;
+using Grpc.Net.ClientFactory;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using BikeStationColor = BikeRental.MessageQueue.Events.BikeStationColor;
@@ -23,18 +24,23 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
     private readonly IDistributedCache _distributedCache;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
+    private readonly BikeBookingServiceGrpc.BikeBookingServiceGrpcClient _bookingClient;
+
     public BikeStationBusinessLogic(
         IUnitOfWork unitOfWork,
         IMapper mapper,
         IGoogleMapService googleMapService,
         IMessageQueuePublisher messageQueuePublisher,
-        IDistributedCache distributedCache)
+        IDistributedCache distributedCache,
+        GrpcClientFactory grpcClientFactory)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _googleMapService = googleMapService;
         _messageQueuePublisher = messageQueuePublisher;
         _distributedCache = distributedCache;
+        _bookingClient =
+            grpcClientFactory.CreateClient<BikeBookingServiceGrpc.BikeBookingServiceGrpcClient>("BikeBooking");
     }
     
     public async Task<BikeStationRetrieveDto> GetStationBike(int id)
@@ -84,6 +90,21 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
 
         var bikeStationCode = bikeStation.Id.ToString().PadLeft(6, '0');
         bikeStation.Code = bikeStationCode;
+        
+        if (bikeInsertDto.ManagerIds.Any(x => x != 0))
+        {
+            foreach (var managerId in bikeInsertDto.ManagerIds.Where(x => x != 0))
+            {
+                await _unitOfWork.BikeStationManagerRepository.Add(new BikeStationManager
+                {
+                    ManagerId = managerId,
+                    BikeStationId = bikeStation.Id,
+                    IsActive = true,
+                    CreatedOn = DateTime.UtcNow,
+                    UpdatedOn = DateTime.UtcNow
+                });
+            }
+        }
         await _unitOfWork.SaveChangesAsync();
     }
 
@@ -217,18 +238,33 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
 
     public async Task<List<BikeRetrieveDto>> GetBikeStationBike(int bikeStationId)
     {
-        var bikes = await _unitOfWork.BikeRepository.Find(x => x.BikeStationId == bikeStationId);
-
-        return bikes.AsNoTracking().Select(x => new BikeRetrieveDto
+        var bikes = (await _unitOfWork.BikeRepository.Find(x => x.BikeStationId == bikeStationId))
+            .AsNoTracking().Select(x => new BikeRetrieveDto
+            {
+                Id = x.Id,
+                BikeStationId = x.BikeStationId,
+                BikeStationName = x.BikeStation!.Name,
+                LicensePlate = x.BikeCode,
+                Description = x.Description,
+                UpdatedOn = x.UpdatedOn,
+                Status = x.Status
+            }).ToList();
+        
+        var bikesRentingCount = await _bookingClient.GetBikesRentingCountAsync(new GetBikesRentingCountRequest
         {
-            Id = x.Id,
-            BikeStationId = x.BikeStationId,
-            BikeStationName = x.BikeStation!.Name,
-            LicensePlate = x.BikeCode,
-            Description = x.Description,
-            UpdatedOn = x.UpdatedOn,
-            Status = x.Status
-        }).ToList();
+            Ids = {bikes.Select(x => x.Id)}
+        });
+
+        var bikesRentingCountDict = bikesRentingCount.BikesRentingCount
+            .ToList()
+            .ToDictionary(x => x.BikeId, x => x.RentingCount);
+
+        foreach (var bike in bikes)
+        {
+            bike.RentingCount = bikesRentingCountDict.GetValueOrDefault(bike.Id);
+        }
+
+        return bikes;
     }
 
     public async Task<List<BikeStationNearMeDto>> GetBikeStationsNearMe(

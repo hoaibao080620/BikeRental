@@ -73,7 +73,7 @@ public class BikeStationController : ControllerBase
     public async Task<IActionResult> DeleteStationBike(int id)
     {
         if (await _bikeStationValidation.IsBikeStationHasBikes(id)) 
-            return BadRequest("Bike station has bike, cannot delete it!");
+            return BadRequest("Trạm hiện đang có xe, không thể xóa!");
         
         await _bikeStationBusinessLogic.DeleteStationBike(id);
         return Ok();

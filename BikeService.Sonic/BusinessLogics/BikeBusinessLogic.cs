@@ -159,8 +159,8 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         var bike = await _unitOfWork.BikeRepository.GetById(id);
         if (bike is null) throw new InvalidOperationException();
         
-        if (bike.Status == BikeStatus.InUsed || bike.BikeStationId.HasValue)
-            throw new InvalidOperationException("Không thể xóa xe đang trong quá trình sử dụng hoặc đang thuộc về trạm!");
+        if (bike.Status == BikeStatus.InUsed)
+            throw new InvalidOperationException("Không thể xóa xe đang trong quá trình sử dụng!");
 
         var bikeLocationHistories = (await _unitOfWork.BikeReportRepository
             .Find(x => x.BikeId == id)).ToList();

@@ -192,7 +192,7 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
         });
 
         if (distanceFromCheckoutLocationToBikeStation >= 20)
-            throw new InvalidOperationException($"Vị trí của bạn và trạm hiện tại cách nhau" +
+            throw new InvalidOperationException("Vị trí của bạn và trạm hiện tại cách nhau" +
                                                 $" {Math.Round(distanceFromCheckoutLocationToBikeStation)}m, Vui lòng di chuyển gần trạm hơn!");
         
         var bike = await GetBikeById(bikeRenting.BikeId);

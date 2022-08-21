@@ -70,7 +70,6 @@ public class BikeController : ControllerBase
         await _bikeBusinessLogic.DeleteBike(id);
         return Ok();
     }
-
     
     [HttpPost]
     [Route("[action]")]
