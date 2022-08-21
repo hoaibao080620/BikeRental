@@ -205,13 +205,14 @@ public class BikeGrpcService : BikeServiceGrpc.BikeServiceGrpcBase
         var currentBikeRentingId = await _bikeBusinessLogic.GetCurrentRentingBike(request.AccountPhone);
 
         var directors = currentBikeRentingId == 0 ? 
-            (await _unitOfWork.ManagerRepository.All()).Select(x => new ManagerCall
+            (await _unitOfWork.ManagerRepository.Find(x => !x.IsSuperManager && x.IsActive)).Select(x => new ManagerCall
             {
                 CreatedOn = Timestamp.FromDateTimeOffset(x.CreatedOn),
                 Email = x.Email
             }).ToList() :
             (await _unitOfWork.BikeStationManagerRepository
-                .Find(x => x.BikeStation.Bikes.Any(xx => xx.Id == currentBikeRentingId)))
+                .Find(x => x.BikeStation.Bikes.Any(xx => xx.Id == currentBikeRentingId)
+                && !x.Manager.IsSuperManager && x.Manager.IsActive))
             .Select(x => new ManagerCall
             {
                 CreatedOn = Timestamp.FromDateTimeOffset(x.CreatedOn),

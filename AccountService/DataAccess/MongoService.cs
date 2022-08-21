@@ -32,9 +32,11 @@ public class MongoService : IMongoService
         await _accountCollection.UpdateOneAsync(x => x.Id == accountId, builder);
     }
 
-    public async Task DeleteAccount(string accountId)
+    public async Task DeleteAccount(Account account)
     {
-        await _accountCollection.DeleteOneAsync(x => x.Id == accountId);
+        await _transactionCollection.DeleteManyAsync(x => x.AccountEmail == account.Email);
+        await _accountPointHistory.DeleteManyAsync(x => x.AccountEmail == account.Email);
+        await _accountCollection.DeleteOneAsync(x => x.Id == account.Id);
     }
 
     public async Task AddAccountTransaction(AccountTransaction accountTransaction)

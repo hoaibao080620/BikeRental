@@ -24,7 +24,7 @@ public class UserDeletedEventHandler : IMessageQueueHandler
             .FindAccounts(x => x.ExternalUserId == userDeleted.UserId)).FirstOrDefault();
         
         if(account is null) return;
-
-        await _mongoService.DeleteAccount(account.Id);
+        
+        await _mongoService.DeleteAccount(account);
     }
 }

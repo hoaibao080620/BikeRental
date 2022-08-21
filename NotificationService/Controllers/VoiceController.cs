@@ -75,7 +75,7 @@ public class VoiceController : ControllerBase
             switch (voiceRequest.Digits)
             {
                 case "1":
-                    email = "token@gmail.com";
+                    email = await GetManagerEmailToCall(voiceRequest.From);
                     break;
                 case "2":
                     email = await GetDirectorEmailToCall();
@@ -161,8 +161,7 @@ public class VoiceController : ControllerBase
                 Number.EventEnum.Answered, 
                 Number.EventEnum.Completed,
             });
-        
-        
+
         dial.Record = Dial.RecordEnum.RecordFromAnswerDual;
         dial.RecordingStatusCallback =
             new Uri("HandleCompletedRecording", UriKind.Relative);
