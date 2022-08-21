@@ -44,9 +44,6 @@ public class MongoService : IMongoService
 
     public async Task DeleteUser(string id)
     {
-        var builder = Builders<User>.Update
-            .Set(x => x.IsActive, false)
-            .Set(x => x.UpdatedOn, DateTime.UtcNow);
-        await _userCollection.UpdateOneAsync(id, builder);
+        await _userCollection.DeleteOneAsync(u => u.Id == id);
     }
 }

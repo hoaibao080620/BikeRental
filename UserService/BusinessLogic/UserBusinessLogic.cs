@@ -140,7 +140,9 @@ public class UserBusinessLogic : IUserBusinessLogic
     public async Task DeleteUser(string id)
     {
         var user = (await _mongoService.FindUser(x => x.Id == id)).FirstOrDefault();
-        await _mongoService.DeleteUser(id);
+
+        if (user is null) return;
+        await _mongoService.DeleteUser(user.Id);
         await DeleteOktaUser(user?.OktaUserId);
         await _messageQueuePublisher.PublishUserDeletedEventToMessageQueue(new User
         {
