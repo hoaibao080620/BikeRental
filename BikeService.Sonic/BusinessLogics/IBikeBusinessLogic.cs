@@ -12,4 +12,5 @@ public interface IBikeBusinessLogic
     Task DeleteBikes(List<int> bikeIds);
     Task UnlockBike(int bikeId);
     Task<int> GetCurrentRentingBike(string phoneNumber);
+    Task<List<BikeRetrieveDto>> GetAllBikes();
 }

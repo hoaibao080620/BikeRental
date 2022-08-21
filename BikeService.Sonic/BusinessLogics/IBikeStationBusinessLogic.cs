@@ -20,4 +20,5 @@ public interface IBikeStationBusinessLogic
     Task<List<AssignableManager>> GetAssignableManagers();
     Task<List<AssignableStation>> GetAssignableStations();
     Task AssignBikeStationsToManager(BikeStationManagerAssignDto bikeStationManagerAssign);
+    Task<List<BikeStationRetrieveDto>> GetAllAdminBikeStation();
 }

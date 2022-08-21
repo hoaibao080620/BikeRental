@@ -66,6 +66,29 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
         return bikeRentingHistories;
     }
 
+    public async Task<List<BikeRentingHistory>> GetAllBikeRentingHistories()
+    {
+        var bikeRentingHistories = (await _unitOfWork.BikeRentalTrackingRepository
+            .All()).Select(x => new BikeRentingHistory
+        {
+            Id = x.Id,
+            BikeId = x.BikeId,
+            BikePlate = x.Bike.BikeCode,
+            AccountEmail = x.Account.Email,
+            CheckedInOn = x.CheckinOn,
+            CheckedOutOn = x.CheckoutOn,
+            AccountPhone = x.Account.PhoneNumber,
+            TotalTime = x.CheckoutOn.HasValue ? x.CheckoutOn.Value.Subtract(x.CheckinOn).TotalMinutes : null,
+            TotalPoint = x.TotalPoint,
+            PaymentStatus = x.PaymentStatus,
+            Status = x.CheckoutOn.HasValue ? "Done" : "InProgress",
+            CheckInStation = x.CheckinBikeStation,
+            CheckOutStation = x.CheckoutBikeStation
+        }).OrderByDescending(x => x.CheckedInOn).ToList();
+
+        return bikeRentingHistories;
+    }
+
     public async Task<List<BikeTrackingRetrieveDto>> GetBikesTracking(string email)
     {
         var getBikeIdsResponse = await _bikeServiceGrpc.GetBikeIdsOfManagerAsync(new GetBikeIdsRequest

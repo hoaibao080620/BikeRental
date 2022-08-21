@@ -44,6 +44,13 @@ public class BikeStationController : ControllerBase
         return Ok(bikeStations);
     }
     
+    [HttpGet]
+    public async Task<IActionResult> GetAllAdminBikeStations()
+    {
+        var bikeStations = await _bikeStationBusinessLogic.GetAllAdminBikeStation();
+        return Ok(bikeStations);
+    }
+    
     [HttpPost]
     public async Task<IActionResult> AddStationBike(BikeStationInsertDto stationInsertDto)
     {

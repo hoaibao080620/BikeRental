@@ -34,6 +34,14 @@ public class BikeController : ControllerBase
     }
     
     [HttpGet]
+    [Route("[action]")]
+    public async Task<IActionResult> GetAllBikes()
+    {
+        var bikes = await _bikeBusinessLogic.GetAllBikes();
+        return Ok(bikes);
+    }
+
+    [HttpGet]
     [Route("{bikeCode}")]
     public async Task<IActionResult> GetBike(string bikeCode)
     {

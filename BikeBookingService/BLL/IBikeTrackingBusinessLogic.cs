@@ -7,6 +7,7 @@ namespace BikeBookingService.BLL;
 public interface IBikeTrackingBusinessLogic
 {
     Task<List<BikeRentingHistory>> GetBikeRentingHistories(string email);
+    Task<List<BikeRentingHistory>> GetAllBikeRentingHistories();
     Task<List<BikeTrackingRetrieveDto>> GetBikesTracking(string email);
     Task BikeChecking(BikeCheckinDto bikeCheckinDto, string accountEmail);
     Task BikeCheckout(BikeCheckoutDto bikeCheckingDto, string accountEmail);

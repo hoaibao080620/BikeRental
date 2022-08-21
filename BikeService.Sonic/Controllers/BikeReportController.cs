@@ -28,6 +28,13 @@ public class BikeReportController : ControllerBase
         var reports = await _bikeReportBusinessLogic.GetBikeReports(email);
         return Ok(reports);
     }
+    
+    [HttpGet]
+    public async Task<IActionResult> GetAllBikeReports()
+    {
+        var reports = await _bikeReportBusinessLogic.GetAllBikeReports();
+        return Ok(reports);
+    }
 
     [HttpPost]
     public async Task<IActionResult> CreateReport([FromBody] BikeReportInsertDto bikeReportInsertDto)

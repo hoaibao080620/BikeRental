@@ -161,6 +161,14 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         
         if (bike.Status == BikeStatus.InUsed || bike.BikeStationId.HasValue)
             throw new InvalidOperationException("Không thể xóa xe đang trong quá trình sử dụng hoặc đang thuộc về trạm!");
+
+        var bikeLocationHistories = (await _unitOfWork.BikeReportRepository
+            .Find(x => x.BikeId == id)).ToList();
+
+        foreach (var bikeLocationHistory in bikeLocationHistories)
+        {
+            await _unitOfWork.BikeReportRepository.Delete(bikeLocationHistory);
+        }
         
         await _unitOfWork.BikeRepository.Delete(bike);
         await _unitOfWork.SaveChangesAsync();
@@ -173,6 +181,14 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         if (bikes.Any(x => x.Status == BikeStatus.InUsed || x.BikeStationId.HasValue))
             throw new InvalidOperationException("Một trong những xe bạn xóa có xe đang trong quá trình " +
                                                 "sử dụng hoặc đang thuộc về trạm!");
+        
+        var bikeLocationHistories = (await _unitOfWork.BikeReportRepository
+            .Find(x => bikeIds.Contains(x.BikeId))).ToList();
+
+        foreach (var bikeLocationHistory in bikeLocationHistories)
+        {
+            await _unitOfWork.BikeReportRepository.Delete(bikeLocationHistory);
+        }
         
         foreach (var bike in bikes)
         {
@@ -198,5 +214,38 @@ public class BikeBusinessLogic : IBikeBusinessLogic
         });
 
         return currentBikeRenting.BikeId;
+    }
+
+    public async Task<List<BikeRetrieveDto>> GetAllBikes()
+    {
+        var bikes = (await _unitOfWork.BikeRepository
+                .All())
+            .AsNoTracking().Select(b => new BikeRetrieveDto
+            {
+                BikeStationId = b.BikeStationId,
+                BikeStationName = b.BikeStation != null ? b.BikeStation.Name : null,
+                Id = b.Id,
+                Description = b.Description,
+                LicensePlate = b.BikeCode,
+                Status = b.Status,
+                UpdatedOn = b.UpdatedOn,
+                CreatedOn = b.CreatedOn
+            }).OrderByDescending(x => x.UpdatedOn).ThenByDescending(x => x.CreatedOn).ToList();
+
+        var bikesRentingCount = await _bookingClient.GetBikesRentingCountAsync(new GetBikesRentingCountRequest
+        {
+            Ids = {bikes.Select(x => x.Id)}
+        });
+
+        var bikesRentingCountDict = bikesRentingCount.BikesRentingCount
+            .ToList()
+            .ToDictionary(x => x.BikeId, x => x.RentingCount);
+
+        foreach (var bike in bikes)
+        {
+            bike.RentingCount = bikesRentingCountDict.GetValueOrDefault(bike.Id);
+        }
+
+        return bikes;
     }
 }

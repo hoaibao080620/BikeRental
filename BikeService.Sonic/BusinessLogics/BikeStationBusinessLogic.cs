@@ -1,9 +1,7 @@
 ﻿using System.Linq.Expressions;
-using System.Text.Json;
 using AutoMapper;
 using BikeRental.MessageQueue.Events;
 using BikeRental.MessageQueue.MessageType;
-using BikeService.Sonic.Const;
 using BikeService.Sonic.DAL;
 using BikeService.Sonic.Dtos;
 using BikeService.Sonic.Dtos.Bike;
@@ -14,7 +12,6 @@ using BikeService.Sonic.Models;
 using BikeService.Sonic.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
-using MongoDB.Driver.Linq;
 using BikeStationColor = BikeRental.MessageQueue.Events.BikeStationColor;
 
 namespace BikeService.Sonic.BusinessLogics;
@@ -394,5 +391,28 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
         }
 
         await _unitOfWork.SaveChangesAsync();
+    }
+
+    public async Task<List<BikeStationRetrieveDto>> GetAllAdminBikeStation()
+    {
+        var stationBikes = await _unitOfWork.BikeStationRepository.All();
+        var bikeStations = stationBikes.Select(x => new BikeStationRetrieveDto
+        {
+            Description = x.Description,
+            Color = x.BikeStationColors.Any() ? x.BikeStationColors.FirstOrDefault()!.Color : null,
+            Id = x.Id,
+            Address = x.Address,
+            Latitude = x.Latitude,
+            Longitude = x.Longitude,
+            Name = x.Name,
+            ParkingSpace = x.ParkingSpace,
+            UsedParkingSpace = x.Bikes.Count,
+            ManagerIds = x.BikeStationManagers.Select(xx => xx.ManagerId).ToList(),
+            CreatedOn = x.CreatedOn,
+            UpdatedOn = x.UpdatedOn,
+            BikeStationCode = x.Code!
+        }).ToList();
+
+        return bikeStations;
     }
 }

@@ -91,4 +91,24 @@ public class BikeReportBusinessLogic : IBikeReportBusinessLogic
         bikeReport.CompletedOn = markReportAsResolveDto.Status == BikeReportStatus.Fixed ? DateTime.UtcNow : null;
         await _unitOfWork.SaveChangesAsync();
     }
+
+    public async Task<List<BikeReportRetriveDto>> GetAllBikeReports()
+    {
+        return (await _unitOfWork.BikeReportRepository
+                .All())
+            .AsNoTracking()
+            .Select(x => new BikeReportRetriveDto
+            {
+                Id = x.Id,
+                AccountPhoneNumber = x.AccountPhoneNumber,
+                BikeCode = x.Bike.BikeCode,
+                AssignTo = x.AssignTo == null ? null : x.AssignTo.Email,
+                CompletedOn = x.CompletedOn,
+                Status = x.Status,
+                ReportDescription = x.ReportDescription,
+                ReportOn = x.CreatedOn,
+                ImageUrl = x.ImageUrl,
+                Title = x.Title
+            }).ToList();
+    }
 }
