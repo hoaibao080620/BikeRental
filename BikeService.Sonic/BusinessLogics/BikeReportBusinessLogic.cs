@@ -46,17 +46,18 @@ public class BikeReportBusinessLogic : IBikeReportBusinessLogic
 
     public async Task<List<BikeReportRetriveDto>> GetBikeReports(string email)
     {
+        var managerAdmin = await _unitOfWork.ManagerRepository.Exists(x => x.Email == email);
         var phoneNumber = email.Split("@")[0];
         var manager = (await _unitOfWork.ManagerRepository.Find(x => x.Email == email)).FirstOrDefault();
         Expression<Func<BikeReport, bool>> expression;
 
         if (manager is not null)
         {
-            expression = x => manager.IsSuperManager || x.AssignToId == manager.Id;
+            expression = x => manager.IsSuperManager || x.AssignToId == manager.Id || !managerAdmin;
         }
         else
         {
-            expression = x => x.AccountPhoneNumber == phoneNumber;
+            expression = x => x.AccountPhoneNumber == phoneNumber || !managerAdmin;
         }
 
         return (await _unitOfWork.BikeReportRepository

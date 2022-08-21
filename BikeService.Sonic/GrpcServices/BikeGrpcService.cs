@@ -23,11 +23,10 @@ public class BikeGrpcService : BikeServiceGrpc.BikeServiceGrpcBase
     {
         var manager = (await _unitOfWork.ManagerRepository
             .Find(x => x.Email == request.ManagerEmail)).FirstOrDefault();
-
-        ArgumentNullException.ThrowIfNull(manager);
         
         var bikeIds = (await _unitOfWork.BikeRepository
             .Find(x =>
+                manager == null ||
                 x.BikeStationId.HasValue &&
                 manager.IsSuperManager || 
                 x.BikeStation!.BikeStationManagers.Any(b => b.Manager.Email == request.ManagerEmail)
