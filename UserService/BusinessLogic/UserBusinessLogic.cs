@@ -66,11 +66,17 @@ public class UserBusinessLogic : IUserBusinessLogic
 
     public async Task AddUser(UserInsertDto user)
     {
+        var email = string.Empty;
+        if (user.RoleName == UserRole.User)
+        {
+            email = $"{user.PhoneNumber}@gmail.com";
+        }
+        
         var userAdded = new User
         {
             RoleName = user.RoleName,
             Address = user.Address,
-            Email = user.Email,
+            Email = email,
             FirstName = user.FirstName,
             LastName = user.LastName,
             PhoneNumber = user.PhoneNumber,
@@ -87,7 +93,7 @@ public class UserBusinessLogic : IUserBusinessLogic
             LastName = user.LastName,
             Address = user.Address,
             DateOfBirth = user.DateOfBirth,
-            Email = user.Email,
+            Email = email,
             Password = user.Password,
             PhoneNumber = user.PhoneNumber,
             RoleName = user.RoleName
