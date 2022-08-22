@@ -90,7 +90,7 @@ public class BikeStationBusinessLogic : IBikeStationBusinessLogic
         await _unitOfWork.BikeStationRepository.Add(bikeStation);
         await _unitOfWork.SaveChangesAsync();
 
-        var bikeStationCode = bikeStation.Id.ToString().PadLeft(6, '0');
+        var bikeStationCode = $"BS-{bikeStation.Id.ToString().PadLeft(6, '0')}";
         bikeStation.Code = bikeStationCode;
         
         if (bikeInsertDto.ManagerIds.Any(x => x != 0))
