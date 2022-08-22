@@ -76,11 +76,11 @@ public class VoiceController : ControllerBase
             {
                 case "1":
                     email = await GetManagerEmailToCall(voiceRequest.From);
-                    email = "token@gmail.com";
+                    // email = "token@gmail.com";
                     break;
                 case "2":
                     email = await GetDirectorEmailToCall();
-                    email = "testmanager@gmail.com";
+                    // email = "testmanager@gmail.com";
                     break;
                 default:
                     response.Say("Sorry, I don't understand that choice.").Pause();
@@ -218,7 +218,7 @@ public class VoiceController : ControllerBase
                 {
                     CallSid = voiceRequest.CallSid,
                     CalledOn = DateTime.UtcNow,
-                    Duration = Convert.ToDouble(voiceRequest.DialCallDuration),
+                    Duration = Convert.ToDouble(voiceRequest.RecordingDuration),
                     From = voiceRequest.From,
                     To = voiceRequest.To,
                     Status = voiceRequest.CallStatus,
