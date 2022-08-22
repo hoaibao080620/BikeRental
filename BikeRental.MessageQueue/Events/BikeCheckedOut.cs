@@ -10,4 +10,5 @@ public class BikeCheckedOut : BaseMessage
     public string BikeCode { get; set; }
     public DateTime CheckoutOn { get; set; }
     public double RentingPoint { get; set; }
+    public string BikeStationCode { get; set; }
 }

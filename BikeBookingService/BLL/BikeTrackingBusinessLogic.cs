@@ -148,16 +148,6 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
             });
         
         await StartTrackingBike(bikeCheckinDto, address, accountEmail, bike.Id);
-        // var updateCachedTask = UpdateBikeCache(new BikeCacheParameter
-        // {
-        //     BikeId = bike.Id,
-        //     Longitude = bikeCheckinDto.Longitude,
-        //     Latitude = bikeCheckinDto.Latitude,
-        //     IsRenting = true,
-        //     Address = address,
-        //     Status = BikeStatus.InUsed
-        // });
-
         await _unitOfWork.SaveChangesAsync();
     }
 
@@ -185,7 +175,7 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
             Longitude = bikeStation.Longitude
         });
 
-        if (distanceFromCheckoutLocationToBikeStation >= 20)
+        if (distanceFromCheckoutLocationToBikeStation >= 400)
             throw new InvalidOperationException("Vị trí của bạn và trạm hiện tại cách nhau" +
                                                 $" {Math.Round(distanceFromCheckoutLocationToBikeStation)}m, Vui lòng di chuyển gần trạm hơn!");
         
@@ -205,16 +195,7 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
             BikeId = bikeRenting.BikeId,
             RentingPoint = rentingPoint
         });
-        // var updateBikeCache = UpdateBikeCache(new BikeCacheParameter
-        // {
-        //     BikeId = bike.Id,
-        //     Longitude = bikeCheckout.Longitude,
-        //     Latitude = bikeCheckout.Latitude,
-        //     Address = address,
-        //     IsRenting = false,
-        //     Status = BikeStatus.Available
-        // });
-        
+
         await _messageQueuePublisher.PublishBikeCheckedOutEvent(
             new BikeCheckedOut
             {
@@ -225,7 +206,9 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
                 LicensePlate = bike.BikeCode,
                 CheckoutOn = bikeCheckout.CheckoutOn,
                 RentingPoint = rentingPoint,
-                MessageType = MessageType.BikeCheckedOut
+                MessageType = MessageType.BikeCheckedOut,
+                BikeStationName = bikeStation.Name,
+                BikeStationCode = bikeCheckout.Code
             });
 
         await _unitOfWork.SaveChangesAsync();
@@ -541,6 +524,6 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
 
     private double GetDistanceBetweenCheckoutAndStation(Coordinate origin, Coordinate destination)
     {
-        return GeoCalculator.GetDistance(origin, destination);
+        return GeoCalculator.GetDistance(origin, destination, 1, DistanceUnit.Meters);
     }
 }
