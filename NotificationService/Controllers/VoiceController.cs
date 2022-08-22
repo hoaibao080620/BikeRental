@@ -255,7 +255,7 @@ public class VoiceController : ControllerBase
     public async Task<IActionResult> GetManagerCalls()
     {
         var email = HttpContext.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
-        var calls = await _notificationRepository.GetCalls(c => c.ManagerCaller == email || c.ManagerReceiver == email);
+        var calls = await _notificationRepository.GetCalls(c => c.ManagerCaller != null && (c.ManagerCaller.Replace("client:", "") == email || c.ManagerReceiver == email));
         return Ok(calls);
     }
 
