@@ -280,7 +280,15 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
                 PaymentStatus = x.PaymentStatus!,
                 TotalPoint = x.TotalPoint,
                 TotalDistance = x.BikeLocationTrackingHistories.Sum(xx => xx.DistanceFromPreviousLocation)
-            });
+            }).OrderByDescending(x => x.CheckinOn);
+        var asiaTimezone = TimeZoneInfo.FindSystemTimeZoneById("Asia/Bangkok");
+        foreach (var bikeBooking in bikeBookings)
+        {
+            bikeBooking.CheckinOn = TimeZoneInfo.ConvertTimeFromUtc(
+                bikeBooking.CheckinOn, asiaTimezone);
+            bikeBooking.CheckoutOn = TimeZoneInfo.ConvertTimeFromUtc(
+                bikeBooking.CheckoutOn, asiaTimezone);
+        }
 
         return bikeBookings.ToList();
     }
