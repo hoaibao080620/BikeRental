@@ -8,4 +8,5 @@ public class BikeRentingStatus
     public bool IsRenting { get; set; }
     public int TimeUsing { get; set; }
     public double? Cost { get; set; }
+    public double TotalRentingDistance { get; set; }
 }

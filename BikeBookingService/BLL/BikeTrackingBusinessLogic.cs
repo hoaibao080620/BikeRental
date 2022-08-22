@@ -255,7 +255,8 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
                 BikeId = x.BikeId,
                 LicensePlate = x.Bike.BikeCode,
                 TimeUsing = DateTime.UtcNow.Subtract(x.CheckinOn).Milliseconds,
-                Cost = Math.Round(GetRentingPoint(x.CheckinOn, DateTime.UtcNow), 2)
+                Cost = Math.Round(GetRentingPoint(x.CheckinOn, DateTime.UtcNow), 2),
+                TotalRentingDistance = x.BikeLocationTrackingHistories.Sum(xx => xx.DistanceFromPreviousLocation)
             }).FirstOrDefault()!
             : new BikeRentingStatus
             {
