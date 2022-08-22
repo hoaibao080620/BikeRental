@@ -133,8 +133,8 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
             bikeCheckinDto.Latitude);
         address ??= "N/A";
         
-        var pushEventToMapTask = _messageQueuePublisher.PublishBikeLocationChangeCommand(managerEmails);
-        var pushNotificationToManagers = _messageQueuePublisher.PublishBikeCheckedInEvent(
+        await _messageQueuePublisher.PublishBikeLocationChangeCommand(managerEmails);
+        await _messageQueuePublisher.PublishBikeCheckedInEvent(
             new BikeCheckedIn
             {
                 ManagerEmails = managerEmails,
@@ -147,7 +147,7 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
                 MessageType = MessageType.BikeCheckedIn
             });
         
-        var startTrackingBikeTask = StartTrackingBike(bikeCheckinDto, address, accountEmail, bike.Id);
+        await StartTrackingBike(bikeCheckinDto, address, accountEmail, bike.Id);
         // var updateCachedTask = UpdateBikeCache(new BikeCacheParameter
         // {
         //     BikeId = bike.Id,
@@ -157,13 +157,7 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
         //     Address = address,
         //     Status = BikeStatus.InUsed
         // });
-        
-        await Task.WhenAll(
-            pushEventToMapTask, 
-            startTrackingBikeTask,
-            pushNotificationToManagers
-        );
-        
+
         await _unitOfWork.SaveChangesAsync();
     }
 
@@ -202,8 +196,8 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
 
         address ??= "N/A";
         var rentingPoint = GetRentingPoint(bikeRenting.CheckinOn, bikeCheckout.CheckoutOn);
-        var pushEventToMapTask = _messageQueuePublisher.PublishBikeLocationChangeCommand(managerEmails);
-        var stopTrackingBikeTask = StopTrackingBike(new StopTrackingBikeParam
+        await _messageQueuePublisher.PublishBikeLocationChangeCommand(managerEmails);
+        await StopTrackingBike(new StopTrackingBikeParam
         {
             AccountEmail = accountEmail,
             Address = address,
@@ -221,7 +215,7 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
         //     Status = BikeStatus.Available
         // });
         
-        var pushNotificationToManagers = _messageQueuePublisher.PublishBikeCheckedOutEvent(
+        await _messageQueuePublisher.PublishBikeCheckedOutEvent(
             new BikeCheckedOut
             {
                 ManagerEmails = managerEmails,
@@ -233,12 +227,7 @@ public class BikeTrackingBusinessLogic : IBikeTrackingBusinessLogic
                 RentingPoint = rentingPoint,
                 MessageType = MessageType.BikeCheckedOut
             });
-        
-        await Task.WhenAll(
-            pushEventToMapTask, 
-            stopTrackingBikeTask, 
-            pushNotificationToManagers);
-        
+
         await _unitOfWork.SaveChangesAsync();
     }
 
