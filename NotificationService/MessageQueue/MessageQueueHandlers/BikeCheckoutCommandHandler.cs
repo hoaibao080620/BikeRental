@@ -64,7 +64,7 @@ public class BikeCheckoutCommandHandler : IMessageQueueHandler
         var localDateTimeAtVietnam = TimeZoneInfo.ConvertTimeFromUtc(
             notificationCommand.CheckoutOn, asiaTimezone);
         
-        var body = $"Bạn vừa trả xe có mã {notificationCommand.BikeCode} thành công tại trạm " +
+        var body = $"Bạn vừa trả xe có mã {notificationCommand.LicensePlate} thành công tại trạm " +
                    $"{notificationCommand.BikeStationName} vào lúc {localDateTimeAtVietnam.ToString(CultureInfo.InvariantCulture)}." +
                    $"Tổng chi phí của chuyến đi là {notificationCommand.RentingPoint} điểm," +
                    " xin cảm ơn vì đã sử dụng dịch vụ của chúng tôi!";
