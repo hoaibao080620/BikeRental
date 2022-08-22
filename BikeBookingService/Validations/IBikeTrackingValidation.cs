@@ -8,4 +8,5 @@ public interface IBikeTrackingValidation
     ValueTask<bool> IsAccountHasBikeRentingPending(string accountEmail);
     ValueTask<bool> IsAccountIsRentingBike(string accountEmail);
     ValueTask<bool> IsBikeAlreadyRent(string bikeCode);
+    ValueTask<bool> IsBikeStatusAvailable(string bikeCode);
 }

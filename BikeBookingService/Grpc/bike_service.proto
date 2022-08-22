@@ -5,6 +5,15 @@ service BikeServiceGrpc {
   rpc GetManagerEmailsOfBikeId (GetManagerEmailsRequest) returns (GetManagerEmailsResponse);
   rpc GetBikeStationNameById(GetBikeStationNameByIdRequest) returns (GetBikeStationNameByIdResponse);
   rpc GetBikeStationByCodeOrId(GetBikeStationByCodeOrIdRequest) returns (GetBikeStationByCodeOrIdResponse);
+  rpc GetBikeStatus(GetBikeStatusRequest) returns (GetBikeStatusResponse);
+}
+
+message GetBikeStatusRequest {
+  int32 bikeId = 1;
+}
+
+message GetBikeStatusResponse {
+  string status = 1;
 }
 
 message GetBikeIdsRequest {

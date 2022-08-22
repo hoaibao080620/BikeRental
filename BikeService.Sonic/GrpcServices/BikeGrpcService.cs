@@ -223,4 +223,13 @@ public class BikeGrpcService : BikeServiceGrpc.BikeServiceGrpcBase
             Managers = { directors }
         };
     }
+
+    public override async Task<GetBikeStatusResponse> GetBikeStatus(GetBikeStatusRequest request, ServerCallContext context)
+    {
+        var bike = await _unitOfWork.BikeRepository.GetById(request.BikeId);
+        return new GetBikeStatusResponse
+        {
+            Status = bike?.Status
+        };
+    }
 }

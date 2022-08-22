@@ -9,11 +9,13 @@ public class BikeTrackingValidation : IBikeTrackingValidation
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly AccountServiceGrpc.AccountServiceGrpcClient _accountService;
+    private readonly BikeServiceGrpc.BikeServiceGrpcClient _bikeService;
 
     public BikeTrackingValidation(IUnitOfWork unitOfWork, GrpcClientFactory grpcClientFactory)
     {
         _unitOfWork = unitOfWork;
         _accountService = grpcClientFactory.CreateClient<AccountServiceGrpc.AccountServiceGrpcClient>("AccountService");
+        _bikeService = grpcClientFactory.CreateClient<BikeServiceGrpc.BikeServiceGrpcClient>("BikeService");
     }
     
     public ValueTask<bool> IsBikeCheckinOrCheckoutWrongTime(DateTime checkinTime)
@@ -66,5 +68,16 @@ public class BikeTrackingValidation : IBikeTrackingValidation
             .Find(x => x.Bike.BikeCode == bikeCode && x.CheckoutOn == null);
 
         return isBikeHasBeenRenting.Any();
+    }
+
+    public async ValueTask<bool> IsBikeStatusAvailable(string bikeCode)
+    {
+        var bike = (await _unitOfWork.BikeRepository.Find(x => x.BikeCode == bikeCode)).FirstOrDefault();
+        var status = await _bikeService.GetBikeStatusAsync(new GetBikeStatusRequest
+        {
+            BikeId = bike!.Id
+        });
+
+        return status.Status == "Available";
     }
 }

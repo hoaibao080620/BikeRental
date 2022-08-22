@@ -12,6 +12,15 @@ service BikeServiceGrpc {
   rpc GetDirectors(google.protobuf.Empty) returns (GetManagersByAccountEmailResponse);
   rpc GetBikeStationByCodeOrId(GetBikeStationByCodeOrIdRequest) returns (GetBikeStationByCodeOrIdResponse);
   rpc GetManagerDashboardStatistic(GetManagerDashboardStatisticRequest) returns (GetManagerDashboardStatisticResponse);
+  rpc GetBikeStatus(GetBikeStatusRequest) returns (GetBikeStatusResponse);
+}
+
+message GetBikeStatusRequest {
+  int32 bikeId = 1;
+}
+
+message GetBikeStatusResponse {
+  string status = 1;
 }
 
 message GetBikeIdsRequest {

@@ -42,27 +42,27 @@ jobs:
 #          heroku_app_name: "bike-rental-account-service-1"
 #          heroku_email: ${{secrets.HEROKU_API_KEY}}
 #
-#      - name: Deploy BikeService
-#        uses: akhileshns/heroku-deploy@v3.0.4
-#        with:
-#          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-#          heroku_app_name: "bike-service-13062022-1"
-#          heroku_email: ${{secrets.HEROKU_API_KEY}}
-#
-#      - name: Deploy Bike Booking Service
-#        uses: akhileshns/heroku-deploy@v3.0.4
-#        with:
-#          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-#          heroku_app_name: "bike-rental-booking-service-1"
-#          heroku_email: ${{secrets.HEROKU_API_KEY}}
-
-      - name: Deploy Notification Service
+      - name: Deploy BikeService
         uses: akhileshns/heroku-deploy@v3.0.4
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: "bike-rental-notification-1"
+          heroku_app_name: "bike-service-13062022-1"
           heroku_email: ${{secrets.HEROKU_API_KEY}}
-#
+
+      - name: Deploy Bike Booking Service
+        uses: akhileshns/heroku-deploy@v3.0.4
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "bike-rental-booking-service-1"
+          heroku_email: ${{secrets.HEROKU_API_KEY}}
+
+#      - name: Deploy Notification Service
+#        uses: akhileshns/heroku-deploy@v3.0.4
+#        with:
+#          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+#          heroku_app_name: "bike-rental-notification-1"
+#          heroku_email: ${{secrets.HEROKU_API_KEY}}
+##
 #      - name: Deploy Payment Service
 #        uses: akhileshns/heroku-deploy@v3.0.4
 #        with:
