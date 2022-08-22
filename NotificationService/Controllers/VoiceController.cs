@@ -185,7 +185,7 @@ public class VoiceController : ControllerBase
             Duration = Convert.ToDouble(voiceRequest.DialCallDuration),
             From = voiceRequest.From,
             To = voiceRequest.To,
-            Status = voiceRequest.CallStatus,
+            Status = voiceRequest.DialCallStatus,
             Direction = voiceRequest.Direction,
             RecordingUrl = voiceRequest.RecordingUrl,
             CallerCountry = voiceRequest.FromCountry,
